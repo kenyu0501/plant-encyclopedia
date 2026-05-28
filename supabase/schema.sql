@@ -86,6 +86,14 @@ create table if not exists public.videos (
   check (fruit_id is not null or cultivar_id is not null)
 );
 
+create table if not exists public.site_settings (
+  id text primary key,
+  home_eyebrow text not null default 'スマホでひらく栽培メモ',
+  home_title text not null default 'けんゆーの熱帯果樹図鑑',
+  home_description text not null default '果樹ページを親にして、品種・写真・YouTubeを整理する熱帯果樹PWAです。 マンゴー、アボカド、バナナなどを現場で見返しやすい形にまとめます。',
+  updated_at timestamptz not null default now()
+);
+
 create index if not exists fruits_public_slug_idx on public.fruits (is_public, slug);
 create index if not exists cultivars_public_slug_idx on public.cultivars (fruit_id, is_public, slug);
 create index if not exists photos_fruit_idx on public.photos (fruit_id, approval_status);
@@ -98,6 +106,7 @@ alter table public.fruits enable row level security;
 alter table public.cultivars enable row level security;
 alter table public.photos enable row level security;
 alter table public.videos enable row level security;
+alter table public.site_settings enable row level security;
 
 drop policy if exists "profiles own read" on public.profiles;
 create policy "profiles own read" on public.profiles
@@ -231,6 +240,32 @@ for all using (
       and profiles.role = 'admin'
   )
 );
+
+drop policy if exists "public site settings are readable" on public.site_settings;
+create policy "public site settings are readable" on public.site_settings
+for select using (true);
+
+drop policy if exists "admins manage site settings" on public.site_settings;
+create policy "admins manage site settings" on public.site_settings
+for all using (
+  exists (
+    select 1
+    from public.profiles
+    where profiles.id = auth.uid()
+      and profiles.role = 'admin'
+  )
+) with check (
+  exists (
+    select 1
+    from public.profiles
+    where profiles.id = auth.uid()
+      and profiles.role = 'admin'
+  )
+);
+
+insert into public.site_settings (id)
+values ('home')
+on conflict (id) do nothing;
 
 insert into storage.buckets (id, name, public)
 values ('fruit-photos', 'fruit-photos', true)

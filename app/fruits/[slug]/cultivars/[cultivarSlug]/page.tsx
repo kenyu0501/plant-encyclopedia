@@ -54,6 +54,27 @@ export default async function CultivarDetailPage({ params }: Props) {
         </div>
       ) : null}
 
+      {cultivar.videos && cultivar.videos.length > 0 ? (
+        <section className="space-y-3">
+          <h2 className="text-lg font-bold text-leaf-900">YouTube</h2>
+          <div className="grid gap-3">
+            {cultivar.videos.map((video) => (
+              <a
+                key={video.id}
+                href={video.youtube_url}
+                target="_blank"
+                rel="noreferrer"
+                className="flex items-center gap-3 rounded-lg bg-white/84 p-4 ring-1 ring-leaf-100"
+              >
+                <PlayCircle className="text-fruit-600" size={24} />
+                <span className="min-w-0 flex-1 font-semibold text-leaf-900">{video.title || video.youtube_url}</span>
+                <ExternalLink size={16} />
+              </a>
+            ))}
+          </div>
+        </section>
+      ) : null}
+
       <section className="rounded-lg bg-white/84 p-5 ring-1 ring-leaf-100">
         <h2 className="font-bold text-leaf-900">品種情報</h2>
         <div className="mt-4 grid gap-4 text-sm leading-6 text-leaf-900/76 sm:grid-cols-2">
@@ -77,27 +98,6 @@ export default async function CultivarDetailPage({ params }: Props) {
         ) : null}
         {cultivar.public_notes ? <p className="mt-4 text-sm leading-6 text-leaf-900/72">{cultivar.public_notes}</p> : null}
       </section>
-
-      {cultivar.videos && cultivar.videos.length > 0 ? (
-        <section className="space-y-3">
-          <h2 className="text-lg font-bold text-leaf-900">YouTube</h2>
-          <div className="grid gap-3">
-            {cultivar.videos.map((video) => (
-              <a
-                key={video.id}
-                href={video.youtube_url}
-                target="_blank"
-                rel="noreferrer"
-                className="flex items-center gap-3 rounded-lg bg-white/84 p-4 ring-1 ring-leaf-100"
-              >
-                <PlayCircle className="text-fruit-600" size={24} />
-                <span className="min-w-0 flex-1 font-semibold text-leaf-900">{video.title || video.youtube_url}</span>
-                <ExternalLink size={16} />
-              </a>
-            ))}
-          </div>
-        </section>
-      ) : null}
     </div>
   );
 }

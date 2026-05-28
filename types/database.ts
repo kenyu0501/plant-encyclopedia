@@ -83,6 +83,12 @@ export type Database = {
           }
         ];
       };
+      site_settings: {
+        Row: SiteSettings;
+        Insert: SiteSettingsInsert;
+        Update: Partial<SiteSettingsInsert>;
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     Functions: Record<string, never>;
@@ -194,14 +200,31 @@ export type VideoInsert = Omit<Video, "id" | "created_at"> & {
   created_at?: string;
 };
 
+export type SiteSettings = {
+  id: string;
+  home_eyebrow: string;
+  home_title: string;
+  home_description: string;
+  updated_at: string;
+};
+
+export type SiteSettingsInsert = Omit<SiteSettings, "updated_at"> & {
+  updated_at?: string;
+};
+
 export type FruitWithChildren = Fruit & {
   photos: Photo[];
   videos: Video[];
-  cultivars: Cultivar[];
+  cultivars: CultivarWithMedia[];
 };
 
 export type CultivarWithFruit = Cultivar & {
   fruits: Fruit | null;
   photos: Photo[];
   videos: Video[];
+};
+
+export type CultivarWithMedia = Cultivar & {
+  photos?: Photo[];
+  videos?: Video[];
 };

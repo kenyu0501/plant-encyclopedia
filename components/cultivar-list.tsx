@@ -4,13 +4,13 @@ import { useMemo, useState } from "react";
 import type { ReactNode } from "react";
 import { Globe2, Tags, Thermometer, ListFilter } from "lucide-react";
 import { CultivarCard } from "@/components/cultivar-card";
-import type { Cultivar } from "@/types/database";
+import type { CultivarWithMedia } from "@/types/database";
 
 type ViewMode = "name" | "cold" | "origin" | "use";
 type CultivarGroup = {
   label: string;
   rank: number;
-  cultivars: Cultivar[];
+  cultivars: CultivarWithMedia[];
 };
 
 export function CultivarList({
@@ -18,7 +18,7 @@ export function CultivarList({
   cultivars
 }: {
   fruitSlug: string;
-  cultivars: Cultivar[];
+  cultivars: CultivarWithMedia[];
 }) {
   const hasColdView = fruitSlug === "avocado" && cultivars.some((cultivar) => getColdHardiness(cultivar));
   const hasOriginView = fruitSlug === "mango" && cultivars.some((cultivar) => getOriginGroup(cultivar));
@@ -77,8 +77,8 @@ export function CultivarList({
   );
 }
 
-function groupByUse(cultivars: Cultivar[]): CultivarGroup[] {
-  const groups = new Map<string, Cultivar[]>();
+function groupByUse(cultivars: CultivarWithMedia[]): CultivarGroup[] {
+  const groups = new Map<string, CultivarWithMedia[]>();
 
   for (const cultivar of cultivars) {
     const use = getUseGroup(cultivar) ?? "用途未設定";
@@ -140,8 +140,8 @@ function ModeButton({
   );
 }
 
-function groupByColdHardiness(cultivars: Cultivar[]): CultivarGroup[] {
-  const groups = new Map<string, Cultivar[]>();
+function groupByColdHardiness(cultivars: CultivarWithMedia[]): CultivarGroup[] {
+  const groups = new Map<string, CultivarWithMedia[]>();
 
   for (const cultivar of cultivars) {
     const cold = getColdHardiness(cultivar) ?? "耐寒温度未設定";
@@ -157,8 +157,8 @@ function groupByColdHardiness(cultivars: Cultivar[]): CultivarGroup[] {
     .sort((a, b) => a.rank - b.rank || a.label.localeCompare(b.label, "ja"));
 }
 
-function groupByOrigin(cultivars: Cultivar[]): CultivarGroup[] {
-  const groups = new Map<string, Cultivar[]>();
+function groupByOrigin(cultivars: CultivarWithMedia[]): CultivarGroup[] {
+  const groups = new Map<string, CultivarWithMedia[]>();
 
   for (const cultivar of cultivars) {
     const origin = getOriginGroup(cultivar) ?? "産地未設定";
@@ -174,12 +174,12 @@ function groupByOrigin(cultivars: Cultivar[]): CultivarGroup[] {
     .sort((a, b) => a.rank - b.rank || a.label.localeCompare(b.label, "ja"));
 }
 
-function getColdHardiness(cultivar: Cultivar) {
+function getColdHardiness(cultivar: CultivarWithMedia) {
   const match = cultivar.difficulty?.match(/耐寒温度:\s*([^。]+)。/);
   return match?.[1] ?? null;
 }
 
-function getUseGroup(cultivar: Cultivar) {
+function getUseGroup(cultivar: CultivarWithMedia) {
   const match = cultivar.difficulty?.match(/用途:\s*([^。]+)。/);
   return match?.[1] ?? null;
 }
@@ -190,7 +190,7 @@ function coldRank(label: string) {
   return numbers[0];
 }
 
-function getOriginGroup(cultivar: Cultivar) {
+function getOriginGroup(cultivar: CultivarWithMedia) {
   const origin = cultivar.origin?.trim();
   if (!origin) return null;
   if (origin.includes("アメリカ")) return "アメリカ";

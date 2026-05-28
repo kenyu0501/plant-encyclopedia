@@ -1,23 +1,22 @@
 import Link from "next/link";
 import { ArrowRight, Leaf, ShieldCheck, Smartphone } from "lucide-react";
 import { FruitCard } from "@/components/fruit-card";
-import { getPublicFruits } from "@/lib/queries";
+import { getPublicFruits, getSiteSettings } from "@/lib/queries";
 
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
-  const fruits = await getPublicFruits(6);
+  const [fruits, settings] = await Promise.all([getPublicFruits(6), getSiteSettings()]);
 
   return (
     <div className="space-y-8">
       <section className="rounded-lg bg-white/84 p-5 shadow-soft ring-1 ring-leaf-100">
-        <p className="text-sm font-semibold text-leaf-700">スマホでひらく栽培メモ</p>
+        <p className="text-sm font-semibold text-leaf-700">{settings.home_eyebrow}</p>
         <h1 className="mt-3 text-3xl font-bold leading-tight text-leaf-900">
-          けんゆーの熱帯果樹図鑑
+          {settings.home_title}
         </h1>
         <p className="mt-3 leading-7 text-leaf-900/75">
-          果樹ページを親にして、品種・写真・YouTubeを整理する熱帯果樹PWAです。
-          マンゴー、アボカド、バナナなどを現場で見返しやすい形にまとめます。
+          {settings.home_description}
         </p>
         <div className="mt-5 flex flex-wrap gap-3">
           <Link

@@ -239,59 +239,15 @@ const fruitUpsert = `insert into public.fruits (
   '初期バナナ品種${cultivars.length}件はけんゆー公開記事とProMusa/PROSEA等の公開情報を参照して作成。',
   true
 )
-on conflict (slug) do update set
-  name_ja = excluded.name_ja,
-  name_en = excluded.name_en,
-  scientific_name = excluded.scientific_name,
-  family_name = excluded.family_name,
-  origin = excluded.origin,
-  description = excluded.description,
-  growth_habit = excluded.growth_habit,
-  flower_description = excluded.flower_description,
-  fruit_description = excluded.fruit_description,
-  cultivation_summary = excluded.cultivation_summary,
-  okinawa_suitability = excluded.okinawa_suitability,
-  private_notes = excluded.private_notes,
-  is_public = excluded.is_public,
-  updated_at = now();`;
+on conflict (slug) do nothing;`;
 
 function cultivarSql(rows) {
-  const values = rows.map((cultivar) => `  (${record(cultivar).map(sql).join(", ")})`).join(",\n");
-  return `with banana as (
-  select id from public.fruits where slug = 'banana'
-)
-insert into public.cultivars (
-  fruit_id,
-  ${columns.join(",\n  ")}
-)
-select
-  banana.id,
-  ${columns.map((_, index) => `v.column${index + 1}`).join(",\n  ")}
-from banana
-cross join (values
-${values}
-) as v
-on conflict (fruit_id, slug) do update set
-  name_ja = excluded.name_ja,
-  name_en = excluded.name_en,
-  origin = excluded.origin,
-  description = excluded.description,
-  fruit_size = excluded.fruit_size,
-  taste = excluded.taste,
-  texture = excluded.texture,
-  aroma = excluded.aroma,
-  harvest_season = excluded.harvest_season,
-  tree_vigor = excluded.tree_vigor,
-  difficulty = excluded.difficulty,
-  okinawa_suitability = excluded.okinawa_suitability,
-  container_suitability = excluded.container_suitability,
-  beginner_suitability = excluded.beginner_suitability,
-  kenyu_comment = excluded.kenyu_comment,
-  public_notes = excluded.public_notes,
-  private_notes = excluded.private_notes,
-  is_public = excluded.is_public,
-  is_for_sale = excluded.is_for_sale,
-  updated_at = now();`;
+  return rows
+    .map((cultivar) => {
+      const values = record(cultivar);
+      return `insert into public.cultivars (fruit_id, ${columns.join(", ")}) values ((select id from public.fruits where slug = 'banana'), ${values.map(sql).join(", ")}) on conflict (fruit_id, slug) do nothing;`;
+    })
+    .join("\n\n");
 }
 
 const videoRows = [

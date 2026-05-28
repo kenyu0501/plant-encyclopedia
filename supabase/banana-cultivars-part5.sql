@@ -4,88 +4,25 @@
 
 begin;
 
-with banana as (
-  select id from public.fruits where slug = 'banana'
-)
-insert into public.cultivars (
-  fruit_id,
-  name_ja,
-  name_en,
-  slug,
-  origin,
-  description,
-  fruit_size,
-  taste,
-  texture,
-  aroma,
-  harvest_season,
-  tree_vigor,
-  difficulty,
-  okinawa_suitability,
-  container_suitability,
-  beginner_suitability,
-  kenyu_comment,
-  public_notes,
-  private_notes,
-  is_public,
-  is_for_sale
-)
-select
-  banana.id,
-  v.column1,
-  v.column2,
-  v.column3,
-  v.column4,
-  v.column5,
-  v.column6,
-  v.column7,
-  v.column8,
-  v.column9,
-  v.column10,
-  v.column11,
-  v.column12,
-  v.column13,
-  v.column14,
-  v.column15,
-  v.column16,
-  v.column17,
-  v.column18,
-  v.column19,
-  v.column20
-from banana
-cross join (values
-  ('ベインテコホール', 'Veinte Cohol', 'veinte-cohol', 'フィリピン', 'ベインテコホールはフィリピンに関連するデザートタイプのバナナです。早生で甘みがあるの品種として、家庭栽培では株の大きさ、風対策、病害への注意を見ながら比較したい品種です。', '小ぶり。草姿: 小型。', '早生で甘みがある。', 'なめらか', '軽い', '沖縄では加温なしでも周年的に生育しやすいが、収穫時期は植え付け時期・株の充実・冬越し条件で変動。', '小型。家庭栽培での管理サイズ: 低。', '用途: デザート。耐寒性目安: 普通。バナナセセリ、バンチートップ、パナマ病、台風による倒伏に注意。', '沖縄では露地・庭植えの候補になりますが、台風対策、排水、株元の保護が重要です。低めの株なので家庭菜園や鉢でも管理しやすい。', '鉢栽培でも検討しやすい。根詰まりと水切れに注意し、毎年の株分け候補を見ておく。', '家庭栽培では防風・肥培管理・収穫後の追熟を意識すると楽しみやすい。', 'ベインテコホールは「デザート」として見比べたい品種。沖縄では味だけでなく、株の大きさ、風への強さ、収穫後の追熟まで含めて評価したいです。', null, 'https://www.promusa.org/Diversity+of+banana+cultivars+portal / 補助: https://www.promusa.org/Diversity+of+banana+cultivars+portal', true, false),
-  ('ブラックタイ', 'Black Thai', 'black-thai', 'タイ', 'ブラックタイはタイに関連する観賞・デザートタイプのバナナです。黒みのある茎が美しく果実も利用可能の品種として、家庭栽培では株の大きさ、風対策、病害への注意を見ながら比較したい品種です。', '中ぶり。草姿: 大型。', '黒みのある茎が美しく果実も利用可能。', 'なめらか', '軽い', '沖縄では加温なしでも周年的に生育しやすいが、収穫時期は植え付け時期・株の充実・冬越し条件で変動。', '大型。家庭栽培での管理サイズ: 高。', '用途: 観賞・デザート。耐寒性目安: 普通。バナナセセリ、バンチートップ、パナマ病、台風による倒伏に注意。', '沖縄では露地・庭植えの候補になりますが、台風対策、排水、株元の保護が重要です。大株になりやすく、防風と十分な株間を確保したい。', '鉢では長期維持が難しいため、露地または大鉢で短期更新を前提にしたい。', '観賞目的なら楽しいが、食用品種としては期待値を調整したい。', 'ブラックタイは「観賞・デザート」として見比べたい品種。沖縄では味だけでなく、株の大きさ、風への強さ、収穫後の追熟まで含めて評価したいです。', null, 'https://www.promusa.org/Diversity+of+banana+cultivars+portal / 補助: https://www.promusa.org/Diversity+of+banana+cultivars+portal', true, false),
-  ('タイブラック', 'Thai Black', 'thai-black', 'タイ', 'タイブラックはタイに関連する観賞・デザートタイプのバナナです。観賞性が高く実も楽しめるの品種として、家庭栽培では株の大きさ、風対策、病害への注意を見ながら比較したい品種です。', '中ぶり。草姿: 大型。', '観賞性が高く実も楽しめる。', 'なめらか', '軽い', '沖縄では加温なしでも周年的に生育しやすいが、収穫時期は植え付け時期・株の充実・冬越し条件で変動。', '大型。家庭栽培での管理サイズ: 高。', '用途: 観賞・デザート。耐寒性目安: 普通。バナナセセリ、バンチートップ、パナマ病、台風による倒伏に注意。', '沖縄では露地・庭植えの候補になりますが、台風対策、排水、株元の保護が重要です。大株になりやすく、防風と十分な株間を確保したい。', '鉢では長期維持が難しいため、露地または大鉢で短期更新を前提にしたい。', '観賞目的なら楽しいが、食用品種としては期待値を調整したい。', 'タイブラックは「観賞・デザート」として見比べたい品種。沖縄では味だけでなく、株の大きさ、風への強さ、収穫後の追熟まで含めて評価したいです。', null, 'https://www.promusa.org/Diversity+of+banana+cultivars+portal / 補助: https://www.promusa.org/Diversity+of+banana+cultivars+portal', true, false),
-  ('アエアエ', 'Ae Ae', 'ae-ae', 'ハワイ・太平洋地域', 'アエアエはハワイ・太平洋地域に関連する観賞・調理タイプのバナナです。斑入り葉と果皮が美しい希少系統の品種として、家庭栽培では株の大きさ、風対策、病害への注意を見ながら比較したい品種です。', '太め。草姿: 大型。', '斑入り葉と果皮が美しい希少系統。', 'しっかり', '穏やか', '沖縄では加温なしでも周年的に生育しやすいが、収穫時期は植え付け時期・株の充実・冬越し条件で変動。', '大型。家庭栽培での管理サイズ: 中。', '用途: 観賞・調理。耐寒性目安: 弱め。バナナセセリ、バンチートップ、パナマ病、台風による倒伏に注意。', '沖縄では露地・庭植えの候補になりますが、台風対策、排水、株元の保護が重要です。冬よりも病害と風害に注意したい。', '大鉢なら試せるが、肥料切れと乾燥で果実品質が落ちやすい。', '調理用品種として目的を決めて育てたい。完熟生食だけを期待すると印象が変わる。', 'アエアエは「観賞・調理」として見比べたい品種。沖縄では味だけでなく、株の大きさ、風への強さ、収穫後の追熟まで含めて評価したいです。', null, 'https://www.promusa.org/Diversity+of+banana+cultivars+portal / 補助: https://www.promusa.org/Diversity+of+banana+cultivars+portal', true, false),
-  ('マニニ', 'Manini', 'manini', 'ハワイ', 'マニニはハワイに関連する観賞・調理タイプのバナナです。斑入りで観賞性が高いの品種として、家庭栽培では株の大きさ、風対策、病害への注意を見ながら比較したい品種です。', '太め。草姿: 大型。', '斑入りで観賞性が高い。', 'しっかり', '穏やか', '沖縄では加温なしでも周年的に生育しやすいが、収穫時期は植え付け時期・株の充実・冬越し条件で変動。', '大型。家庭栽培での管理サイズ: 中。', '用途: 観賞・調理。耐寒性目安: 弱め。バナナセセリ、バンチートップ、パナマ病、台風による倒伏に注意。', '沖縄では露地・庭植えの候補になりますが、台風対策、排水、株元の保護が重要です。冬よりも病害と風害に注意したい。', '大鉢なら試せるが、肥料切れと乾燥で果実品質が落ちやすい。', '調理用品種として目的を決めて育てたい。完熟生食だけを期待すると印象が変わる。', 'マニニは「観賞・調理」として見比べたい品種。沖縄では味だけでなく、株の大きさ、風への強さ、収穫後の追熟まで含めて評価したいです。', null, 'https://www.promusa.org/Diversity+of+banana+cultivars+portal / 補助: https://www.promusa.org/Diversity+of+banana+cultivars+portal', true, false),
-  ('ムサバショウ', 'Musa basjoo', 'musa-basjoo', '日本・中国', 'ムサバショウは日本・中国に関連する観賞タイプのバナナです。繊維質で種が多いの品種として、家庭栽培では株の大きさ、風対策、病害への注意を見ながら比較したい品種です。', '基本は食用向きでない。草姿: 大型。', '繊維質で種が多い。', '繊維質', '弱い', '沖縄では加温なしでも周年的に生育しやすいが、収穫時期は植え付け時期・株の充実・冬越し条件で変動。', '大型。家庭栽培での管理サイズ: 高。', '用途: 観賞。耐寒性目安: 非常に強い。バナナセセリ、バンチートップ、パナマ病、台風による倒伏に注意。', '沖縄では露地・庭植えの候補になりますが、台風対策、排水、株元の保護が重要です。大株になりやすく、防風と十分な株間を確保したい。比較的作りやすい候補として試しやすい。', '鉢では長期維持が難しいため、露地または大鉢で短期更新を前提にしたい。', '観賞目的なら楽しいが、食用品種としては期待値を調整したい。', 'ムサバショウは「観賞」として見比べたい品種。沖縄では味だけでなく、株の大きさ、風への強さ、収穫後の追熟まで含めて評価したいです。', null, 'https://www.promusa.org/Diversity+of+banana+cultivars+portal / 補助: https://www.promusa.org/Diversity+of+banana+cultivars+portal', true, false),
-  ('ピンクバナナ', 'Musa velutina', 'musa-velutina', 'インド・ヒマラヤ周辺', 'ピンクバナナはインド・ヒマラヤ周辺に関連する観賞タイプのバナナです。果実は種が多く観賞向きの品種として、家庭栽培では株の大きさ、風対策、病害への注意を見ながら比較したい品種です。', '小ぶり。草姿: 小型。', '果実は種が多く観賞向き。', '種が多い', '軽い', '沖縄では加温なしでも周年的に生育しやすいが、収穫時期は植え付け時期・株の充実・冬越し条件で変動。', '小型。家庭栽培での管理サイズ: 低。', '用途: 観賞。耐寒性目安: 強め。バナナセセリ、バンチートップ、パナマ病、台風による倒伏に注意。', '沖縄では露地・庭植えの候補になりますが、台風対策、排水、株元の保護が重要です。低めの株なので家庭菜園や鉢でも管理しやすい。比較的作りやすい候補として試しやすい。', '鉢栽培でも検討しやすい。根詰まりと水切れに注意し、毎年の株分け候補を見ておく。', '初心者にも試しやすい候補。まずは排水のよい場所と防風を整える。', 'ピンクバナナは「観賞」として見比べたい品種。沖縄では味だけでなく、株の大きさ、風への強さ、収穫後の追熟まで含めて評価したいです。', null, 'https://www.promusa.org/Diversity+of+banana+cultivars+portal / 補助: https://www.promusa.org/Diversity+of+banana+cultivars+portal', true, false),
-  ('ムサオルナータ', 'Musa ornata', 'musa-ornata', '東南アジア', 'ムサオルナータは東南アジアに関連する観賞タイプのバナナです。花が美しく観賞向きの品種として、家庭栽培では株の大きさ、風対策、病害への注意を見ながら比較したい品種です。', '小ぶり。草姿: 小型。', '花が美しく観賞向き。', '種が多い', '軽い', '沖縄では加温なしでも周年的に生育しやすいが、収穫時期は植え付け時期・株の充実・冬越し条件で変動。', '小型。家庭栽培での管理サイズ: 低。', '用途: 観賞。耐寒性目安: 普通。バナナセセリ、バンチートップ、パナマ病、台風による倒伏に注意。', '沖縄では露地・庭植えの候補になりますが、台風対策、排水、株元の保護が重要です。低めの株なので家庭菜園や鉢でも管理しやすい。', '鉢栽培でも検討しやすい。根詰まりと水切れに注意し、毎年の株分け候補を見ておく。', '観賞目的なら楽しいが、食用品種としては期待値を調整したい。', 'ムサオルナータは「観賞」として見比べたい品種。沖縄では味だけでなく、株の大きさ、風への強さ、収穫後の追熟まで含めて評価したいです。', null, 'https://www.promusa.org/Diversity+of+banana+cultivars+portal / 補助: https://www.promusa.org/Diversity+of+banana+cultivars+portal', true, false),
-  ('ムサシッキメンシス', 'Musa sikkimensis', 'musa-sikkimensis', 'ヒマラヤ周辺', 'ムサシッキメンシスはヒマラヤ周辺に関連する観賞タイプのバナナです。観賞・耐寒性重視の品種として、家庭栽培では株の大きさ、風対策、病害への注意を見ながら比較したい品種です。', '基本は食用向きでない。草姿: 大型。', '観賞・耐寒性重視。', '繊維質', '弱い', '沖縄では加温なしでも周年的に生育しやすいが、収穫時期は植え付け時期・株の充実・冬越し条件で変動。', '大型。家庭栽培での管理サイズ: 高。', '用途: 観賞。耐寒性目安: 強め。バナナセセリ、バンチートップ、パナマ病、台風による倒伏に注意。', '沖縄では露地・庭植えの候補になりますが、台風対策、排水、株元の保護が重要です。大株になりやすく、防風と十分な株間を確保したい。比較的作りやすい候補として試しやすい。', '鉢では長期維持が難しいため、露地または大鉢で短期更新を前提にしたい。', '観賞目的なら楽しいが、食用品種としては期待値を調整したい。', 'ムサシッキメンシスは「観賞」として見比べたい品種。沖縄では味だけでなく、株の大きさ、風への強さ、収穫後の追熟まで含めて評価したいです。', null, 'https://www.promusa.org/Diversity+of+banana+cultivars+portal / 補助: https://www.promusa.org/Diversity+of+banana+cultivars+portal', true, false),
-  ('ムサイチネランス', 'Musa itinerans', 'musa-itinerans', '東南アジア', 'ムサイチネランスは東南アジアに関連する観賞タイプのバナナです。観賞・育種素材向きの品種として、家庭栽培では株の大きさ、風対策、病害への注意を見ながら比較したい品種です。', '基本は食用向きでない。草姿: 大型。', '観賞・育種素材向き。', '繊維質', '弱い', '沖縄では加温なしでも周年的に生育しやすいが、収穫時期は植え付け時期・株の充実・冬越し条件で変動。', '大型。家庭栽培での管理サイズ: 高。', '用途: 観賞。耐寒性目安: 普通。バナナセセリ、バンチートップ、パナマ病、台風による倒伏に注意。', '沖縄では露地・庭植えの候補になりますが、台風対策、排水、株元の保護が重要です。大株になりやすく、防風と十分な株間を確保したい。', '鉢では長期維持が難しいため、露地または大鉢で短期更新を前提にしたい。', '観賞目的なら楽しいが、食用品種としては期待値を調整したい。', 'ムサイチネランスは「観賞」として見比べたい品種。沖縄では味だけでなく、株の大きさ、風への強さ、収穫後の追熟まで含めて評価したいです。', null, 'https://www.promusa.org/Diversity+of+banana+cultivars+portal / 補助: https://www.promusa.org/Diversity+of+banana+cultivars+portal', true, false)
-) as v
-on conflict (fruit_id, slug) do update set
-  name_ja = excluded.name_ja,
-  name_en = excluded.name_en,
-  origin = excluded.origin,
-  description = excluded.description,
-  fruit_size = excluded.fruit_size,
-  taste = excluded.taste,
-  texture = excluded.texture,
-  aroma = excluded.aroma,
-  harvest_season = excluded.harvest_season,
-  tree_vigor = excluded.tree_vigor,
-  difficulty = excluded.difficulty,
-  okinawa_suitability = excluded.okinawa_suitability,
-  container_suitability = excluded.container_suitability,
-  beginner_suitability = excluded.beginner_suitability,
-  kenyu_comment = excluded.kenyu_comment,
-  public_notes = excluded.public_notes,
-  private_notes = excluded.private_notes,
-  is_public = excluded.is_public,
-  is_for_sale = excluded.is_for_sale,
-  updated_at = now();
+insert into public.cultivars (fruit_id, name_ja, name_en, slug, origin, description, fruit_size, taste, texture, aroma, harvest_season, tree_vigor, difficulty, okinawa_suitability, container_suitability, beginner_suitability, kenyu_comment, public_notes, private_notes, is_public, is_for_sale) values ((select id from public.fruits where slug = 'banana'), 'ベインテコホール', 'Veinte Cohol', 'veinte-cohol', 'フィリピン', 'ベインテコホールはフィリピンに関連するデザートタイプのバナナです。早生で甘みがあるの品種として、家庭栽培では株の大きさ、風対策、病害への注意を見ながら比較したい品種です。', '小ぶり。草姿: 小型。', '早生で甘みがある。', 'なめらか', '軽い', '沖縄では加温なしでも周年的に生育しやすいが、収穫時期は植え付け時期・株の充実・冬越し条件で変動。', '小型。家庭栽培での管理サイズ: 低。', '用途: デザート。耐寒性目安: 普通。バナナセセリ、バンチートップ、パナマ病、台風による倒伏に注意。', '沖縄では露地・庭植えの候補になりますが、台風対策、排水、株元の保護が重要です。低めの株なので家庭菜園や鉢でも管理しやすい。', '鉢栽培でも検討しやすい。根詰まりと水切れに注意し、毎年の株分け候補を見ておく。', '家庭栽培では防風・肥培管理・収穫後の追熟を意識すると楽しみやすい。', 'ベインテコホールは「デザート」として見比べたい品種。沖縄では味だけでなく、株の大きさ、風への強さ、収穫後の追熟まで含めて評価したいです。', null, 'https://www.promusa.org/Diversity+of+banana+cultivars+portal / 補助: https://www.promusa.org/Diversity+of+banana+cultivars+portal', true, false) on conflict (fruit_id, slug) do nothing;
+
+insert into public.cultivars (fruit_id, name_ja, name_en, slug, origin, description, fruit_size, taste, texture, aroma, harvest_season, tree_vigor, difficulty, okinawa_suitability, container_suitability, beginner_suitability, kenyu_comment, public_notes, private_notes, is_public, is_for_sale) values ((select id from public.fruits where slug = 'banana'), 'ブラックタイ', 'Black Thai', 'black-thai', 'タイ', 'ブラックタイはタイに関連する観賞・デザートタイプのバナナです。黒みのある茎が美しく果実も利用可能の品種として、家庭栽培では株の大きさ、風対策、病害への注意を見ながら比較したい品種です。', '中ぶり。草姿: 大型。', '黒みのある茎が美しく果実も利用可能。', 'なめらか', '軽い', '沖縄では加温なしでも周年的に生育しやすいが、収穫時期は植え付け時期・株の充実・冬越し条件で変動。', '大型。家庭栽培での管理サイズ: 高。', '用途: 観賞・デザート。耐寒性目安: 普通。バナナセセリ、バンチートップ、パナマ病、台風による倒伏に注意。', '沖縄では露地・庭植えの候補になりますが、台風対策、排水、株元の保護が重要です。大株になりやすく、防風と十分な株間を確保したい。', '鉢では長期維持が難しいため、露地または大鉢で短期更新を前提にしたい。', '観賞目的なら楽しいが、食用品種としては期待値を調整したい。', 'ブラックタイは「観賞・デザート」として見比べたい品種。沖縄では味だけでなく、株の大きさ、風への強さ、収穫後の追熟まで含めて評価したいです。', null, 'https://www.promusa.org/Diversity+of+banana+cultivars+portal / 補助: https://www.promusa.org/Diversity+of+banana+cultivars+portal', true, false) on conflict (fruit_id, slug) do nothing;
+
+insert into public.cultivars (fruit_id, name_ja, name_en, slug, origin, description, fruit_size, taste, texture, aroma, harvest_season, tree_vigor, difficulty, okinawa_suitability, container_suitability, beginner_suitability, kenyu_comment, public_notes, private_notes, is_public, is_for_sale) values ((select id from public.fruits where slug = 'banana'), 'タイブラック', 'Thai Black', 'thai-black', 'タイ', 'タイブラックはタイに関連する観賞・デザートタイプのバナナです。観賞性が高く実も楽しめるの品種として、家庭栽培では株の大きさ、風対策、病害への注意を見ながら比較したい品種です。', '中ぶり。草姿: 大型。', '観賞性が高く実も楽しめる。', 'なめらか', '軽い', '沖縄では加温なしでも周年的に生育しやすいが、収穫時期は植え付け時期・株の充実・冬越し条件で変動。', '大型。家庭栽培での管理サイズ: 高。', '用途: 観賞・デザート。耐寒性目安: 普通。バナナセセリ、バンチートップ、パナマ病、台風による倒伏に注意。', '沖縄では露地・庭植えの候補になりますが、台風対策、排水、株元の保護が重要です。大株になりやすく、防風と十分な株間を確保したい。', '鉢では長期維持が難しいため、露地または大鉢で短期更新を前提にしたい。', '観賞目的なら楽しいが、食用品種としては期待値を調整したい。', 'タイブラックは「観賞・デザート」として見比べたい品種。沖縄では味だけでなく、株の大きさ、風への強さ、収穫後の追熟まで含めて評価したいです。', null, 'https://www.promusa.org/Diversity+of+banana+cultivars+portal / 補助: https://www.promusa.org/Diversity+of+banana+cultivars+portal', true, false) on conflict (fruit_id, slug) do nothing;
+
+insert into public.cultivars (fruit_id, name_ja, name_en, slug, origin, description, fruit_size, taste, texture, aroma, harvest_season, tree_vigor, difficulty, okinawa_suitability, container_suitability, beginner_suitability, kenyu_comment, public_notes, private_notes, is_public, is_for_sale) values ((select id from public.fruits where slug = 'banana'), 'アエアエ', 'Ae Ae', 'ae-ae', 'ハワイ・太平洋地域', 'アエアエはハワイ・太平洋地域に関連する観賞・調理タイプのバナナです。斑入り葉と果皮が美しい希少系統の品種として、家庭栽培では株の大きさ、風対策、病害への注意を見ながら比較したい品種です。', '太め。草姿: 大型。', '斑入り葉と果皮が美しい希少系統。', 'しっかり', '穏やか', '沖縄では加温なしでも周年的に生育しやすいが、収穫時期は植え付け時期・株の充実・冬越し条件で変動。', '大型。家庭栽培での管理サイズ: 中。', '用途: 観賞・調理。耐寒性目安: 弱め。バナナセセリ、バンチートップ、パナマ病、台風による倒伏に注意。', '沖縄では露地・庭植えの候補になりますが、台風対策、排水、株元の保護が重要です。冬よりも病害と風害に注意したい。', '大鉢なら試せるが、肥料切れと乾燥で果実品質が落ちやすい。', '調理用品種として目的を決めて育てたい。完熟生食だけを期待すると印象が変わる。', 'アエアエは「観賞・調理」として見比べたい品種。沖縄では味だけでなく、株の大きさ、風への強さ、収穫後の追熟まで含めて評価したいです。', null, 'https://www.promusa.org/Diversity+of+banana+cultivars+portal / 補助: https://www.promusa.org/Diversity+of+banana+cultivars+portal', true, false) on conflict (fruit_id, slug) do nothing;
+
+insert into public.cultivars (fruit_id, name_ja, name_en, slug, origin, description, fruit_size, taste, texture, aroma, harvest_season, tree_vigor, difficulty, okinawa_suitability, container_suitability, beginner_suitability, kenyu_comment, public_notes, private_notes, is_public, is_for_sale) values ((select id from public.fruits where slug = 'banana'), 'マニニ', 'Manini', 'manini', 'ハワイ', 'マニニはハワイに関連する観賞・調理タイプのバナナです。斑入りで観賞性が高いの品種として、家庭栽培では株の大きさ、風対策、病害への注意を見ながら比較したい品種です。', '太め。草姿: 大型。', '斑入りで観賞性が高い。', 'しっかり', '穏やか', '沖縄では加温なしでも周年的に生育しやすいが、収穫時期は植え付け時期・株の充実・冬越し条件で変動。', '大型。家庭栽培での管理サイズ: 中。', '用途: 観賞・調理。耐寒性目安: 弱め。バナナセセリ、バンチートップ、パナマ病、台風による倒伏に注意。', '沖縄では露地・庭植えの候補になりますが、台風対策、排水、株元の保護が重要です。冬よりも病害と風害に注意したい。', '大鉢なら試せるが、肥料切れと乾燥で果実品質が落ちやすい。', '調理用品種として目的を決めて育てたい。完熟生食だけを期待すると印象が変わる。', 'マニニは「観賞・調理」として見比べたい品種。沖縄では味だけでなく、株の大きさ、風への強さ、収穫後の追熟まで含めて評価したいです。', null, 'https://www.promusa.org/Diversity+of+banana+cultivars+portal / 補助: https://www.promusa.org/Diversity+of+banana+cultivars+portal', true, false) on conflict (fruit_id, slug) do nothing;
+
+insert into public.cultivars (fruit_id, name_ja, name_en, slug, origin, description, fruit_size, taste, texture, aroma, harvest_season, tree_vigor, difficulty, okinawa_suitability, container_suitability, beginner_suitability, kenyu_comment, public_notes, private_notes, is_public, is_for_sale) values ((select id from public.fruits where slug = 'banana'), 'ムサバショウ', 'Musa basjoo', 'musa-basjoo', '日本・中国', 'ムサバショウは日本・中国に関連する観賞タイプのバナナです。繊維質で種が多いの品種として、家庭栽培では株の大きさ、風対策、病害への注意を見ながら比較したい品種です。', '基本は食用向きでない。草姿: 大型。', '繊維質で種が多い。', '繊維質', '弱い', '沖縄では加温なしでも周年的に生育しやすいが、収穫時期は植え付け時期・株の充実・冬越し条件で変動。', '大型。家庭栽培での管理サイズ: 高。', '用途: 観賞。耐寒性目安: 非常に強い。バナナセセリ、バンチートップ、パナマ病、台風による倒伏に注意。', '沖縄では露地・庭植えの候補になりますが、台風対策、排水、株元の保護が重要です。大株になりやすく、防風と十分な株間を確保したい。比較的作りやすい候補として試しやすい。', '鉢では長期維持が難しいため、露地または大鉢で短期更新を前提にしたい。', '観賞目的なら楽しいが、食用品種としては期待値を調整したい。', 'ムサバショウは「観賞」として見比べたい品種。沖縄では味だけでなく、株の大きさ、風への強さ、収穫後の追熟まで含めて評価したいです。', null, 'https://www.promusa.org/Diversity+of+banana+cultivars+portal / 補助: https://www.promusa.org/Diversity+of+banana+cultivars+portal', true, false) on conflict (fruit_id, slug) do nothing;
+
+insert into public.cultivars (fruit_id, name_ja, name_en, slug, origin, description, fruit_size, taste, texture, aroma, harvest_season, tree_vigor, difficulty, okinawa_suitability, container_suitability, beginner_suitability, kenyu_comment, public_notes, private_notes, is_public, is_for_sale) values ((select id from public.fruits where slug = 'banana'), 'ピンクバナナ', 'Musa velutina', 'musa-velutina', 'インド・ヒマラヤ周辺', 'ピンクバナナはインド・ヒマラヤ周辺に関連する観賞タイプのバナナです。果実は種が多く観賞向きの品種として、家庭栽培では株の大きさ、風対策、病害への注意を見ながら比較したい品種です。', '小ぶり。草姿: 小型。', '果実は種が多く観賞向き。', '種が多い', '軽い', '沖縄では加温なしでも周年的に生育しやすいが、収穫時期は植え付け時期・株の充実・冬越し条件で変動。', '小型。家庭栽培での管理サイズ: 低。', '用途: 観賞。耐寒性目安: 強め。バナナセセリ、バンチートップ、パナマ病、台風による倒伏に注意。', '沖縄では露地・庭植えの候補になりますが、台風対策、排水、株元の保護が重要です。低めの株なので家庭菜園や鉢でも管理しやすい。比較的作りやすい候補として試しやすい。', '鉢栽培でも検討しやすい。根詰まりと水切れに注意し、毎年の株分け候補を見ておく。', '初心者にも試しやすい候補。まずは排水のよい場所と防風を整える。', 'ピンクバナナは「観賞」として見比べたい品種。沖縄では味だけでなく、株の大きさ、風への強さ、収穫後の追熟まで含めて評価したいです。', null, 'https://www.promusa.org/Diversity+of+banana+cultivars+portal / 補助: https://www.promusa.org/Diversity+of+banana+cultivars+portal', true, false) on conflict (fruit_id, slug) do nothing;
+
+insert into public.cultivars (fruit_id, name_ja, name_en, slug, origin, description, fruit_size, taste, texture, aroma, harvest_season, tree_vigor, difficulty, okinawa_suitability, container_suitability, beginner_suitability, kenyu_comment, public_notes, private_notes, is_public, is_for_sale) values ((select id from public.fruits where slug = 'banana'), 'ムサオルナータ', 'Musa ornata', 'musa-ornata', '東南アジア', 'ムサオルナータは東南アジアに関連する観賞タイプのバナナです。花が美しく観賞向きの品種として、家庭栽培では株の大きさ、風対策、病害への注意を見ながら比較したい品種です。', '小ぶり。草姿: 小型。', '花が美しく観賞向き。', '種が多い', '軽い', '沖縄では加温なしでも周年的に生育しやすいが、収穫時期は植え付け時期・株の充実・冬越し条件で変動。', '小型。家庭栽培での管理サイズ: 低。', '用途: 観賞。耐寒性目安: 普通。バナナセセリ、バンチートップ、パナマ病、台風による倒伏に注意。', '沖縄では露地・庭植えの候補になりますが、台風対策、排水、株元の保護が重要です。低めの株なので家庭菜園や鉢でも管理しやすい。', '鉢栽培でも検討しやすい。根詰まりと水切れに注意し、毎年の株分け候補を見ておく。', '観賞目的なら楽しいが、食用品種としては期待値を調整したい。', 'ムサオルナータは「観賞」として見比べたい品種。沖縄では味だけでなく、株の大きさ、風への強さ、収穫後の追熟まで含めて評価したいです。', null, 'https://www.promusa.org/Diversity+of+banana+cultivars+portal / 補助: https://www.promusa.org/Diversity+of+banana+cultivars+portal', true, false) on conflict (fruit_id, slug) do nothing;
+
+insert into public.cultivars (fruit_id, name_ja, name_en, slug, origin, description, fruit_size, taste, texture, aroma, harvest_season, tree_vigor, difficulty, okinawa_suitability, container_suitability, beginner_suitability, kenyu_comment, public_notes, private_notes, is_public, is_for_sale) values ((select id from public.fruits where slug = 'banana'), 'ムサシッキメンシス', 'Musa sikkimensis', 'musa-sikkimensis', 'ヒマラヤ周辺', 'ムサシッキメンシスはヒマラヤ周辺に関連する観賞タイプのバナナです。観賞・耐寒性重視の品種として、家庭栽培では株の大きさ、風対策、病害への注意を見ながら比較したい品種です。', '基本は食用向きでない。草姿: 大型。', '観賞・耐寒性重視。', '繊維質', '弱い', '沖縄では加温なしでも周年的に生育しやすいが、収穫時期は植え付け時期・株の充実・冬越し条件で変動。', '大型。家庭栽培での管理サイズ: 高。', '用途: 観賞。耐寒性目安: 強め。バナナセセリ、バンチートップ、パナマ病、台風による倒伏に注意。', '沖縄では露地・庭植えの候補になりますが、台風対策、排水、株元の保護が重要です。大株になりやすく、防風と十分な株間を確保したい。比較的作りやすい候補として試しやすい。', '鉢では長期維持が難しいため、露地または大鉢で短期更新を前提にしたい。', '観賞目的なら楽しいが、食用品種としては期待値を調整したい。', 'ムサシッキメンシスは「観賞」として見比べたい品種。沖縄では味だけでなく、株の大きさ、風への強さ、収穫後の追熟まで含めて評価したいです。', null, 'https://www.promusa.org/Diversity+of+banana+cultivars+portal / 補助: https://www.promusa.org/Diversity+of+banana+cultivars+portal', true, false) on conflict (fruit_id, slug) do nothing;
+
+insert into public.cultivars (fruit_id, name_ja, name_en, slug, origin, description, fruit_size, taste, texture, aroma, harvest_season, tree_vigor, difficulty, okinawa_suitability, container_suitability, beginner_suitability, kenyu_comment, public_notes, private_notes, is_public, is_for_sale) values ((select id from public.fruits where slug = 'banana'), 'ムサイチネランス', 'Musa itinerans', 'musa-itinerans', '東南アジア', 'ムサイチネランスは東南アジアに関連する観賞タイプのバナナです。観賞・育種素材向きの品種として、家庭栽培では株の大きさ、風対策、病害への注意を見ながら比較したい品種です。', '基本は食用向きでない。草姿: 大型。', '観賞・育種素材向き。', '繊維質', '弱い', '沖縄では加温なしでも周年的に生育しやすいが、収穫時期は植え付け時期・株の充実・冬越し条件で変動。', '大型。家庭栽培での管理サイズ: 高。', '用途: 観賞。耐寒性目安: 普通。バナナセセリ、バンチートップ、パナマ病、台風による倒伏に注意。', '沖縄では露地・庭植えの候補になりますが、台風対策、排水、株元の保護が重要です。大株になりやすく、防風と十分な株間を確保したい。', '鉢では長期維持が難しいため、露地または大鉢で短期更新を前提にしたい。', '観賞目的なら楽しいが、食用品種としては期待値を調整したい。', 'ムサイチネランスは「観賞」として見比べたい品種。沖縄では味だけでなく、株の大きさ、風への強さ、収穫後の追熟まで含めて評価したいです。', null, 'https://www.promusa.org/Diversity+of+banana+cultivars+portal / 補助: https://www.promusa.org/Diversity+of+banana+cultivars+portal', true, false) on conflict (fruit_id, slug) do nothing;
 
 
 with banana as (

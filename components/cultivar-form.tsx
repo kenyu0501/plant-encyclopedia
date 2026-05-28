@@ -2,8 +2,10 @@
 
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Save, Trash2 } from "lucide-react";
+import { ImagePlus, PlaySquare, Save, Trash2 } from "lucide-react";
+import { compressImageForUpload, formatBytes } from "@/lib/image-compress";
 import { createClient } from "@/lib/supabase-browser";
+import { getYoutubeThumbnail } from "@/lib/youtube";
 import type { Cultivar, CultivarInsert, Fruit } from "@/types/database";
 
 type Field = keyof Pick<
@@ -59,6 +61,11 @@ export function CultivarForm({ cultivar, fruits }: { cultivar?: Cultivar | null;
   );
   const [isPublic, setIsPublic] = useState(cultivar?.is_public ?? false);
   const [isForSale, setIsForSale] = useState(cultivar?.is_for_sale ?? false);
+  const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [photoCaption, setPhotoCaption] = useState("");
+  const [photoIsMain, setPhotoIsMain] = useState(true);
+  const [youtubeUrl, setYoutubeUrl] = useState("");
+  const [youtubeTitle, setYoutubeTitle] = useState("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -81,11 +88,94 @@ export function CultivarForm({ cultivar, fruits }: { cultivar?: Cultivar | null;
     const { data, error } = cultivar
       ? await supabase.from("cultivars").update(payload).eq("id", cultivar.id).select("id").single()
       : await supabase.from("cultivars").insert(payload).select("id").single();
-    setLoading(false);
     if (error) {
+      setLoading(false);
       setMessage(error.message);
       return;
     }
+
+    const savedCultivarId = data.id;
+
+    if (photoFile) {
+      setMessage("写真を圧縮しています。");
+      const {
+        data: { user }
+      } = await supabase.auth.getUser();
+      if (!user) {
+        setLoading(false);
+        setMessage("写真追加にはログイン状態の確認が必要です。もう一度ログインしてください。");
+        return;
+      }
+
+      let compressed;
+      try {
+        compressed = await compressImageForUpload(photoFile);
+      } catch (compressError) {
+        setLoading(false);
+        setMessage(compressError instanceof Error ? compressError.message : "画像圧縮に失敗しました。");
+        return;
+      }
+
+      const storagePath = `${fruitId}/${savedCultivarId}/${crypto.randomUUID()}.jpg`;
+      setMessage(
+        `写真をアップロードしています。${formatBytes(compressed.originalBytes)} → ${formatBytes(
+          compressed.compressedBytes
+        )} / ${compressed.width}x${compressed.height}px`
+      );
+      const { error: uploadError } = await supabase.storage.from("fruit-photos").upload(storagePath, compressed.file, {
+        cacheControl: "3600",
+        upsert: false
+      });
+      if (uploadError) {
+        setLoading(false);
+        setMessage(`写真アップロードに失敗しました: ${uploadError.message}`);
+        return;
+      }
+
+      const { data: publicUrl } = supabase.storage.from("fruit-photos").getPublicUrl(storagePath);
+      if (photoIsMain) {
+        await supabase.from("photos").update({ is_main: false }).eq("cultivar_id", savedCultivarId);
+      }
+      const { error: photoError } = await supabase.from("photos").insert({
+        fruit_id: fruitId || null,
+        cultivar_id: savedCultivarId,
+        image_url: publicUrl.publicUrl,
+        storage_path: storagePath,
+        photo_type: "cultivar",
+        caption: photoCaption || null,
+        taken_at: null,
+        uploaded_by: user.id,
+        source_type: "admin",
+        approval_status: "approved",
+        is_main: photoIsMain
+      });
+      if (photoError) {
+        setLoading(false);
+        setMessage(`写真レコード登録に失敗しました: ${photoError.message}`);
+        return;
+      }
+    }
+
+    if (youtubeUrl) {
+      setMessage("YouTubeリンクを登録しています。");
+      const { error: videoError } = await supabase.from("videos").insert({
+        fruit_id: fruitId || null,
+        cultivar_id: savedCultivarId,
+        youtube_url: youtubeUrl,
+        title: youtubeTitle || null,
+        description: null,
+        thumbnail_url: getYoutubeThumbnail(youtubeUrl),
+        video_type: "cultivar",
+        is_public: true
+      });
+      if (videoError) {
+        setLoading(false);
+        setMessage(`YouTube登録に失敗しました: ${videoError.message}`);
+        return;
+      }
+    }
+
+    setLoading(false);
     router.replace(`/admin/cultivars/${data.id}`);
     router.refresh();
   }
@@ -150,6 +240,44 @@ export function CultivarForm({ cultivar, fruits }: { cultivar?: Cultivar | null;
           )}
         </label>
       ))}
+      <section className="space-y-3 rounded-lg border border-leaf-100 bg-leaf-50 p-4">
+        <div className="flex items-center gap-2 font-bold text-leaf-900">
+          <ImagePlus size={18} />
+          写真も同時に追加
+        </div>
+        <label className="block">
+          <span className="text-sm font-semibold text-leaf-900">写真</span>
+          <input
+            type="file"
+            accept="image/*"
+            capture="environment"
+            onChange={(event) => setPhotoFile(event.target.files?.[0] ?? null)}
+            className="mt-2 block w-full text-sm"
+          />
+        </label>
+        <label className="block">
+          <span className="text-sm font-semibold text-leaf-900">写真キャプション</span>
+          <input value={photoCaption} onChange={(event) => setPhotoCaption(event.target.value)} className="mt-2 w-full rounded-md border border-leaf-100 bg-white px-3 py-3" />
+        </label>
+        <label className="flex items-center justify-between gap-3 rounded-md bg-white p-3">
+          <span className="font-semibold text-leaf-900">メイン写真にする</span>
+          <input type="checkbox" checked={photoIsMain} onChange={(event) => setPhotoIsMain(event.target.checked)} className="h-5 w-5" />
+        </label>
+      </section>
+      <section className="space-y-3 rounded-lg border border-leaf-100 bg-fruit-100 p-4">
+        <div className="flex items-center gap-2 font-bold text-leaf-900">
+          <PlaySquare size={18} />
+          YouTubeも同時に追加
+        </div>
+        <label className="block">
+          <span className="text-sm font-semibold text-leaf-900">YouTube URL</span>
+          <input type="url" value={youtubeUrl} onChange={(event) => setYoutubeUrl(event.target.value)} className="mt-2 w-full rounded-md border border-leaf-100 bg-white px-3 py-3" />
+        </label>
+        <label className="block">
+          <span className="text-sm font-semibold text-leaf-900">YouTubeタイトル</span>
+          <input value={youtubeTitle} onChange={(event) => setYoutubeTitle(event.target.value)} className="mt-2 w-full rounded-md border border-leaf-100 bg-white px-3 py-3" />
+        </label>
+      </section>
       {message ? <p className="rounded-md bg-red-50 p-3 text-sm text-red-700">{message}</p> : null}
       <div className="flex flex-col gap-3 sm:flex-row">
         <button type="submit" disabled={loading} className="inline-flex flex-1 items-center justify-center gap-2 rounded-md bg-leaf-700 px-4 py-3 font-semibold text-white disabled:opacity-60">
