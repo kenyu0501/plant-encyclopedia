@@ -1,0 +1,19 @@
+{
+  "name": "けんゆーの熱帯果樹図鑑",
+  "short_name": "熱帯果樹図鑑",
+  "description": "スマホで使える熱帯果樹と品種の図鑑PWA",
+  "start_url": "/",
+  "scope": "/",
+  "display": "standalone",
+  "background_color": "#f7fbf7",
+  "theme_color": "#2f855a",
+  "orientation": "portrait",
+  "icons": [
+    {
+      "src": "/icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ]
+}
