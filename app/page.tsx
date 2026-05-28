@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { ArrowRight, Leaf, ShieldCheck, Smartphone } from "lucide-react";
+import { ArrowRight } from "lucide-react";
 import { FruitCard } from "@/components/fruit-card";
 import { getPublicFruits, getSiteSettings } from "@/lib/queries";
 
@@ -35,12 +35,6 @@ export default async function HomePage() {
         </div>
       </section>
 
-      <section className="grid gap-3 sm:grid-cols-3">
-        <Feature icon={<Leaf size={20} />} title="果樹が親ページ" text="品種は果樹に紐づく子ページとして管理します。" />
-        <Feature icon={<Smartphone size={20} />} title="スマホ優先" text="下部ナビと大きめのフォームで屋外でも扱いやすく。" />
-        <Feature icon={<ShieldCheck size={20} />} title="管理者だけ編集" text="公開ページは一般閲覧、編集はSupabase Authで保護します。" />
-      </section>
-
       <section className="space-y-4">
         <div className="flex items-center justify-between gap-4">
           <h2 className="text-xl font-bold text-leaf-900">公開中の果樹</h2>
@@ -60,26 +54,6 @@ export default async function HomePage() {
           </p>
         )}
       </section>
-    </div>
-  );
-}
-
-function Feature({
-  icon,
-  title,
-  text
-}: {
-  icon: React.ReactNode;
-  title: string;
-  text: string;
-}) {
-  return (
-    <div className="rounded-lg bg-white/78 p-4 ring-1 ring-leaf-100">
-      <div className="flex h-10 w-10 items-center justify-center rounded-md bg-fruit-100 text-leaf-800">
-        {icon}
-      </div>
-      <h2 className="mt-3 font-bold text-leaf-900">{title}</h2>
-      <p className="mt-1 text-sm leading-6 text-leaf-900/70">{text}</p>
     </div>
   );
 }

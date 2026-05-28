@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ExternalLink, Pencil, PlayCircle } from "lucide-react";
+import { ExternalLink, ImagePlus, Pencil, PlayCircle } from "lucide-react";
 import { PageHeader } from "@/components/page-header";
 import { getCurrentUser, isAdminUser } from "@/lib/auth";
 import { getPublicCultivarBySlugs } from "@/lib/queries";
@@ -29,6 +29,8 @@ export default async function CultivarDetailPage({ params }: Props) {
   const user = await getCurrentUser();
   const isAdmin = await isAdminUser(user);
   const mainPhoto = cultivar.photos?.find((photo) => photo.is_main) ?? cultivar.photos?.[0];
+  const photos = [...(cultivar.photos ?? [])].sort((a, b) => Number(b.is_main) - Number(a.is_main));
+  const galleryPhotos = mainPhoto ? photos.filter((photo) => photo.id !== mainPhoto.id) : photos;
 
   return (
     <div className="space-y-6">
@@ -37,6 +39,14 @@ export default async function CultivarDetailPage({ params }: Props) {
         description={`${cultivar.fruits.name_ja}の品種${cultivar.name_en ? ` / ${cultivar.name_en}` : ""}`}
         action={
           isAdmin ? (
+            <div className="flex flex-wrap gap-2">
+              <Link
+                href={`/admin/photos?fruit_id=${cultivar.fruit_id}&cultivar_id=${cultivar.id}`}
+                className="inline-flex items-center gap-2 rounded-md border border-leaf-200 bg-white px-3 py-2 text-sm font-semibold text-leaf-800"
+              >
+                <ImagePlus size={16} />
+                写真追加
+              </Link>
             <Link
               href={`/admin/cultivars/${cultivar.id}`}
               className="inline-flex items-center gap-2 rounded-md bg-leaf-700 px-3 py-2 text-sm font-semibold text-white"
@@ -44,6 +54,7 @@ export default async function CultivarDetailPage({ params }: Props) {
               <Pencil size={16} />
               編集
             </Link>
+            </div>
           ) : null
         }
       />
@@ -52,6 +63,41 @@ export default async function CultivarDetailPage({ params }: Props) {
         <div className="relative aspect-[4/3] overflow-hidden rounded-lg bg-leaf-100">
           <Image src={mainPhoto.image_url} alt={mainPhoto.caption ?? cultivar.name_ja} fill className="object-cover" priority />
         </div>
+      ) : null}
+
+      {galleryPhotos.length > 0 ? (
+        <section className="space-y-3">
+          <div className="flex items-center justify-between gap-3">
+            <h2 className="text-lg font-bold text-leaf-900">写真</h2>
+            {isAdmin ? (
+              <Link href={`/admin/photos?fruit_id=${cultivar.fruit_id}&cultivar_id=${cultivar.id}`} className="text-sm font-semibold text-leaf-700">
+                写真追加
+              </Link>
+            ) : null}
+          </div>
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
+            {galleryPhotos.map((photo) => (
+              <figure key={photo.id} className="overflow-hidden rounded-lg bg-white/84 ring-1 ring-leaf-100">
+                <div className="relative aspect-square bg-leaf-100">
+                  <Image src={photo.image_url} alt={photo.caption ?? cultivar.name_ja} fill className="object-cover" sizes="(min-width: 640px) 33vw, 50vw" />
+                </div>
+                {photo.caption || photo.photo_type ? (
+                  <figcaption className="space-y-1 p-2 text-xs leading-5 text-leaf-900/68">
+                    {photo.photo_type ? <span className="inline-flex rounded-md bg-leaf-50 px-2 py-1 font-semibold">{photo.photo_type}</span> : null}
+                    {photo.caption ? <p>{photo.caption}</p> : null}
+                  </figcaption>
+                ) : null}
+              </figure>
+            ))}
+          </div>
+        </section>
+      ) : isAdmin ? (
+        <section className="rounded-lg border border-dashed border-leaf-200 bg-white/70 p-4">
+          <Link href={`/admin/photos?fruit_id=${cultivar.fruit_id}&cultivar_id=${cultivar.id}`} className="inline-flex w-full items-center justify-center gap-2 rounded-md bg-leaf-700 px-4 py-3 text-sm font-semibold text-white">
+            <ImagePlus size={17} />
+            この品種に写真を追加
+          </Link>
+        </section>
       ) : null}
 
       {cultivar.videos && cultivar.videos.length > 0 ? (

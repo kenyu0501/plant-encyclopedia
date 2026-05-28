@@ -1,7 +1,7 @@
 "use client";
 
 import { useState } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, useSearchParams } from "next/navigation";
 import { Upload } from "lucide-react";
 import { compressImageForUpload, formatBytes } from "@/lib/image-compress";
 import { createClient } from "@/lib/supabase-browser";
@@ -16,10 +16,13 @@ export function PhotoUploadForm({
   cultivars: AdminCultivar[];
 }) {
   const router = useRouter();
-  const [fruitId, setFruitId] = useState(fruits[0]?.id ?? "");
-  const [cultivarId, setCultivarId] = useState("");
+  const searchParams = useSearchParams();
+  const initialFruitId = searchParams.get("fruit_id") ?? fruits[0]?.id ?? "";
+  const initialCultivarId = searchParams.get("cultivar_id") ?? "";
+  const [fruitId, setFruitId] = useState(initialFruitId);
+  const [cultivarId, setCultivarId] = useState(initialCultivarId);
   const [caption, setCaption] = useState("");
-  const [photoType, setPhotoType] = useState("fruit");
+  const [photoType, setPhotoType] = useState(initialCultivarId ? "果実" : "fruit");
   const [isMain, setIsMain] = useState(false);
   const [file, setFile] = useState<File | null>(null);
   const [message, setMessage] = useState("");
@@ -105,7 +108,15 @@ export function PhotoUploadForm({
     <form onSubmit={onSubmit} className="space-y-4 rounded-lg bg-white/86 p-5 ring-1 ring-leaf-100">
       <label className="block">
         <span className="text-sm font-semibold text-leaf-900">果樹</span>
-        <select value={fruitId} onChange={(event) => setFruitId(event.target.value)} className="mt-2 w-full rounded-md border border-leaf-100 bg-white px-3 py-3">
+        <select
+          value={fruitId}
+          onChange={(event) => {
+            setFruitId(event.target.value);
+            setCultivarId("");
+            setPhotoType("fruit");
+          }}
+          className="mt-2 w-full rounded-md border border-leaf-100 bg-white px-3 py-3"
+        >
           {fruits.map((fruit) => (
             <option key={fruit.id} value={fruit.id}>
               {fruit.name_ja}
@@ -115,7 +126,14 @@ export function PhotoUploadForm({
       </label>
       <label className="block">
         <span className="text-sm font-semibold text-leaf-900">品種に紐づける</span>
-        <select value={cultivarId} onChange={(event) => setCultivarId(event.target.value)} className="mt-2 w-full rounded-md border border-leaf-100 bg-white px-3 py-3">
+        <select
+          value={cultivarId}
+          onChange={(event) => {
+            setCultivarId(event.target.value);
+            setPhotoType(event.target.value ? "果実" : "fruit");
+          }}
+          className="mt-2 w-full rounded-md border border-leaf-100 bg-white px-3 py-3"
+        >
           <option value="">果樹ページの写真</option>
           {filteredCultivars.map((cultivar) => (
             <option key={cultivar.id} value={cultivar.id}>
@@ -126,7 +144,15 @@ export function PhotoUploadForm({
       </label>
       <label className="block">
         <span className="text-sm font-semibold text-leaf-900">写真タイプ</span>
-        <input value={photoType} onChange={(event) => setPhotoType(event.target.value)} className="mt-2 w-full rounded-md border border-leaf-100 bg-white px-3 py-3" />
+        <select value={photoType} onChange={(event) => setPhotoType(event.target.value)} className="mt-2 w-full rounded-md border border-leaf-100 bg-white px-3 py-3">
+          <option value="fruit">果樹ページ用</option>
+          <option value="果実">果実</option>
+          <option value="枝葉">枝葉</option>
+          <option value="花">花</option>
+          <option value="木の様子">木の様子</option>
+          <option value="糖度計">糖度計</option>
+          <option value="栽培記録">栽培記録</option>
+        </select>
       </label>
       <label className="block">
         <span className="text-sm font-semibold text-leaf-900">キャプション</span>
