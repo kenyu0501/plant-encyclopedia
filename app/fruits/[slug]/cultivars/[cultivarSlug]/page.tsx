@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { ReactNode } from "react";
-import { Apple, BarChart3, Dna, ExternalLink, ImagePlus, Leaf, Pencil, PlayCircle, Ruler, Sprout } from "lucide-react";
+import { Apple, BarChart3, Dna, ExternalLink, Flower2, Globe2, ImagePlus, Leaf, Pencil, PlayCircle, Ruler, Scale, Sprout, Thermometer } from "lucide-react";
 import { PageHeader } from "@/components/page-header";
 import { getCurrentUser, isAdminUser } from "@/lib/auth";
 import { getPublicCultivarBySlugs } from "@/lib/queries";
@@ -32,19 +32,24 @@ export default async function CultivarDetailPage({ params }: Props) {
   const mainPhoto = cultivar.photos?.find((photo) => photo.is_main) ?? cultivar.photos?.[0];
   const photos = [...(cultivar.photos ?? [])].sort((a, b) => Number(b.is_main) - Number(a.is_main));
   const galleryPhotos = mainPhoto ? photos.filter((photo) => photo.id !== mainPhoto.id) : photos;
-  const isBanana = cultivar.fruits.slug === "banana";
+  const fruitSlug = cultivar.fruits.slug;
+  const isBanana = fruitSlug === "banana";
+  const isAvocado = fruitSlug === "avocado";
+  const showsFloweringType = fruitSlug === "avocado" || fruitSlug === "white-sapote";
   const displayOrigin = isBanana ? getPublicBananaOrigin(cultivar.origin) : cultivar.origin;
-  const primaryStats = isBanana
-    ? [
-        { label: "背丈", value: cultivar.plant_height_type, icon: <Ruler size={18} /> },
-        { label: "ゲノム", value: cultivar.genome_group, icon: <Dna size={18} /> },
-        { label: "収量", value: cultivar.yield_level, icon: <BarChart3 size={18} /> }
-      ]
-    : [
-        { label: "耐寒温度目安", value: cultivar.cold_hardiness, icon: <Sprout size={18} /> },
-        { label: "開花型", value: cultivar.flowering_type, icon: <Leaf size={18} /> },
-        { label: "収穫期", value: cultivar.harvest_season, icon: <Apple size={18} /> }
-      ];
+  const primaryStats = getPrimaryStats({
+    fruitSlug,
+    origin: displayOrigin,
+    fruitSize: cultivar.fruit_size,
+    taste: cultivar.taste,
+    description: cultivar.description,
+    harvestSeason: cultivar.harvest_season,
+    coldHardiness: cultivar.cold_hardiness,
+    floweringType: cultivar.flowering_type,
+    plantHeightType: cultivar.plant_height_type,
+    genomeGroup: cultivar.genome_group,
+    yieldLevel: cultivar.yield_level
+  });
 
   return (
     <div className="space-y-6">
@@ -141,7 +146,7 @@ export default async function CultivarDetailPage({ params }: Props) {
         {cultivar.description ? <p className="mt-4 leading-7 text-leaf-900/82">{cultivar.description}</p> : null}
 
         {primaryStats.some((stat) => stat.value) ? (
-          <div className="mt-5 grid gap-3 sm:grid-cols-3">
+          <div className="mt-5 grid gap-3 sm:grid-cols-2 lg:grid-cols-4">
             {primaryStats.map((stat) => (
               <MetricCard key={stat.label} label={stat.label} value={stat.value} icon={stat.icon} />
             ))}
@@ -159,8 +164,8 @@ export default async function CultivarDetailPage({ params }: Props) {
           </InfoGroup>
 
           <InfoGroup title="栽培の見どころ">
-            {!isBanana ? <Info label="耐寒温度目安" value={cultivar.cold_hardiness} /> : null}
-            {!isBanana ? <Info label="開花型" value={cultivar.flowering_type} /> : null}
+            {isAvocado ? <Info label="耐寒温度目安" value={cultivar.cold_hardiness} /> : null}
+            {showsFloweringType ? <Info label="開花型" value={cultivar.flowering_type} /> : null}
             {isBanana ? <Info label="背丈" value={cultivar.plant_height_type} /> : null}
             {isBanana ? <Info label="ゲノム構成" value={cultivar.genome_group} /> : null}
             {isBanana ? <Info label="収量" value={cultivar.yield_level} /> : null}
@@ -200,6 +205,85 @@ function MetricCard({ label, value, icon }: { label: string; value: string | nul
       <dd className="mt-2 text-lg font-bold leading-tight text-leaf-900">{value}</dd>
     </div>
   );
+}
+
+function getPrimaryStats({
+  fruitSlug,
+  origin,
+  fruitSize,
+  taste,
+  description,
+  harvestSeason,
+  coldHardiness,
+  floweringType,
+  plantHeightType,
+  genomeGroup,
+  yieldLevel
+}: {
+  fruitSlug: string;
+  origin: string | null;
+  fruitSize: string | null;
+  taste: string | null;
+  description: string | null;
+  harvestSeason: string | null;
+  coldHardiness: string | null;
+  floweringType: string | null;
+  plantHeightType: string | null;
+  genomeGroup: string | null;
+  yieldLevel: string | null;
+}) {
+  if (fruitSlug === "banana") {
+    return [
+      { label: "背丈", value: plantHeightType, icon: <Ruler size={18} /> },
+      { label: "ゲノム", value: genomeGroup, icon: <Dna size={18} /> },
+      { label: "収量", value: yieldLevel, icon: <BarChart3 size={18} /> }
+    ];
+  }
+
+  if (fruitSlug === "avocado") {
+    return [
+      { label: "耐寒温度", value: coldHardiness, icon: <Thermometer size={18} /> },
+      { label: "開花型", value: floweringType, icon: <Flower2 size={18} /> },
+      { label: "収穫期", value: harvestSeason, icon: <Apple size={18} /> }
+    ];
+  }
+
+  if (fruitSlug === "mango") {
+    return [
+      { label: "産地", value: origin, icon: <Globe2 size={18} /> },
+      { label: "糖度", value: getMangoSugar(taste, description), icon: <BarChart3 size={18} /> },
+      { label: "収穫期", value: harvestSeason ?? getMaturityDays(taste, description), icon: <Apple size={18} /> },
+      { label: "果実重", value: getFruitWeightSummary(fruitSize, description), icon: <Scale size={18} /> }
+    ];
+  }
+
+  return [
+    { label: "耐寒温度目安", value: coldHardiness, icon: <Sprout size={18} /> },
+    { label: "開花型", value: floweringType, icon: <Leaf size={18} /> },
+    { label: "収穫期", value: harvestSeason, icon: <Apple size={18} /> }
+  ];
+}
+
+function getMangoSugar(taste: string | null, description: string | null) {
+  const text = [taste, description].filter(Boolean).join(" ");
+  const match = text.match(/糖度[^0-9]*(\d+(?:\.\d+)?)\s*度?/);
+  return match ? `${match[1]}度` : null;
+}
+
+function getMaturityDays(taste: string | null, description: string | null) {
+  const text = [taste, description].filter(Boolean).join(" ");
+  const match = text.match(/成熟日数[^0-9]*(\d+(?:\.\d+)?)\s*日/);
+  return match ? `成熟${match[1]}日` : null;
+}
+
+function getFruitWeightSummary(fruitSize: string | null, description: string | null) {
+  const text = [fruitSize, description].filter(Boolean).join(" ");
+  const labeled = text.match(/(?:果実重|平均果実重|重さ)[^0-9]*(\d+(?:\.\d+)?)\s*(kg|g|グラム)/i);
+  const fallback = text.match(/(\d+(?:\.\d+)?)\s*(kg|g|グラム)/i);
+  const match = labeled ?? fallback;
+  if (!match) return null;
+  const unit = match[2] === "グラム" ? "g" : match[2];
+  return `${match[1]}${unit}`;
 }
 
 function InfoGroup({ title, children }: { title: string; children: ReactNode }) {

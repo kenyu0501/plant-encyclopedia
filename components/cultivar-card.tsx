@@ -9,6 +9,9 @@ export function CultivarCard({ fruitSlug, cultivar }: { fruitSlug: string; culti
   const genomeGroup = fruitSlug === "banana" ? cultivar.genome_group : null;
   const yieldLevel = fruitSlug === "banana" ? cultivar.yield_level : null;
   const originGroup = fruitSlug === "mango" ? getOriginGroup(cultivar) : null;
+  const mangoSugar = fruitSlug === "mango" ? getMangoSugar(cultivar.taste, cultivar.description) : null;
+  const mangoFruitWeight = fruitSlug === "mango" ? getFruitWeightSummary(cultivar.fruit_size, cultivar.description) : null;
+  const harvestSummary = cultivar.harvest_season ?? (fruitSlug === "mango" ? getMaturityDays(cultivar.taste, cultivar.description) : null);
   const useGroup = fruitSlug === "banana" ? getUseGroup(cultivar) : null;
   const mainPhoto = cultivar.photos?.find((photo) => photo.is_main) ?? cultivar.photos?.[0];
   const mainVideo = cultivar.videos?.[0];
@@ -38,20 +41,18 @@ export function CultivarCard({ fruitSlug, cultivar }: { fruitSlug: string; culti
             <span className="rounded-md bg-fruit-100 px-2 py-1 text-xs font-bold text-leaf-900">販売</span>
           ) : null}
         </div>
-        {coldHardiness || floweringType || plantHeightType || genomeGroup || yieldLevel || cultivar.harvest_season || useGroup ? (
+        {coldHardiness || floweringType || plantHeightType || genomeGroup || yieldLevel || originGroup || mangoSugar || mangoFruitWeight || harvestSummary || useGroup ? (
           <div className="mt-3 flex flex-wrap gap-2 text-xs font-semibold text-leaf-900/64">
             {originGroup ? <span className="rounded-md bg-leaf-50 px-2 py-1">{originGroup}</span> : null}
             {useGroup ? <span className="rounded-md bg-leaf-50 px-2 py-1">{useGroup}</span> : null}
-            {coldHardiness ? <span className="rounded-md bg-leaf-50 px-2 py-1">耐寒 {coldHardiness}</span> : null}
+            {coldHardiness ? <span className="rounded-md bg-leaf-50 px-2 py-1">耐寒温度 {coldHardiness}</span> : null}
             {floweringType ? <span className="rounded-md bg-leaf-50 px-2 py-1">開花 {floweringType}</span> : null}
+            {mangoSugar ? <span className="rounded-md bg-fruit-100 px-2 py-1">糖度 {mangoSugar}</span> : null}
             {plantHeightType ? <span className="rounded-md bg-leaf-50 px-2 py-1">背丈 {plantHeightType}</span> : null}
             {genomeGroup ? <span className="rounded-md bg-leaf-50 px-2 py-1">ゲノム {genomeGroup}</span> : null}
             {yieldLevel ? <span className="rounded-md bg-fruit-100 px-2 py-1">収量 {yieldLevel}</span> : null}
-            {cultivar.harvest_season ? <span className="rounded-md bg-fruit-100 px-2 py-1">{shortHarvest(cultivar.harvest_season)}</span> : null}
-          </div>
-        ) : originGroup ? (
-          <div className="mt-3 flex flex-wrap gap-2 text-xs font-semibold text-leaf-900/64">
-            <span className="rounded-md bg-leaf-50 px-2 py-1">{originGroup}</span>
+            {harvestSummary ? <span className="rounded-md bg-fruit-100 px-2 py-1">収穫 {shortHarvest(harvestSummary)}</span> : null}
+            {mangoFruitWeight ? <span className="rounded-md bg-leaf-50 px-2 py-1">果実重 {mangoFruitWeight}</span> : null}
           </div>
         ) : null}
         {mainVideo ? (
@@ -90,4 +91,26 @@ function getOriginGroup(cultivar: CultivarWithMedia) {
   if (origin.includes("メキシコ")) return "メキシコ";
   if (origin.includes("中南米")) return "中南米";
   return origin.replace(/（.*?）/g, "").replace(/由来$/, "").trim() || origin;
+}
+
+function getMangoSugar(taste: string | null, description: string | null) {
+  const text = [taste, description].filter(Boolean).join(" ");
+  const match = text.match(/糖度[^0-9]*(\d+(?:\.\d+)?)\s*度?/);
+  return match ? `${match[1]}度` : null;
+}
+
+function getMaturityDays(taste: string | null, description: string | null) {
+  const text = [taste, description].filter(Boolean).join(" ");
+  const match = text.match(/成熟日数[^0-9]*(\d+(?:\.\d+)?)\s*日/);
+  return match ? `成熟${match[1]}日` : null;
+}
+
+function getFruitWeightSummary(fruitSize: string | null, description: string | null) {
+  const text = [fruitSize, description].filter(Boolean).join(" ");
+  const labeled = text.match(/(?:果実重|平均果実重|重さ)[^0-9]*(\d+(?:\.\d+)?)\s*(kg|g|グラム)/i);
+  const fallback = text.match(/(\d+(?:\.\d+)?)\s*(kg|g|グラム)/i);
+  const match = labeled ?? fallback;
+  if (!match) return null;
+  const unit = match[2] === "グラム" ? "g" : match[2];
+  return `${match[1]}${unit}`;
 }
