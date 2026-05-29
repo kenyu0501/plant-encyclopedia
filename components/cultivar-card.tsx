@@ -4,7 +4,7 @@ import type { CultivarWithMedia } from "@/types/database";
 
 export function CultivarCard({ fruitSlug, cultivar }: { fruitSlug: string; cultivar: CultivarWithMedia }) {
   const coldHardiness = getColdHardiness(cultivar);
-  const floweringType = fruitSlug === "avocado" ? cultivar.flowering_type : null;
+  const floweringType = ["avocado", "white-sapote"].includes(fruitSlug) ? cultivar.flowering_type : null;
   const plantHeightType = fruitSlug === "banana" ? cultivar.plant_height_type : null;
   const genomeGroup = fruitSlug === "banana" ? cultivar.genome_group : null;
   const yieldLevel = fruitSlug === "banana" ? cultivar.yield_level : null;

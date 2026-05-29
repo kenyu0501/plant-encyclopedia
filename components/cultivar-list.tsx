@@ -21,7 +21,7 @@ export function CultivarList({
   cultivars: CultivarWithMedia[];
 }) {
   const hasColdView = fruitSlug === "avocado" && cultivars.some((cultivar) => getColdHardiness(cultivar));
-  const hasFloweringView = fruitSlug === "avocado" && cultivars.some((cultivar) => cultivar.flowering_type);
+  const hasFloweringView = ["avocado", "white-sapote"].includes(fruitSlug) && cultivars.some((cultivar) => cultivar.flowering_type);
   const hasOriginView = fruitSlug === "mango" && cultivars.some((cultivar) => getOriginGroup(cultivar));
   const hasUseView = fruitSlug === "banana" && cultivars.some((cultivar) => getUseGroup(cultivar));
   const hasHeightView = fruitSlug === "banana" && cultivars.some((cultivar) => cultivar.plant_height_type);
@@ -295,7 +295,7 @@ function heightRank(label: string) {
 }
 
 function floweringRank(label: string) {
-  const order = ["A型", "B型", "AB型", "開花型未設定"];
+  const order = ["A型", "B型", "AB型", "タイプ1", "タイプ2", "タイプ3", "開花型未設定"];
   const index = order.indexOf(label);
   return index === -1 ? order.length : index;
 }
