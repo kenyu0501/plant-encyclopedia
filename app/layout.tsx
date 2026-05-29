@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import "./globals.css";
 import { BottomNav } from "@/components/bottom-nav";
+import { PageViewTracker } from "@/components/page-view-tracker";
 import { PwaRegister } from "@/components/pwa-register";
 
 export const metadata: Metadata = {
@@ -28,6 +29,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
     <html lang="ja">
       <body>
         <PwaRegister />
+        <PageViewTracker />
         <main className="safe-bottom mx-auto min-h-screen w-full max-w-4xl px-4 pb-24 pt-5 sm:px-6">
           {children}
         </main>

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ExternalLink, Pencil, PlayCircle } from "lucide-react";
+import { Pencil } from "lucide-react";
 import { CultivarList } from "@/components/cultivar-list";
 import { MangoPedigree } from "@/components/mango-pedigree";
 import { PageHeader } from "@/components/page-header";
@@ -31,6 +31,8 @@ export default async function FruitDetailPage({ params }: Props) {
   const user = await getCurrentUser();
   const isAdmin = await isAdminUser(user);
   const mainPhoto = fruit.photos?.find((photo) => photo.is_main) ?? fruit.photos?.[0];
+  const photos = [...(fruit.photos ?? [])].sort((a, b) => Number(b.is_main) - Number(a.is_main));
+  const galleryPhotos = mainPhoto ? photos.filter((photo) => photo.id !== mainPhoto.id) : photos;
 
   return (
     <div className="space-y-6">
@@ -56,6 +58,24 @@ export default async function FruitDetailPage({ params }: Props) {
         </div>
       ) : null}
 
+      {galleryPhotos.length > 0 ? (
+        <section className="grid gap-3 sm:grid-cols-3">
+          {galleryPhotos.map((photo, index) => (
+            <figure key={photo.id} className="overflow-hidden rounded-lg bg-white/84 ring-1 ring-leaf-100">
+              <div className="relative aspect-[4/3] bg-leaf-100">
+                <Image src={photo.image_url} alt={photo.caption ?? `${fruit.name_ja} メイン画像${index + 2}`} fill className="object-cover" sizes="(min-width: 640px) 33vw, 100vw" />
+              </div>
+              <figcaption className="space-y-1 p-3 text-xs leading-5 text-leaf-900/68">
+                <span className="inline-flex rounded-md bg-leaf-50 px-2 py-1 font-semibold">
+                  {photo.photo_type || `メイン画像${index + 2}`}
+                </span>
+                {photo.caption ? <p>{photo.caption}</p> : null}
+              </figcaption>
+            </figure>
+          ))}
+        </section>
+      ) : null}
+
       <section className="rounded-lg bg-white/84 p-5 ring-1 ring-leaf-100">
         <h2 className="font-bold text-leaf-900">果樹情報</h2>
         <div className="mt-4 grid gap-4 text-sm leading-6 text-leaf-900/76">
@@ -71,8 +91,6 @@ export default async function FruitDetailPage({ params }: Props) {
         {fruit.public_notes ? <p className="mt-4 rounded-md bg-leaf-50 p-3 text-sm leading-6 text-leaf-900/76">{fruit.public_notes}</p> : null}
       </section>
 
-      {fruit.slug === "mango" ? <MangoPedigree /> : null}
-
       <section className="space-y-3">
         <div className="flex items-center justify-between gap-3">
           <h2 className="text-lg font-bold text-leaf-900">品種</h2>
@@ -85,26 +103,7 @@ export default async function FruitDetailPage({ params }: Props) {
         <CultivarList fruitSlug={fruit.slug} cultivars={fruit.cultivars ?? []} />
       </section>
 
-      {fruit.videos && fruit.videos.length > 0 ? (
-        <section className="space-y-3">
-          <h2 className="text-lg font-bold text-leaf-900">YouTube</h2>
-          <div className="grid gap-3">
-            {fruit.videos.map((video) => (
-              <a
-                key={video.id}
-                href={video.youtube_url}
-                target="_blank"
-                rel="noreferrer"
-                className="flex items-center gap-3 rounded-lg bg-white/84 p-4 ring-1 ring-leaf-100"
-              >
-                <PlayCircle className="text-fruit-600" size={24} />
-                <span className="min-w-0 flex-1 font-semibold text-leaf-900">{video.title || video.youtube_url}</span>
-                <ExternalLink size={16} />
-              </a>
-            ))}
-          </div>
-        </section>
-      ) : null}
+      {fruit.slug === "mango" ? <MangoPedigree /> : null}
     </div>
   );
 }

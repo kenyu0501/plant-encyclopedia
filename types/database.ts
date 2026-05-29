@@ -89,9 +89,35 @@ export type Database = {
         Update: Partial<SiteSettingsInsert>;
         Relationships: [];
       };
+      page_views: {
+        Row: PageView;
+        Insert: PageViewInsert;
+        Update: Partial<PageViewInsert>;
+        Relationships: [
+          {
+            foreignKeyName: "page_views_fruit_id_fkey";
+            columns: ["fruit_id"];
+            isOneToOne: false;
+            referencedRelation: "fruits";
+            referencedColumns: ["id"];
+          },
+          {
+            foreignKeyName: "page_views_cultivar_id_fkey";
+            columns: ["cultivar_id"];
+            isOneToOne: false;
+            referencedRelation: "cultivars";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
     };
     Views: Record<string, never>;
-    Functions: Record<string, never>;
+    Functions: {
+      track_page_view: {
+        Args: { p_path: string };
+        Returns: null;
+      };
+    };
     Enums: Record<string, never>;
     CompositeTypes: Record<string, never>;
   };
@@ -215,6 +241,24 @@ export type SiteSettings = {
 };
 
 export type SiteSettingsInsert = Omit<SiteSettings, "updated_at"> & {
+  updated_at?: string;
+};
+
+export type PageView = {
+  [key: string]: unknown;
+  id: string;
+  page_path: string;
+  fruit_id: string | null;
+  cultivar_id: string | null;
+  view_date: string;
+  views: number;
+  created_at: string;
+  updated_at: string;
+};
+
+export type PageViewInsert = Omit<PageView, "id" | "created_at" | "updated_at"> & {
+  id?: string;
+  created_at?: string;
   updated_at?: string;
 };
 

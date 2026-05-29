@@ -24,6 +24,17 @@ export type PublicSearchEntry = {
   keywords: string;
 };
 
+export type SiteAnalytics = {
+  todayViews: number;
+  totalViews: number;
+  topCultivars: {
+    fruitName: string;
+    cultivarName: string;
+    href: string;
+    views: number;
+  }[];
+};
+
 export const defaultSiteSettings: SiteSettings = {
   id: "home",
   home_eyebrow: "スマホでひらく栽培メモ",
@@ -176,6 +187,68 @@ export async function getPublicSearchEntries() {
     }));
 
   return [...fruitEntries, ...cultivarEntries];
+}
+
+export async function getSiteAnalytics(): Promise<SiteAnalytics | null> {
+  const supabase = await createClient();
+  const today = new Date().toISOString().slice(0, 10);
+  const { data, error } = await supabase
+    .from("page_views")
+    .select("views, view_date, cultivar_id, cultivars(name_ja, slug, fruits(name_ja, slug))");
+
+  if (error) {
+    console.error(error);
+    return null;
+  }
+
+  type AnalyticsRow = {
+    views: number | null;
+    view_date: string | null;
+    cultivar_id: string | null;
+    cultivars:
+      | {
+          name_ja: string | null;
+          slug: string | null;
+          fruits: { name_ja: string | null; slug: string | null } | { name_ja: string | null; slug: string | null }[] | null;
+        }
+      | {
+          name_ja: string | null;
+          slug: string | null;
+          fruits: { name_ja: string | null; slug: string | null } | { name_ja: string | null; slug: string | null }[] | null;
+        }[]
+      | null;
+  };
+
+  const rows = (data ?? []) as unknown as AnalyticsRow[];
+  const totalViews = rows.reduce((sum, row) => sum + (row.views ?? 0), 0);
+  const todayViews = rows
+    .filter((row) => row.view_date === today)
+    .reduce((sum, row) => sum + (row.views ?? 0), 0);
+  const cultivarMap = new Map<string, SiteAnalytics["topCultivars"][number]>();
+
+  for (const row of rows) {
+    if (!row.cultivar_id || !row.cultivars) continue;
+    const cultivar = Array.isArray(row.cultivars) ? row.cultivars[0] : row.cultivars;
+    const fruit = Array.isArray(cultivar.fruits) ? cultivar.fruits[0] : cultivar.fruits;
+    if (!cultivar?.slug || !cultivar.name_ja || !fruit?.slug || !fruit.name_ja) continue;
+
+    const href = `/fruits/${fruit.slug}/cultivars/${cultivar.slug}`;
+    const current = cultivarMap.get(href);
+    cultivarMap.set(href, {
+      fruitName: fruit.name_ja,
+      cultivarName: cultivar.name_ja,
+      href,
+      views: (current?.views ?? 0) + (row.views ?? 0)
+    });
+  }
+
+  return {
+    todayViews,
+    totalViews,
+    topCultivars: Array.from(cultivarMap.values())
+      .sort((a, b) => b.views - a.views)
+      .slice(0, 5)
+  };
 }
 
 export async function getAdminFruits() {
