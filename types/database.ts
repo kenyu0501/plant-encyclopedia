@@ -142,6 +142,9 @@ export type Cultivar = {
   harvest_season: string | null;
   cold_hardiness: string | null;
   flowering_type: string | null;
+  plant_height_type: string | null;
+  genome_group: string | null;
+  yield_level: string | null;
   tree_vigor: string | null;
   difficulty: string | null;
   okinawa_suitability: string | null;

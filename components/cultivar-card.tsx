@@ -5,6 +5,9 @@ import type { CultivarWithMedia } from "@/types/database";
 export function CultivarCard({ fruitSlug, cultivar }: { fruitSlug: string; cultivar: CultivarWithMedia }) {
   const coldHardiness = getColdHardiness(cultivar);
   const floweringType = fruitSlug === "avocado" ? cultivar.flowering_type : null;
+  const plantHeightType = fruitSlug === "banana" ? cultivar.plant_height_type : null;
+  const genomeGroup = fruitSlug === "banana" ? cultivar.genome_group : null;
+  const yieldLevel = fruitSlug === "banana" ? cultivar.yield_level : null;
   const originGroup = fruitSlug === "mango" ? getOriginGroup(cultivar) : null;
   const useGroup = fruitSlug === "banana" ? getUseGroup(cultivar) : null;
   const mainPhoto = cultivar.photos?.find((photo) => photo.is_main) ?? cultivar.photos?.[0];
@@ -35,12 +38,15 @@ export function CultivarCard({ fruitSlug, cultivar }: { fruitSlug: string; culti
             <span className="rounded-md bg-fruit-100 px-2 py-1 text-xs font-bold text-leaf-900">販売</span>
           ) : null}
         </div>
-        {coldHardiness || floweringType || cultivar.harvest_season || useGroup ? (
+        {coldHardiness || floweringType || plantHeightType || genomeGroup || yieldLevel || cultivar.harvest_season || useGroup ? (
           <div className="mt-3 flex flex-wrap gap-2 text-xs font-semibold text-leaf-900/64">
             {originGroup ? <span className="rounded-md bg-leaf-50 px-2 py-1">{originGroup}</span> : null}
             {useGroup ? <span className="rounded-md bg-leaf-50 px-2 py-1">{useGroup}</span> : null}
             {coldHardiness ? <span className="rounded-md bg-leaf-50 px-2 py-1">耐寒 {coldHardiness}</span> : null}
             {floweringType ? <span className="rounded-md bg-leaf-50 px-2 py-1">開花 {floweringType}</span> : null}
+            {plantHeightType ? <span className="rounded-md bg-leaf-50 px-2 py-1">{plantHeightType}</span> : null}
+            {genomeGroup ? <span className="rounded-md bg-leaf-50 px-2 py-1">{genomeGroup}</span> : null}
+            {yieldLevel ? <span className="rounded-md bg-fruit-100 px-2 py-1">収量 {yieldLevel}</span> : null}
             {cultivar.harvest_season ? <span className="rounded-md bg-fruit-100 px-2 py-1">{shortHarvest(cultivar.harvest_season)}</span> : null}
           </div>
         ) : originGroup ? (
