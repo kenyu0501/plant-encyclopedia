@@ -2,11 +2,11 @@
 
 import { useMemo, useState } from "react";
 import type { ReactNode } from "react";
-import { BarChart3, Dna, Globe2, Tags, Thermometer, ListFilter, Ruler } from "lucide-react";
+import { BarChart3, Dna, Flower2, Globe2, Tags, Thermometer, ListFilter, Ruler } from "lucide-react";
 import { CultivarCard } from "@/components/cultivar-card";
 import type { CultivarWithMedia } from "@/types/database";
 
-type ViewMode = "name" | "cold" | "origin" | "use" | "height" | "genome" | "yield";
+type ViewMode = "name" | "cold" | "flowering" | "origin" | "use" | "height" | "genome" | "yield";
 type CultivarGroup = {
   label: string;
   rank: number;
@@ -21,6 +21,7 @@ export function CultivarList({
   cultivars: CultivarWithMedia[];
 }) {
   const hasColdView = fruitSlug === "avocado" && cultivars.some((cultivar) => getColdHardiness(cultivar));
+  const hasFloweringView = fruitSlug === "avocado" && cultivars.some((cultivar) => cultivar.flowering_type);
   const hasOriginView = fruitSlug === "mango" && cultivars.some((cultivar) => getOriginGroup(cultivar));
   const hasUseView = fruitSlug === "banana" && cultivars.some((cultivar) => getUseGroup(cultivar));
   const hasHeightView = fruitSlug === "banana" && cultivars.some((cultivar) => cultivar.plant_height_type);
@@ -34,6 +35,7 @@ export function CultivarList({
   );
 
   const coldGroups = useMemo(() => groupByColdHardiness(cultivars), [cultivars]);
+  const floweringGroups = useMemo(() => groupByField(cultivars, "flowering_type", floweringRank, "開花型未設定"), [cultivars]);
   const originGroups = useMemo(() => groupByOrigin(cultivars), [cultivars]);
   const useGroups = useMemo(() => groupByUse(cultivars), [cultivars]);
   const heightGroups = useMemo(() => groupByField(cultivars, "plant_height_type", heightRank, "背丈未設定"), [cultivars]);
@@ -42,6 +44,7 @@ export function CultivarList({
   const availableModes: ViewMode[] = [
     "name",
     ...(hasColdView ? (["cold"] as const) : []),
+    ...(hasFloweringView ? (["flowering"] as const) : []),
     ...(hasOriginView ? (["origin"] as const) : []),
     ...(hasUseView ? (["use"] as const) : []),
     ...(hasHeightView ? (["height"] as const) : []),
@@ -64,6 +67,7 @@ export function CultivarList({
         <div className="flex gap-1 overflow-x-auto rounded-lg bg-white/86 p-1 ring-1 ring-leaf-100">
           <ModeButton active={activeMode === "name"} icon={<ListFilter size={16} />} label="あいうえお順" onClick={() => setViewMode("name")} />
           {hasColdView ? <ModeButton active={activeMode === "cold"} icon={<Thermometer size={16} />} label="耐寒性順" onClick={() => setViewMode("cold")} /> : null}
+          {hasFloweringView ? <ModeButton active={activeMode === "flowering"} icon={<Flower2 size={16} />} label="開花型別" onClick={() => setViewMode("flowering")} /> : null}
           {hasOriginView ? <ModeButton active={activeMode === "origin"} icon={<Globe2 size={16} />} label="産地別" onClick={() => setViewMode("origin")} /> : null}
           {hasUseView ? <ModeButton active={activeMode === "use"} icon={<Tags size={16} />} label="用途別" onClick={() => setViewMode("use")} /> : null}
           {hasHeightView ? <ModeButton active={activeMode === "height"} icon={<Ruler size={16} />} label="背丈別" onClick={() => setViewMode("height")} /> : null}
@@ -74,6 +78,8 @@ export function CultivarList({
 
       {activeMode === "cold" ? (
         <GroupedCultivars fruitSlug={fruitSlug} groups={coldGroups} />
+      ) : activeMode === "flowering" ? (
+        <GroupedCultivars fruitSlug={fruitSlug} groups={floweringGroups} />
       ) : activeMode === "origin" ? (
         <GroupedCultivars fruitSlug={fruitSlug} groups={originGroups} />
       ) : activeMode === "use" ? (
@@ -97,7 +103,7 @@ export function CultivarList({
 
 function groupByField(
   cultivars: CultivarWithMedia[],
-  field: "plant_height_type" | "genome_group" | "yield_level",
+  field: "flowering_type" | "plant_height_type" | "genome_group" | "yield_level",
   ranker: (label: string) => number,
   fallback: string
 ): CultivarGroup[] {
@@ -284,6 +290,12 @@ function useRank(label: string) {
 
 function heightRank(label: string) {
   const order = ["矮性", "小型", "中間", "中型", "高性", "大型", "背丈未設定"];
+  const index = order.indexOf(label);
+  return index === -1 ? order.length : index;
+}
+
+function floweringRank(label: string) {
+  const order = ["A型", "B型", "AB型", "開花型未設定"];
   const index = order.indexOf(label);
   return index === -1 ? order.length : index;
 }
