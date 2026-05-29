@@ -145,7 +145,14 @@ export function PhotoUploadForm({
       <label className="block">
         <span className="text-sm font-semibold text-leaf-900">写真タイプ</span>
         <select value={photoType} onChange={(event) => setPhotoType(event.target.value)} className="mt-2 w-full rounded-md border border-leaf-100 bg-white px-3 py-3">
-          <option value="fruit">果樹ページ用</option>
+          <option value="fruit">通常写真（果樹ページには自動表示しない）</option>
+          <option value="メイン下画像">メイン下画像</option>
+          <option value="メイン画像2">メイン画像2</option>
+          <option value="メイン画像3">メイン画像3</option>
+          <option value="栽培暦">栽培暦</option>
+          <option value="特徴図">特徴図</option>
+          <option value="育て方図">育て方図</option>
+          <option value="剪定図">剪定図</option>
           <option value="果実">果実</option>
           <option value="枝葉">枝葉</option>
           <option value="花">花</option>

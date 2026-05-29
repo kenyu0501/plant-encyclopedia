@@ -32,7 +32,10 @@ export default async function FruitDetailPage({ params }: Props) {
   const isAdmin = await isAdminUser(user);
   const mainPhoto = fruit.photos?.find((photo) => photo.is_main) ?? fruit.photos?.[0];
   const photos = [...(fruit.photos ?? [])].sort((a, b) => Number(b.is_main) - Number(a.is_main));
-  const galleryPhotos = mainPhoto ? photos.filter((photo) => photo.id !== mainPhoto.id) : photos;
+  const galleryPhotos = photos
+    .filter((photo) => photo.id !== mainPhoto?.id)
+    .filter((photo) => isFruitHeroSupplementPhoto(photo.photo_type))
+    .slice(0, 6);
 
   return (
     <div className="space-y-6">
@@ -106,6 +109,11 @@ export default async function FruitDetailPage({ params }: Props) {
       {fruit.slug === "mango" ? <MangoPedigree /> : null}
     </div>
   );
+}
+
+function isFruitHeroSupplementPhoto(photoType: string | null) {
+  if (!photoType) return false;
+  return ["メイン下画像", "メイン画像2", "メイン画像3", "栽培暦", "特徴図", "育て方図", "剪定図"].includes(photoType);
 }
 
 function Info({ label, value }: { label: string; value: string | null }) {

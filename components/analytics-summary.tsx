@@ -7,8 +7,7 @@ export function AnalyticsSummary({ analytics }: { analytics: SiteAnalytics | nul
   return (
     <section className="space-y-3 rounded-lg bg-white/84 p-5 ring-1 ring-leaf-100">
       <div>
-        <p className="text-sm font-semibold text-leaf-700">閲覧データ</p>
-        <h2 className="mt-1 text-xl font-bold text-leaf-900">よく見られている品種</h2>
+        <h2 className="text-xl font-bold text-leaf-900">閲覧データ</h2>
       </div>
 
       <div className="grid gap-3 sm:grid-cols-2">
