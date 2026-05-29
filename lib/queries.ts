@@ -15,6 +15,15 @@ export type AdminVideo = Video & {
   cultivars: Pick<Cultivar, "name_ja" | "slug"> | null;
 };
 
+export type PublicSearchEntry = {
+  id: string;
+  type: "fruit" | "cultivar";
+  title: string;
+  subtitle: string | null;
+  href: string;
+  keywords: string;
+};
+
 export const defaultSiteSettings: SiteSettings = {
   id: "home",
   home_eyebrow: "スマホでひらく栽培メモ",
@@ -100,6 +109,71 @@ export async function getPublicCultivarBySlugs(fruitSlug: string, cultivarSlug: 
     photos: (cultivar.photos ?? []).filter((photo) => photo.approval_status === "approved"),
     videos: (cultivar.videos ?? []).filter((video) => video.is_public)
   };
+}
+
+export async function getPublicSearchEntries() {
+  const supabase = await createClient();
+  const [fruitsResult, cultivarsResult] = await Promise.all([
+    supabase
+      .from("fruits")
+      .select("id, name_ja, name_en, slug, scientific_name, family_name, origin, description")
+      .eq("is_public", true)
+      .order("name_ja", { ascending: true }),
+    supabase
+      .from("cultivars")
+      .select("id, name_ja, name_en, slug, origin, description, taste, harvest_season, fruits!inner(name_ja, slug, is_public)")
+      .eq("is_public", true)
+      .eq("fruits.is_public", true)
+      .order("name_ja", { ascending: true })
+  ]);
+
+  if (fruitsResult.error) console.error(fruitsResult.error);
+  if (cultivarsResult.error) console.error(cultivarsResult.error);
+
+  const fruitEntries: PublicSearchEntry[] = ((fruitsResult.data ?? []) as Pick<
+    Fruit,
+    "id" | "name_ja" | "name_en" | "slug" | "scientific_name" | "family_name" | "origin" | "description"
+  >[]).map((fruit) => ({
+    id: fruit.id,
+    type: "fruit",
+    title: fruit.name_ja,
+    subtitle: [fruit.name_en, fruit.scientific_name].filter(Boolean).join(" / ") || null,
+    href: `/fruits/${fruit.slug}`,
+    keywords: [fruit.name_ja, fruit.name_en, fruit.scientific_name, fruit.family_name, fruit.origin, fruit.description]
+      .filter(Boolean)
+      .join(" ")
+  }));
+
+  type SearchCultivar = Pick<
+    Cultivar,
+    "id" | "name_ja" | "name_en" | "slug" | "origin" | "description" | "taste" | "harvest_season"
+  > & {
+    fruits: Pick<Fruit, "name_ja" | "slug"> | Pick<Fruit, "name_ja" | "slug">[] | null;
+  };
+
+  const cultivarEntries: PublicSearchEntry[] = ((cultivarsResult.data ?? []) as SearchCultivar[])
+    .map((cultivar) => ({ ...cultivar, fruit: Array.isArray(cultivar.fruits) ? cultivar.fruits[0] : cultivar.fruits }))
+    .filter((cultivar) => cultivar.fruit)
+    .map((cultivar) => ({
+      id: cultivar.id,
+      type: "cultivar",
+      title: cultivar.name_ja,
+      subtitle: [cultivar.fruit?.name_ja, cultivar.name_en].filter(Boolean).join(" / ") || null,
+      href: `/fruits/${cultivar.fruit?.slug}/cultivars/${cultivar.slug}`,
+      keywords: [
+        cultivar.name_ja,
+        cultivar.name_en,
+        cultivar.fruit?.name_ja,
+        cultivar.origin,
+        cultivar.description,
+        cultivar.taste,
+        cultivar.harvest_season
+      ]
+        .filter(Boolean)
+        .join(" ")
+    }));
+
+  return [...fruitEntries, ...cultivarEntries];
 }
 
 export async function getAdminFruits() {

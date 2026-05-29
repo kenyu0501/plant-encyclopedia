@@ -1,12 +1,17 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { FruitCard } from "@/components/fruit-card";
-import { getPublicFruits, getSiteSettings } from "@/lib/queries";
+import { HomeSearch } from "@/components/home-search";
+import { getPublicFruits, getPublicSearchEntries, getSiteSettings } from "@/lib/queries";
 
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
-  const [fruits, settings] = await Promise.all([getPublicFruits(6), getSiteSettings()]);
+  const [fruits, settings, searchEntries] = await Promise.all([
+    getPublicFruits(6),
+    getSiteSettings(),
+    getPublicSearchEntries()
+  ]);
 
   return (
     <div className="space-y-8">
@@ -18,6 +23,7 @@ export default async function HomePage() {
         <p className="mt-3 leading-7 text-leaf-900/75">
           {settings.home_description}
         </p>
+        <HomeSearch entries={searchEntries} />
         <div className="mt-5 flex flex-wrap gap-3">
           <Link
             href="/fruits"

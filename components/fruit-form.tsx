@@ -24,10 +24,16 @@ type Field = keyof Pick<
   | "private_notes"
 >;
 
-const fields: { name: Field; label: string; textarea?: boolean; required?: boolean }[] = [
+const fields: { name: Field; label: string; textarea?: boolean; required?: boolean; placeholder?: string; help?: string }[] = [
   { name: "name_ja", label: "和名", required: true },
   { name: "name_en", label: "英名" },
-  { name: "slug", label: "URLスラッグ", required: true },
+  {
+    name: "slug",
+    label: "URLスラッグ",
+    required: true,
+    placeholder: "例: dragon-fruit",
+    help: "URLに使う英数字です。新しい果樹ごとに重複しない値にしてください。"
+  },
   { name: "scientific_name", label: "学名" },
   { name: "family_name", label: "科名" },
   { name: "origin", label: "原産地" },
@@ -102,6 +108,7 @@ export function FruitForm({ fruit }: { fruit?: Fruit | null }) {
               required={field.required}
               value={form[field.name]}
               onChange={(event) => update(field.name, event.target.value)}
+              placeholder={field.placeholder}
               rows={4}
               className="mt-2 w-full rounded-md border border-leaf-100 bg-white px-3 py-3 outline-none focus:border-leaf-600"
             />
@@ -110,9 +117,11 @@ export function FruitForm({ fruit }: { fruit?: Fruit | null }) {
               required={field.required}
               value={form[field.name]}
               onChange={(event) => update(field.name, event.target.value)}
+              placeholder={field.placeholder}
               className="mt-2 w-full rounded-md border border-leaf-100 bg-white px-3 py-3 outline-none focus:border-leaf-600"
             />
           )}
+          {field.help ? <span className="mt-1 block text-xs leading-5 text-leaf-900/58">{field.help}</span> : null}
         </label>
       ))}
       {message ? <p className="rounded-md bg-red-50 p-3 text-sm text-red-700">{message}</p> : null}
