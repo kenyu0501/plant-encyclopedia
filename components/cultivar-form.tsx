@@ -57,7 +57,7 @@ const fields: { name: Field; label: string; textarea?: boolean; required?: boole
   { name: "container_suitability", label: "鉢植え適性" },
   { name: "beginner_suitability", label: "初心者向け" },
   { name: "kenyu_comment", label: "けんゆーコメント", textarea: true },
-  { name: "public_notes", label: "公開メモ", textarea: true },
+  { name: "public_notes", label: "出典・公開メモ", textarea: true },
   { name: "private_notes", label: "非公開メモ", textarea: true }
 ];
 

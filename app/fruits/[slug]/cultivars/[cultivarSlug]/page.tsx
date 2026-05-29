@@ -147,7 +147,12 @@ export default async function CultivarDetailPage({ params }: Props) {
             {cultivar.kenyu_comment}
           </p>
         ) : null}
-        {cultivar.public_notes ? <p className="mt-4 text-sm leading-6 text-leaf-900/72">{cultivar.public_notes}</p> : null}
+        {cultivar.public_notes ? (
+          <div className="mt-4 rounded-md bg-leaf-50 p-3 text-sm leading-6 text-leaf-900/72">
+            <p className="font-bold text-leaf-900">出典・補足</p>
+            <p className="mt-1 whitespace-pre-line">{cultivar.public_notes}</p>
+          </div>
+        ) : null}
       </section>
     </div>
   );
