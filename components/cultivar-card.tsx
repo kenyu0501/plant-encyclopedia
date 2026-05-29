@@ -44,8 +44,8 @@ export function CultivarCard({ fruitSlug, cultivar }: { fruitSlug: string; culti
             {useGroup ? <span className="rounded-md bg-leaf-50 px-2 py-1">{useGroup}</span> : null}
             {coldHardiness ? <span className="rounded-md bg-leaf-50 px-2 py-1">耐寒 {coldHardiness}</span> : null}
             {floweringType ? <span className="rounded-md bg-leaf-50 px-2 py-1">開花 {floweringType}</span> : null}
-            {plantHeightType ? <span className="rounded-md bg-leaf-50 px-2 py-1">{plantHeightType}</span> : null}
-            {genomeGroup ? <span className="rounded-md bg-leaf-50 px-2 py-1">{genomeGroup}</span> : null}
+            {plantHeightType ? <span className="rounded-md bg-leaf-50 px-2 py-1">背丈 {plantHeightType}</span> : null}
+            {genomeGroup ? <span className="rounded-md bg-leaf-50 px-2 py-1">ゲノム {genomeGroup}</span> : null}
             {yieldLevel ? <span className="rounded-md bg-fruit-100 px-2 py-1">収量 {yieldLevel}</span> : null}
             {cultivar.harvest_season ? <span className="rounded-md bg-fruit-100 px-2 py-1">{shortHarvest(cultivar.harvest_season)}</span> : null}
           </div>
@@ -60,7 +60,7 @@ export function CultivarCard({ fruitSlug, cultivar }: { fruitSlug: string; culti
             <span className="truncate">{mainVideo.title || "YouTubeあり"}</span>
           </div>
         ) : null}
-        {cultivar.taste ? <p className="mt-3 text-sm leading-6 text-leaf-900/70">{cultivar.taste}</p> : null}
+        {cultivar.taste ? <p className="mt-3 line-clamp-2 text-sm leading-6 text-leaf-900/70">{cultivar.taste}</p> : null}
       </div>
     </Link>
   );

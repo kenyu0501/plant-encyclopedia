@@ -2,7 +2,8 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ExternalLink, ImagePlus, Pencil, PlayCircle } from "lucide-react";
+import type { ReactNode } from "react";
+import { Apple, BarChart3, Dna, ExternalLink, ImagePlus, Leaf, Pencil, PlayCircle, Ruler, Sprout } from "lucide-react";
 import { PageHeader } from "@/components/page-header";
 import { getCurrentUser, isAdminUser } from "@/lib/auth";
 import { getPublicCultivarBySlugs } from "@/lib/queries";
@@ -31,6 +32,19 @@ export default async function CultivarDetailPage({ params }: Props) {
   const mainPhoto = cultivar.photos?.find((photo) => photo.is_main) ?? cultivar.photos?.[0];
   const photos = [...(cultivar.photos ?? [])].sort((a, b) => Number(b.is_main) - Number(a.is_main));
   const galleryPhotos = mainPhoto ? photos.filter((photo) => photo.id !== mainPhoto.id) : photos;
+  const isBanana = cultivar.fruits.slug === "banana";
+  const displayOrigin = isBanana ? getPublicBananaOrigin(cultivar.origin) : cultivar.origin;
+  const primaryStats = isBanana
+    ? [
+        { label: "背丈", value: cultivar.plant_height_type, icon: <Ruler size={18} /> },
+        { label: "ゲノム", value: cultivar.genome_group, icon: <Dna size={18} /> },
+        { label: "収量", value: cultivar.yield_level, icon: <BarChart3 size={18} /> }
+      ]
+    : [
+        { label: "耐寒温度目安", value: cultivar.cold_hardiness, icon: <Sprout size={18} /> },
+        { label: "開花型", value: cultivar.flowering_type, icon: <Leaf size={18} /> },
+        { label: "収穫期", value: cultivar.harvest_season, icon: <Apple size={18} /> }
+      ];
 
   return (
     <div className="space-y-6">
@@ -123,32 +137,49 @@ export default async function CultivarDetailPage({ params }: Props) {
 
       <section className="rounded-lg bg-white/84 p-5 ring-1 ring-leaf-100">
         <h2 className="font-bold text-leaf-900">品種情報</h2>
-        <div className="mt-4 grid gap-4 text-sm leading-6 text-leaf-900/76 sm:grid-cols-2">
-          <Info label="原産地" value={cultivar.origin} />
-          <Info label="果実サイズ" value={cultivar.fruit_size} />
-          <Info label="味" value={cultivar.taste} />
-          <Info label="食感" value={cultivar.texture} />
-          <Info label="香り" value={cultivar.aroma} />
-          <Info label="収穫期" value={cultivar.harvest_season} />
-          <Info label="耐寒温度目安" value={cultivar.cold_hardiness} />
-          <Info label="開花型" value={cultivar.flowering_type} />
-          <Info label="背丈" value={cultivar.plant_height_type} />
-          <Info label="ゲノム構成" value={cultivar.genome_group} />
-          <Info label="収量" value={cultivar.yield_level} />
-          <Info label="樹勢" value={cultivar.tree_vigor} />
-          <Info label="難易度" value={cultivar.difficulty} />
-          <Info label="沖縄適性" value={cultivar.okinawa_suitability} />
-          <Info label="鉢植え適性" value={cultivar.container_suitability} />
-          <Info label="初心者向け" value={cultivar.beginner_suitability} />
+
+        {cultivar.description ? <p className="mt-4 leading-7 text-leaf-900/82">{cultivar.description}</p> : null}
+
+        {primaryStats.some((stat) => stat.value) ? (
+          <div className="mt-5 grid gap-3 sm:grid-cols-3">
+            {primaryStats.map((stat) => (
+              <MetricCard key={stat.label} label={stat.label} value={stat.value} icon={stat.icon} />
+            ))}
+          </div>
+        ) : null}
+
+        <div className="mt-5 grid gap-4 lg:grid-cols-[1fr_1fr]">
+          <InfoGroup title="果実と食味">
+            <Info label="原産地" value={displayOrigin} />
+            <Info label="果実サイズ" value={cultivar.fruit_size} />
+            <Info label="味" value={cultivar.taste} />
+            <Info label="食感" value={cultivar.texture} />
+            <Info label="香り" value={cultivar.aroma} />
+            <Info label="収穫期" value={cultivar.harvest_season} />
+          </InfoGroup>
+
+          <InfoGroup title="栽培の見どころ">
+            {!isBanana ? <Info label="耐寒温度目安" value={cultivar.cold_hardiness} /> : null}
+            {!isBanana ? <Info label="開花型" value={cultivar.flowering_type} /> : null}
+            {isBanana ? <Info label="背丈" value={cultivar.plant_height_type} /> : null}
+            {isBanana ? <Info label="ゲノム構成" value={cultivar.genome_group} /> : null}
+            {isBanana ? <Info label="収量" value={cultivar.yield_level} /> : null}
+            <Info label="樹勢" value={cultivar.tree_vigor} />
+            <Info label="難易度" value={cultivar.difficulty} />
+            <Info label="沖縄適性" value={cultivar.okinawa_suitability} />
+            <Info label="鉢植え適性" value={cultivar.container_suitability} />
+            <Info label="初心者向け" value={cultivar.beginner_suitability} />
+          </InfoGroup>
         </div>
-        {cultivar.description ? <p className="mt-5 leading-7 text-leaf-900/80">{cultivar.description}</p> : null}
+
         {cultivar.kenyu_comment ? (
-          <p className="mt-4 rounded-md bg-fruit-100 p-3 text-sm leading-6 text-leaf-900/82">
-            {cultivar.kenyu_comment}
-          </p>
+          <div className="mt-5 rounded-lg bg-fruit-100 p-4 text-sm leading-6 text-leaf-900/82">
+            <p className="font-bold text-leaf-900">けんゆーコメント</p>
+            <p className="mt-2">{cultivar.kenyu_comment}</p>
+          </div>
         ) : null}
         {cultivar.public_notes ? (
-          <div className="mt-4 rounded-md bg-leaf-50 p-3 text-sm leading-6 text-leaf-900/72">
+          <div className="mt-4 rounded-lg bg-leaf-50 p-4 text-sm leading-6 text-leaf-900/72">
             <p className="font-bold text-leaf-900">出典・補足</p>
             <p className="mt-1 whitespace-pre-line">{cultivar.public_notes}</p>
           </div>
@@ -158,12 +189,41 @@ export default async function CultivarDetailPage({ params }: Props) {
   );
 }
 
+function MetricCard({ label, value, icon }: { label: string; value: string | null; icon: ReactNode }) {
+  if (!value) return null;
+  return (
+    <div className="rounded-lg bg-leaf-50 p-4 ring-1 ring-leaf-100">
+      <div className="flex items-center gap-2 text-leaf-700">
+        {icon}
+        <dt className="text-xs font-bold">{label}</dt>
+      </div>
+      <dd className="mt-2 text-lg font-bold leading-tight text-leaf-900">{value}</dd>
+    </div>
+  );
+}
+
+function InfoGroup({ title, children }: { title: string; children: ReactNode }) {
+  return (
+    <section className="rounded-lg bg-white/72 p-4 ring-1 ring-leaf-100">
+      <h3 className="text-sm font-bold text-leaf-900">{title}</h3>
+      <dl className="mt-3 grid gap-3 text-sm leading-6 text-leaf-900/76">{children}</dl>
+    </section>
+  );
+}
+
 function Info({ label, value }: { label: string; value: string | boolean | null }) {
   if (value === null || value === "") return null;
   return (
-    <div>
+    <div className="grid gap-1 border-b border-leaf-100 pb-3 last:border-b-0 last:pb-0 sm:grid-cols-[8.5rem_1fr]">
       <dt className="font-semibold text-leaf-900">{label}</dt>
-      <dd className="mt-1">{typeof value === "boolean" ? (value ? "はい" : "いいえ") : value}</dd>
+      <dd className="whitespace-pre-line">{typeof value === "boolean" ? (value ? "はい" : "いいえ") : value}</dd>
     </div>
   );
+}
+
+function getPublicBananaOrigin(origin: string | null) {
+  if (!origin) return null;
+  const internalPatterns = ["さん", "氏", "購入", "吸芽", "導入", "提供", "株", "メイクマン", "JAおきなわ", "旧農大", "農大"];
+  if (internalPatterns.some((pattern) => origin.includes(pattern))) return null;
+  return origin;
 }
