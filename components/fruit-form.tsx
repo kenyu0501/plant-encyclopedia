@@ -52,6 +52,7 @@ export function FruitForm({ fruit }: { fruit?: Fruit | null }) {
   const [form, setForm] = useState<Record<string, string>>(() =>
     Object.fromEntries(fields.map((field) => [field.name, fruit?.[field.name] ?? ""]))
   );
+  const [displayOrder, setDisplayOrder] = useState(fruit?.display_order?.toString() ?? "");
   const [isPublic, setIsPublic] = useState(fruit?.is_public ?? false);
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
@@ -67,6 +68,7 @@ export function FruitForm({ fruit }: { fruit?: Fruit | null }) {
     const supabase = createClient();
     const payload = {
       ...form,
+      display_order: displayOrder.trim() ? Number(displayOrder) : null,
       is_public: isPublic,
       updated_at: new Date().toISOString()
     } as FruitInsert;
@@ -99,6 +101,20 @@ export function FruitForm({ fruit }: { fruit?: Fruit | null }) {
       <label className="flex items-center justify-between gap-3 rounded-md bg-leaf-50 p-3">
         <span className="font-semibold text-leaf-900">公開する</span>
         <input type="checkbox" checked={isPublic} onChange={(event) => setIsPublic(event.target.checked)} className="h-5 w-5" />
+      </label>
+      <label className="block rounded-md border border-leaf-100 bg-white p-3">
+        <span className="text-sm font-semibold text-leaf-900">表示順</span>
+        <input
+          type="number"
+          inputMode="numeric"
+          value={displayOrder}
+          onChange={(event) => setDisplayOrder(event.target.value)}
+          placeholder="例: 10"
+          className="mt-2 w-full rounded-md border border-leaf-100 bg-white px-3 py-3 outline-none focus:border-leaf-600"
+        />
+        <span className="mt-1 block text-xs leading-5 text-leaf-900/58">
+          小さい数字ほど先に表示されます。未入力の果樹は、表示順が入っている果樹の後ろで名前順になります。
+        </span>
       </label>
       {fields.map((field) => (
         <label key={field.name} className="block">

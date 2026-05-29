@@ -114,6 +114,7 @@ export type Fruit = {
   okinawa_suitability: string | null;
   public_notes: string | null;
   private_notes: string | null;
+  display_order: number | null;
   is_public: boolean;
   created_at: string;
   updated_at: string;

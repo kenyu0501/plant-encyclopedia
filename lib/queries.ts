@@ -39,6 +39,7 @@ export async function getPublicFruits(limit?: number) {
     .from("fruits")
     .select("*, photos(*), cultivars(id), videos(*)")
     .eq("is_public", true)
+    .order("display_order", { ascending: true, nullsFirst: false })
     .order("name_ja", { ascending: true });
 
   if (limit) query = query.limit(limit);
@@ -118,6 +119,7 @@ export async function getPublicSearchEntries() {
       .from("fruits")
       .select("id, name_ja, name_en, slug, scientific_name, family_name, origin, description")
       .eq("is_public", true)
+      .order("display_order", { ascending: true, nullsFirst: false })
       .order("name_ja", { ascending: true }),
     supabase
       .from("cultivars")
@@ -178,7 +180,11 @@ export async function getPublicSearchEntries() {
 
 export async function getAdminFruits() {
   const supabase = await createClient();
-  const { data, error } = await supabase.from("fruits").select("*").order("name_ja", { ascending: true });
+  const { data, error } = await supabase
+    .from("fruits")
+    .select("*")
+    .order("display_order", { ascending: true, nullsFirst: false })
+    .order("name_ja", { ascending: true });
   if (error) {
     console.error(error);
     return [];

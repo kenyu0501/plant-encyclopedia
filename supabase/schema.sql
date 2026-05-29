@@ -22,6 +22,7 @@ create table if not exists public.fruits (
   okinawa_suitability text,
   public_notes text,
   private_notes text,
+  display_order integer,
   is_public boolean not null default false,
   created_at timestamptz not null default now(),
   updated_at timestamptz not null default now()

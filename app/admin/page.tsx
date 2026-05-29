@@ -23,8 +23,13 @@ export default async function AdminPage() {
         <div className="grid gap-3">
           {fruits.map((fruit) => (
             <Link key={fruit.id} href={`/admin/fruits/${fruit.id}`} className="flex items-center justify-between gap-3 rounded-lg bg-white/84 p-4 ring-1 ring-leaf-100">
-              <span className="font-semibold text-leaf-900">{fruit.name_ja}</span>
-              <span className={`rounded-md px-2 py-1 text-xs font-bold ${fruit.is_public ? "bg-leaf-50 text-leaf-800" : "bg-stone-100 text-stone-600"}`}>
+              <span>
+                <span className="font-semibold text-leaf-900">{fruit.name_ja}</span>
+                <span className="ml-2 text-xs font-semibold text-leaf-900/48">
+                  表示順 {fruit.display_order ?? "未設定"}
+                </span>
+              </span>
+              <span className={`shrink-0 rounded-md px-2 py-1 text-xs font-bold ${fruit.is_public ? "bg-leaf-50 text-leaf-800" : "bg-stone-100 text-stone-600"}`}>
                 {fruit.is_public ? "公開" : "非公開"}
               </span>
             </Link>
