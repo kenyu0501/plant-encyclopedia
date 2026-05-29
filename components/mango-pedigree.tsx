@@ -1,5 +1,57 @@
 import Link from "next/link";
 
+const families: PedigreeFamilyData[] = [
+  {
+    theme: "florida",
+    group: "フロリダ系",
+    parentA: { label: "Lippens", year: "1940年代", tone: "parent" },
+    parentB: { label: "Haden", year: "1910年頃", tone: "ancestor" },
+    child: { label: "アーウィン", year: "1949年選抜", href: "/fruits/mango/cultivars/irwin" }
+  },
+  {
+    theme: "florida",
+    group: "フロリダ系",
+    parentA: { label: "Carrie", year: "1940年代", tone: "parent" },
+    parentB: { label: "Spirit of '76", year: "1970年代", href: "/fruits/mango/cultivars/spirit-of-76", tone: "parent" },
+    child: { label: "ドット", year: "1980年代", href: "/fruits/mango/cultivars/dot" }
+  },
+  {
+    theme: "australia",
+    group: "豪州系",
+    parentA: { label: "Kensington", year: "豪州系", href: "/fruits/mango/cultivars/kensington", tone: "parent" },
+    parentB: { label: "Kent", year: "1930年代", tone: "ancestor" },
+    child: { label: "R2E2", year: "1982年頃", href: "/fruits/mango/cultivars/r2e2" }
+  },
+  {
+    theme: "florida",
+    group: "フロリダ系",
+    parentA: { label: "Sensation", year: "1940年代", href: "/fruits/mango/cultivars/sensation", tone: "parent" },
+    parentB: { label: "アーウィン", year: "1949年選抜", href: "/fruits/mango/cultivars/irwin", tone: "child" },
+    child: { label: "ジュビリー", year: "年代未確認", href: "/fruits/mango/cultivars/jubilee" }
+  },
+  {
+    theme: "israel",
+    group: "イスラエル系",
+    parentA: { label: "Springfels", year: "1920年代", href: "/fruits/mango/cultivars/springfels", tone: "parent" },
+    parentB: { label: "Sensation", year: "1940年代", href: "/fruits/mango/cultivars/sensation", tone: "parent" },
+    child: { label: "リリー", year: "年代未確認", href: "/fruits/mango/cultivars/lily" }
+  },
+  {
+    theme: "hawaii",
+    group: "ハワイ系",
+    parentA: { label: "アーウィン", year: "1949年選抜", href: "/fruits/mango/cultivars/irwin", tone: "child" },
+    parentB: { label: "Kent", year: "1930年代", tone: "ancestor" },
+    child: { label: "ラポザ", year: "1990年代", href: "/fruits/mango/cultivars/rapoza" }
+  },
+  {
+    theme: "latin",
+    group: "中南米系",
+    parentA: { label: "Haden", year: "1910年頃", tone: "ancestor" },
+    parentB: { label: "Kent", year: "1930年代", tone: "ancestor" },
+    child: { label: "マンザニーロ", year: "年代未確認", href: "/fruits/mango/cultivars/manzanillo" }
+  }
+];
+
 const hiddenRows = [
   "Barl: Keitt × Tommy Atkins",
   "Jinhuang: White × Kent",
@@ -17,8 +69,19 @@ export function MangoPedigree() {
         </p>
       </div>
 
-      <div className="overflow-x-auto rounded-lg bg-leaf-50 p-3 ring-1 ring-leaf-100">
-        <MangoPedigreeMap />
+      <div className="rounded-lg bg-gradient-to-br from-leaf-50 via-white to-fruit-50 p-3 ring-1 ring-leaf-100">
+        <div className="mb-3 flex flex-wrap items-center gap-2">
+          <span className="rounded-full bg-leaf-900 px-3 py-1 text-xs font-bold text-white">親子関係マップ</span>
+          <LegendChip tone="ancestor" label="祖先・重要親" />
+          <LegendChip tone="parent" label="親" />
+          <LegendChip tone="child" label="子品種" />
+        </div>
+
+        <div className="grid gap-3">
+          {families.map((family) => (
+            <PedigreeFamily key={`${family.child.label}-${family.parentA.label}-${family.parentB.label}`} family={family} />
+          ))}
+        </div>
       </div>
 
       <div className="rounded-md bg-fruit-100 p-3 text-sm leading-6 text-leaf-900/74">
@@ -33,86 +96,13 @@ export function MangoPedigree() {
   );
 }
 
-function MangoPedigreeMap() {
-  return (
-    <svg viewBox="0 0 780 980" role="img" aria-label="マンゴー品種の親子関係マップ" className="min-w-[720px]">
-      <defs>
-        <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
-          <path d="M 0 0 L 10 5 L 0 10 z" fill="#2f5d3b" />
-        </marker>
-      </defs>
-
-      <text x="24" y="34" className="fill-leaf-900 text-[18px] font-bold">
-        SSR解析で示された主な親子関係
-      </text>
-      <text x="24" y="58" className="fill-leaf-900/60 text-[12px]">
-        親品種から子品種へ矢印で表示しています
-      </text>
-
-      <g transform="translate(24 92)">
-        <PedigreeFamily
-          parentA={{ label: "Lippens", year: "1940年代", tone: "parent" }}
-          parentB={{ label: "Haden", year: "1910年頃", tone: "ancestor" }}
-          child={{ label: "アーウィン", year: "1949年選抜", href: "/fruits/mango/cultivars/irwin" }}
-        />
-      </g>
-
-      <g transform="translate(24 212)">
-        <PedigreeFamily
-          parentA={{ label: "Carrie", year: "1940年代", tone: "parent" }}
-          parentB={{ label: "Spirit of '76", year: "1970年代", href: "/fruits/mango/cultivars/spirit-of-76", tone: "parent" }}
-          child={{ label: "ドット", year: "1980年代", href: "/fruits/mango/cultivars/dot" }}
-        />
-      </g>
-
-      <g transform="translate(24 332)">
-        <PedigreeFamily
-          parentA={{ label: "Kensington", year: "豪州系", href: "/fruits/mango/cultivars/kensington", tone: "parent" }}
-          parentB={{ label: "Kent", year: "1930年代", tone: "ancestor" }}
-          child={{ label: "R2E2", year: "1982年頃", href: "/fruits/mango/cultivars/r2e2" }}
-        />
-      </g>
-
-      <g transform="translate(24 452)">
-        <PedigreeFamily
-          parentA={{ label: "Sensation", year: "1940年代", href: "/fruits/mango/cultivars/sensation", tone: "parent" }}
-          parentB={{ label: "アーウィン", year: "1949年選抜", href: "/fruits/mango/cultivars/irwin", tone: "child" }}
-          child={{ label: "ジュビリー", year: "年代未確認", href: "/fruits/mango/cultivars/jubilee" }}
-        />
-      </g>
-
-      <g transform="translate(24 572)">
-        <PedigreeFamily
-          parentA={{ label: "Springfels", year: "1920年代", href: "/fruits/mango/cultivars/springfels", tone: "parent" }}
-          parentB={{ label: "Sensation", year: "1940年代", href: "/fruits/mango/cultivars/sensation", tone: "parent" }}
-          child={{ label: "リリー", year: "年代未確認", href: "/fruits/mango/cultivars/lily" }}
-        />
-      </g>
-
-      <g transform="translate(24 692)">
-        <PedigreeFamily
-          parentA={{ label: "アーウィン", year: "1949年選抜", href: "/fruits/mango/cultivars/irwin", tone: "child" }}
-          parentB={{ label: "Kent", year: "1930年代", tone: "ancestor" }}
-          child={{ label: "ラポザ", year: "1990年代", href: "/fruits/mango/cultivars/rapoza" }}
-        />
-      </g>
-
-      <g transform="translate(24 812)">
-        <PedigreeFamily
-          parentA={{ label: "Haden", year: "1910年頃", tone: "ancestor" }}
-          parentB={{ label: "Kent", year: "1930年代", tone: "ancestor" }}
-          child={{ label: "マンザニーロ", year: "年代未確認", href: "/fruits/mango/cultivars/manzanillo" }}
-        />
-      </g>
-
-      <g transform="translate(552 26)">
-        <LegendChip color="#f9d77e" label="祖先・重要親" />
-        <LegendChip color="#d9ead3" label="親" y={24} />
-        <LegendChip color="#ffffff" label="子品種" y={48} />
-      </g>
-    </svg>
-  );
-}
+type PedigreeFamilyData = {
+  theme: "florida" | "australia" | "israel" | "hawaii" | "latin";
+  group: string;
+  parentA: PedigreeNodeData;
+  parentB: PedigreeNodeData;
+  child: PedigreeNodeData;
+};
 
 type PedigreeNodeData = {
   label: string;
@@ -121,72 +111,114 @@ type PedigreeNodeData = {
   tone?: "ancestor" | "parent" | "child";
 };
 
-function PedigreeFamily({ parentA, parentB, child }: { parentA: PedigreeNodeData; parentB: PedigreeNodeData; child: PedigreeNodeData }) {
-  return (
-    <g>
-      <PedigreeEdge from={[152, 34]} to={[376, 60]} />
-      <PedigreeEdge from={[152, 94]} to={[376, 60]} />
-      <PedigreeNode x={16} y={0} label={parentA.label} year={parentA.year} href={parentA.href} tone={parentA.tone ?? "parent"} />
-      <PedigreeNode x={16} y={60} label={parentB.label} year={parentB.year} href={parentB.href} tone={parentB.tone ?? "parent"} />
-      <PedigreeNode x={376} y={30} label={child.label} year={child.year} href={child.href} tone="child" />
-    </g>
-  );
-}
+function PedigreeFamily({ family }: { family: PedigreeFamilyData }) {
+  const theme = themeStyles(family.theme);
 
-function PedigreeEdge({ from, to }: { from: [number, number]; to: [number, number] }) {
   return (
-    <line
-      x1={from[0]}
-      y1={from[1]}
-      x2={to[0]}
-      y2={to[1]}
-      stroke="#2f5d3b"
-      strokeWidth="2"
-      markerEnd="url(#arrow)"
-      opacity="0.76"
-    />
+    <article className="relative overflow-hidden rounded-lg bg-white shadow-sm ring-1 ring-leaf-100">
+      <div className={`absolute inset-y-0 left-0 w-1.5 ${theme.rail}`} />
+      <div className="grid gap-3 p-3 sm:grid-cols-[1fr_auto_1.1fr] sm:items-center sm:p-4">
+        <div className="space-y-2">
+          <div className="flex items-center gap-2">
+            <span className={`rounded-full px-2.5 py-1 text-[11px] font-bold ${theme.badge}`}>{family.group}</span>
+            <span className="text-xs font-semibold text-leaf-900/54">親品種</span>
+          </div>
+          <div className="grid gap-2 sm:grid-cols-2">
+            <PedigreeNode node={family.parentA} fallbackTone="parent" />
+            <PedigreeNode node={family.parentB} fallbackTone="parent" />
+          </div>
+        </div>
+
+        <div className="flex items-center justify-center gap-2 sm:block">
+          <div className={`grid h-11 w-11 place-items-center rounded-full text-lg font-black text-white shadow-sm ${theme.circle}`}>
+            ×
+          </div>
+          <div className="h-px flex-1 bg-leaf-200 sm:mt-2 sm:h-10 sm:w-px sm:flex-none sm:bg-leaf-200" />
+        </div>
+
+        <div>
+          <div className="mb-2 flex items-center justify-between gap-2">
+            <span className="text-xs font-semibold text-leaf-900/54">子品種</span>
+            <span className={`rounded-full px-2.5 py-1 text-[11px] font-bold ${theme.badge}`}>推定親子</span>
+          </div>
+          <PedigreeNode node={family.child} fallbackTone="child" featured />
+        </div>
+      </div>
+    </article>
   );
 }
 
 function PedigreeNode({
-  x,
-  y,
-  label,
-  year,
-  tone,
-  href
+  node,
+  fallbackTone,
+  featured = false
 }: {
-  x: number;
-  y: number;
-  label: string;
-  year: string;
-  tone: "ancestor" | "parent" | "child";
-  href?: string;
+  node: PedigreeNodeData;
+  fallbackTone: "ancestor" | "parent" | "child";
+  featured?: boolean;
 }) {
-  const fill = tone === "ancestor" ? "#f9d77e" : tone === "parent" ? "#d9ead3" : "#ffffff";
+  const tone = node.tone ?? fallbackTone;
   const content = (
-    <g>
-      <rect x={x} y={y} width="136" height="48" rx="8" fill={fill} stroke="#c7dcc8" />
-      <text x={x + 68} y={y + 20} textAnchor="middle" className="fill-leaf-900 text-[13px] font-bold">
-        {label}
-      </text>
-      <text x={x + 68} y={y + 36} textAnchor="middle" className="fill-leaf-900/60 text-[11px] font-semibold">
-        {year}
-      </text>
-    </g>
+    <div
+      className={[
+        "min-h-[68px] rounded-md border p-3 transition",
+        featured ? "border-leaf-200 bg-white shadow-[0_8px_20px_rgba(23,65,42,0.08)]" : toneClass(tone),
+        node.href ? "hover:-translate-y-0.5 hover:border-leaf-300 hover:shadow-md" : ""
+      ].join(" ")}
+    >
+      <div className="text-base font-bold leading-tight text-leaf-900">{node.label}</div>
+      <div className="mt-1 text-xs font-semibold text-leaf-900/60">{node.year}</div>
+    </div>
   );
 
-  if (!href) return content;
-  return <Link href={href}>{content}</Link>;
+  if (!node.href) return content;
+  return (
+    <Link href={node.href} className="block">
+      {content}
+    </Link>
+  );
 }
 
-function LegendChip({ color, label, y = 0 }: { color: string; label: string; y?: number }) {
+function LegendChip({ tone, label }: { tone: "ancestor" | "parent" | "child"; label: string }) {
   return (
-    <g transform={`translate(0 ${y})`}>
-      <rect x="0" y="-12" width="18" height="18" rx="4" fill={color} stroke="#c7dcc8" />
-      <text x="26" y="2" className="fill-leaf-900/70 text-[12px] font-semibold">
-        {label}
-      </text>
-    </g>
+    <span className={`rounded-full border px-2.5 py-1 text-xs font-semibold text-leaf-900/70 ${toneClass(tone)}`}>{label}</span>
   );
+}
+
+function toneClass(tone: "ancestor" | "parent" | "child") {
+  if (tone === "ancestor") return "border-amber-200 bg-amber-100/80";
+  if (tone === "parent") return "border-leaf-200 bg-leaf-100/80";
+  return "border-leaf-200 bg-white";
+}
+
+function themeStyles(theme: PedigreeFamilyData["theme"]) {
+  const styles = {
+    florida: {
+      rail: "bg-rose-400",
+      badge: "bg-rose-100 text-rose-900",
+      circle: "bg-rose-500"
+    },
+    australia: {
+      rail: "bg-amber-400",
+      badge: "bg-amber-100 text-amber-900",
+      circle: "bg-amber-500"
+    },
+    israel: {
+      rail: "bg-violet-400",
+      badge: "bg-violet-100 text-violet-900",
+      circle: "bg-violet-500"
+    },
+    hawaii: {
+      rail: "bg-sky-400",
+      badge: "bg-sky-100 text-sky-900",
+      circle: "bg-sky-500"
+    },
+    latin: {
+      rail: "bg-emerald-400",
+      badge: "bg-emerald-100 text-emerald-900",
+      circle: "bg-emerald-500"
+    }
+  };
+
+  return styles[theme];
 }
