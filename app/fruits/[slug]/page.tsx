@@ -4,6 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ExternalLink, Pencil, PlayCircle } from "lucide-react";
 import { CultivarList } from "@/components/cultivar-list";
+import { MangoPedigree } from "@/components/mango-pedigree";
 import { PageHeader } from "@/components/page-header";
 import { getCurrentUser, isAdminUser } from "@/lib/auth";
 import { getPublicFruitBySlug } from "@/lib/queries";
@@ -69,6 +70,8 @@ export default async function FruitDetailPage({ params }: Props) {
         {fruit.description ? <p className="mt-5 leading-7 text-leaf-900/80">{fruit.description}</p> : null}
         {fruit.public_notes ? <p className="mt-4 rounded-md bg-leaf-50 p-3 text-sm leading-6 text-leaf-900/76">{fruit.public_notes}</p> : null}
       </section>
+
+      {fruit.slug === "mango" ? <MangoPedigree /> : null}
 
       <section className="space-y-3">
         <div className="flex items-center justify-between gap-3">
