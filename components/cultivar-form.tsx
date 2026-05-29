@@ -20,6 +20,8 @@ type Field = keyof Pick<
   | "texture"
   | "aroma"
   | "harvest_season"
+  | "cold_hardiness"
+  | "flowering_type"
   | "tree_vigor"
   | "difficulty"
   | "okinawa_suitability"
@@ -41,6 +43,8 @@ const fields: { name: Field; label: string; textarea?: boolean; required?: boole
   { name: "texture", label: "食感" },
   { name: "aroma", label: "香り" },
   { name: "harvest_season", label: "収穫期" },
+  { name: "cold_hardiness", label: "耐寒温度目安" },
+  { name: "flowering_type", label: "開花型" },
   { name: "tree_vigor", label: "樹勢" },
   { name: "difficulty", label: "難易度" },
   { name: "okinawa_suitability", label: "沖縄適性", textarea: true },

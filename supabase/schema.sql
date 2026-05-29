@@ -41,6 +41,8 @@ create table if not exists public.cultivars (
   texture text,
   aroma text,
   harvest_season text,
+  cold_hardiness text,
+  flowering_type text,
   tree_vigor text,
   difficulty text,
   okinawa_suitability text,

@@ -175,6 +175,7 @@ function groupByOrigin(cultivars: CultivarWithMedia[]): CultivarGroup[] {
 }
 
 function getColdHardiness(cultivar: CultivarWithMedia) {
+  if (cultivar.cold_hardiness) return cultivar.cold_hardiness;
   const match = cultivar.difficulty?.match(/耐寒温度:\s*([^。]+)。/);
   return match?.[1] ?? null;
 }

@@ -130,6 +130,8 @@ export default async function CultivarDetailPage({ params }: Props) {
           <Info label="食感" value={cultivar.texture} />
           <Info label="香り" value={cultivar.aroma} />
           <Info label="収穫期" value={cultivar.harvest_season} />
+          <Info label="耐寒温度目安" value={cultivar.cold_hardiness} />
+          <Info label="開花型" value={cultivar.flowering_type} />
           <Info label="樹勢" value={cultivar.tree_vigor} />
           <Info label="難易度" value={cultivar.difficulty} />
           <Info label="沖縄適性" value={cultivar.okinawa_suitability} />
