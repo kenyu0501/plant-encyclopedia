@@ -96,7 +96,7 @@ export function MangoPedigree() {
 
 function MangoPedigreeMap() {
   return (
-    <svg viewBox="0 0 940 610" role="img" aria-label="マンゴー品種の親子関係マップ" className="min-w-[860px]">
+    <svg viewBox="0 0 1120 720" role="img" aria-label="マンゴー品種の親子関係マップ" className="min-w-[1040px]">
       <defs>
         <marker id="arrow" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="7" markerHeight="7" orient="auto-start-reverse">
           <path d="M 0 0 L 10 5 L 0 10 z" fill="#2f5d3b" />
@@ -110,56 +110,55 @@ function MangoPedigreeMap() {
         親品種から子品種へ矢印で表示しています
       </text>
 
-      <PedigreeEdge from={[152, 128]} to={[352, 128]} />
-      <PedigreeEdge from={[152, 218]} to={[352, 128]} />
+      <PedigreeEdge from={[160, 150]} to={[360, 150]} />
+      <PedigreeEdge from={[160, 230]} to={[360, 150]} />
 
-      <PedigreeEdge from={[152, 308]} to={[352, 308]} />
-      <PedigreeEdge from={[152, 398]} to={[352, 308]} />
+      <PedigreeEdge from={[160, 330]} to={[360, 330]} />
+      <PedigreeEdge from={[160, 410]} to={[360, 330]} />
 
-      <PedigreeEdge from={[152, 488]} to={[352, 488]} />
-      <PedigreeEdge from={[152, 578]} to={[352, 488]} />
+      <PedigreeEdge from={[160, 525]} to={[360, 525]} />
+      <PedigreeEdge from={[160, 605]} to={[360, 525]} />
 
-      <PedigreeEdge from={[552, 128]} to={[752, 128]} />
-      <PedigreeEdge from={[552, 218]} to={[752, 128]} />
+      <PedigreeEdge from={[630, 150]} to={[850, 150]} />
+      <PedigreeEdge from={[630, 230]} to={[850, 150]} />
 
-      <PedigreeEdge from={[552, 308]} to={[752, 308]} />
-      <PedigreeEdge from={[552, 398]} to={[752, 308]} />
+      <PedigreeEdge from={[630, 330]} to={[850, 330]} />
+      <PedigreeEdge from={[630, 410]} to={[850, 330]} />
 
-      <PedigreeEdge from={[552, 488]} to={[752, 488]} />
-      <PedigreeEdge from={[552, 578]} to={[752, 488]} />
+      <PedigreeEdge from={[630, 525]} to={[850, 525]} />
+      <PedigreeEdge from={[630, 605]} to={[850, 525]} />
 
-      <PedigreeEdge from={[352, 128]} to={[552, 488]} dashed />
-      <PedigreeEdge from={[352, 488]} to={[552, 488]} dashed />
+      <PedigreeEdge from={[630, 650]} to={[850, 650]} />
+      <PedigreeEdge from={[160, 230]} to={[850, 650]} />
 
-      <PedigreeNode x={24} y={98} label="Lippens" tone="parent" />
-      <PedigreeNode x={24} y={188} label="Haden" tone="ancestor" />
-      <PedigreeNode x={288} y={98} label="アーウィン" href="/fruits/mango/cultivars/irwin" tone="child" />
+      <PedigreeNode x={24} y={150} label="Lippens" year="1940年代" tone="parent" />
+      <PedigreeNode x={24} y={230} label="Haden" year="1910年頃" tone="ancestor" />
+      <PedigreeNode x={296} y={150} label="アーウィン" year="1949年選抜" href="/fruits/mango/cultivars/irwin" tone="child" />
 
-      <PedigreeNode x={24} y={278} label="Carrie" tone="parent" />
-      <PedigreeNode x={24} y={368} label="Spirit of '76" href="/fruits/mango/cultivars/spirit-of-76" tone="parent" />
-      <PedigreeNode x={288} y={278} label="ドット" href="/fruits/mango/cultivars/dot" tone="child" />
+      <PedigreeNode x={24} y={330} label="Carrie" year="1940年代" tone="parent" />
+      <PedigreeNode x={24} y={410} label="Spirit of '76" year="1970年代" href="/fruits/mango/cultivars/spirit-of-76" tone="parent" />
+      <PedigreeNode x={296} y={330} label="ドット" year="1980年代" href="/fruits/mango/cultivars/dot" tone="child" />
 
-      <PedigreeNode x={24} y={458} label="Kensington" href="/fruits/mango/cultivars/kensington" tone="parent" />
-      <PedigreeNode x={24} y={548} label="Kent" tone="ancestor" />
-      <PedigreeNode x={288} y={458} label="R2E2" href="/fruits/mango/cultivars/r2e2" tone="child" />
+      <PedigreeNode x={24} y={525} label="Kensington" year="豪州系" href="/fruits/mango/cultivars/kensington" tone="parent" />
+      <PedigreeNode x={24} y={605} label="Kent" year="1930年代" tone="ancestor" />
+      <PedigreeNode x={296} y={525} label="R2E2" year="1982年頃" href="/fruits/mango/cultivars/r2e2" tone="child" />
 
-      <PedigreeNode x={488} y={98} label="Sensation" href="/fruits/mango/cultivars/sensation" tone="parent" />
-      <PedigreeNode x={488} y={188} label="アーウィン" href="/fruits/mango/cultivars/irwin" tone="child" />
-      <PedigreeNode x={688} y={98} label="ジュビリー" href="/fruits/mango/cultivars/jubilee" tone="child" />
+      <PedigreeNode x={496} y={150} label="Sensation" year="1940年代" href="/fruits/mango/cultivars/sensation" tone="parent" />
+      <PedigreeNode x={496} y={230} label="アーウィン" year="1949年選抜" href="/fruits/mango/cultivars/irwin" tone="child" />
+      <PedigreeNode x={784} y={150} label="ジュビリー" year="年代未確認" href="/fruits/mango/cultivars/jubilee" tone="child" />
 
-      <PedigreeNode x={488} y={278} label="Springfels" href="/fruits/mango/cultivars/springfels" tone="parent" />
-      <PedigreeNode x={488} y={368} label="Sensation" href="/fruits/mango/cultivars/sensation" tone="parent" />
-      <PedigreeNode x={688} y={278} label="リリー" href="/fruits/mango/cultivars/lily" tone="child" />
+      <PedigreeNode x={496} y={330} label="Springfels" year="1920年代" href="/fruits/mango/cultivars/springfels" tone="parent" />
+      <PedigreeNode x={496} y={410} label="Sensation" year="1940年代" href="/fruits/mango/cultivars/sensation" tone="parent" />
+      <PedigreeNode x={784} y={330} label="リリー" year="年代未確認" href="/fruits/mango/cultivars/lily" tone="child" />
 
-      <PedigreeNode x={488} y={458} label="アーウィン" href="/fruits/mango/cultivars/irwin" tone="child" />
-      <PedigreeNode x={488} y={548} label="Kent" tone="ancestor" />
-      <PedigreeNode x={688} y={458} label="ラポザ" href="/fruits/mango/cultivars/rapoza" tone="child" />
+      <PedigreeNode x={496} y={525} label="アーウィン" year="1949年選抜" href="/fruits/mango/cultivars/irwin" tone="child" />
+      <PedigreeNode x={496} y={605} label="Kent" year="1930年代" tone="ancestor" />
+      <PedigreeNode x={784} y={525} label="ラポザ" year="1990年代" href="/fruits/mango/cultivars/rapoza" tone="child" />
 
-      <PedigreeNode x={688} y={548} label="マンザニーロ" href="/fruits/mango/cultivars/manzanillo" tone="child" />
-      <PedigreeEdge from={[552, 578]} to={[752, 578]} />
-      <PedigreeEdge from={[152, 218]} to={[752, 578]} dashed />
+      <PedigreeNode x={496} y={650} label="Kent" year="1930年代" tone="ancestor" />
+      <PedigreeNode x={784} y={650} label="マンザニーロ" year="年代未確認" href="/fruits/mango/cultivars/manzanillo" tone="child" />
 
-      <g transform="translate(716 34)">
+      <g transform="translate(900 94)">
         <LegendChip color="#f9d77e" label="祖先・重要親" />
         <LegendChip color="#d9ead3" label="親" y={24} />
         <LegendChip color="#ffffff" label="子品種" y={48} />
@@ -168,7 +167,7 @@ function MangoPedigreeMap() {
   );
 }
 
-function PedigreeEdge({ from, to, dashed = false }: { from: [number, number]; to: [number, number]; dashed?: boolean }) {
+function PedigreeEdge({ from, to }: { from: [number, number]; to: [number, number] }) {
   return (
     <line
       x1={from[0]}
@@ -177,9 +176,8 @@ function PedigreeEdge({ from, to, dashed = false }: { from: [number, number]; to
       y2={to[1]}
       stroke="#2f5d3b"
       strokeWidth="2"
-      strokeDasharray={dashed ? "6 6" : undefined}
       markerEnd="url(#arrow)"
-      opacity={dashed ? "0.58" : "0.82"}
+      opacity="0.76"
     />
   );
 }
@@ -188,21 +186,26 @@ function PedigreeNode({
   x,
   y,
   label,
+  year,
   tone,
   href
 }: {
   x: number;
   y: number;
   label: string;
+  year: string;
   tone: "ancestor" | "parent" | "child";
   href?: string;
 }) {
   const fill = tone === "ancestor" ? "#f9d77e" : tone === "parent" ? "#d9ead3" : "#ffffff";
   const content = (
     <g>
-      <rect x={x} y={y - 30} width="128" height="60" rx="8" fill={fill} stroke="#c7dcc8" />
-      <text x={x + 64} y={y + 5} textAnchor="middle" className="fill-leaf-900 text-[13px] font-bold">
+      <rect x={x} y={y - 34} width="136" height="68" rx="8" fill={fill} stroke="#c7dcc8" />
+      <text x={x + 68} y={y - 2} textAnchor="middle" className="fill-leaf-900 text-[13px] font-bold">
         {label}
+      </text>
+      <text x={x + 68} y={y + 17} textAnchor="middle" className="fill-leaf-900/60 text-[11px] font-semibold">
+        {year}
       </text>
     </g>
   );
