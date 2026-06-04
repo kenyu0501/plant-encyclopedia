@@ -72,7 +72,7 @@ export function CultivarForm({ cultivar, fruits }: { cultivar?: Cultivar | null;
   const [form, setForm] = useState<Record<string, string>>(() =>
     Object.fromEntries(fields.map((field) => [field.name, cultivar?.[field.name] ?? ""]))
   );
-  const [isPublic, setIsPublic] = useState(cultivar?.is_public ?? false);
+  const [isPublic, setIsPublic] = useState(cultivar?.is_public ?? true);
   const [isForSale, setIsForSale] = useState(cultivar?.is_for_sale ?? false);
   const [photoFiles, setPhotoFiles] = useState<File[]>([]);
   const [photoInputKey, setPhotoInputKey] = useState(0);
@@ -217,7 +217,7 @@ export function CultivarForm({ cultivar, fruits }: { cultivar?: Cultivar | null;
 
     setLoading(false);
     setSaveSucceeded(true);
-    setMessage("保存しました．");
+    setMessage(isPublic ? "保存しました．公開中の品種一覧に表示されます．" : "保存しました．現在は非公開です．");
     setPhotoFiles([]);
     setPhotoInputKey((current) => current + 1);
     setPhotoType("果実");
