@@ -62,6 +62,8 @@ const fields: { name: Field; label: string; textarea?: boolean; required?: boole
   { name: "private_notes", label: "非公開メモ", textarea: true }
 ];
 
+const cultivarPhotoTypes = ["果実", "果実断面", "花", "枝葉", "新芽", "木の様子", "樹皮", "糖度計", "収穫物", "栽培記録", "その他"];
+
 export function CultivarForm({ cultivar, fruits }: { cultivar?: Cultivar | null; fruits: Fruit[] }) {
   const router = useRouter();
   const searchParams = useSearchParams();
@@ -72,9 +74,11 @@ export function CultivarForm({ cultivar, fruits }: { cultivar?: Cultivar | null;
   );
   const [isPublic, setIsPublic] = useState(cultivar?.is_public ?? false);
   const [isForSale, setIsForSale] = useState(cultivar?.is_for_sale ?? false);
-  const [photoFile, setPhotoFile] = useState<File | null>(null);
+  const [photoFiles, setPhotoFiles] = useState<File[]>([]);
+  const [photoInputKey, setPhotoInputKey] = useState(0);
+  const [photoType, setPhotoType] = useState("果実");
   const [photoCaption, setPhotoCaption] = useState("");
-  const [photoIsMain, setPhotoIsMain] = useState(true);
+  const [photoIsMain, setPhotoIsMain] = useState(false);
   const [youtubeUrl, setYoutubeUrl] = useState("");
   const [youtubeTitle, setYoutubeTitle] = useState("");
   const [message, setMessage] = useState("");
@@ -110,68 +114,8 @@ export function CultivarForm({ cultivar, fruits }: { cultivar?: Cultivar | null;
 
     const savedCultivarId = data.id;
 
-    if (photoFile) {
-      setMessage("写真を圧縮しています．");
-      const {
-        data: { user }
-      } = await supabase.auth.getUser();
-      if (!user) {
-        setLoading(false);
-        setMessage("写真追加にはログイン状態の確認が必要です．もう一度ログインしてください．");
-        return;
-      }
-
-      let compressed;
-      try {
-        compressed = await compressImageForUpload(photoFile);
-      } catch (compressError) {
-        setLoading(false);
-        setMessage(compressError instanceof Error ? compressError.message : "画像圧縮に失敗しました．");
-        return;
-      }
-
-      const storagePath = `${fruitId}/${savedCultivarId}/${crypto.randomUUID()}.jpg`;
-      setMessage(
-        `写真をアップロードしています．${formatBytes(compressed.originalBytes)} → ${formatBytes(
-          compressed.compressedBytes
-        )} / ${compressed.width}x${compressed.height}px`
-      );
-      const { error: uploadError } = await supabase.storage.from("fruit-photos").upload(storagePath, compressed.file, {
-        cacheControl: "3600",
-        upsert: false
-      });
-      if (uploadError) {
-        setLoading(false);
-        setMessage(`写真アップロードに失敗しました: ${uploadError.message}`);
-        return;
-      }
-
-      const { data: publicUrl } = supabase.storage.from("fruit-photos").getPublicUrl(storagePath);
-      if (photoIsMain) {
-        await supabase.from("photos").update({ is_main: false }).eq("cultivar_id", savedCultivarId);
-      }
-      const { error: photoError } = await supabase.from("photos").insert({
-        fruit_id: fruitId || null,
-        cultivar_id: savedCultivarId,
-        image_url: publicUrl.publicUrl,
-        storage_path: storagePath,
-        photo_type: "cultivar",
-        caption: photoCaption || null,
-        taken_at: null,
-        uploaded_by: user.id,
-        source_type: "admin",
-        approval_status: "approved",
-        is_main: photoIsMain
-      });
-      if (photoError) {
-        setLoading(false);
-        setMessage(`写真レコード登録に失敗しました: ${photoError.message}`);
-        return;
-      }
-    }
-
     if (youtubeUrl) {
-      setMessage("YouTubeリンクを登録しています．");
+      setMessage("YouTubeリンクの重複を確認しています．");
       const { data: existingVideos, error: existingVideosError } = await supabase
         .from("videos")
         .select("youtube_url")
@@ -186,6 +130,74 @@ export function CultivarForm({ cultivar, fruits }: { cultivar?: Cultivar | null;
         setMessage("同じYouTubeリンクは既にこの品種へ登録されています．");
         return;
       }
+    }
+
+    if (photoFiles.length > 0) {
+      const {
+        data: { user }
+      } = await supabase.auth.getUser();
+      if (!user) {
+        setLoading(false);
+        setMessage("写真追加にはログイン状態の確認が必要です．もう一度ログインしてください．");
+        return;
+      }
+
+      if (photoIsMain) {
+        await supabase.from("photos").update({ is_main: false }).eq("cultivar_id", savedCultivarId);
+      }
+
+      for (let index = 0; index < photoFiles.length; index += 1) {
+        const photoFile = photoFiles[index];
+        setMessage(`写真${index + 1}/${photoFiles.length}を圧縮しています．`);
+        let compressed;
+        try {
+          compressed = await compressImageForUpload(photoFile);
+        } catch (compressError) {
+          setLoading(false);
+          setMessage(compressError instanceof Error ? compressError.message : "画像圧縮に失敗しました．");
+          return;
+        }
+
+        const storagePath = `${fruitId}/${savedCultivarId}/${crypto.randomUUID()}.jpg`;
+        setMessage(
+          `写真${index + 1}/${photoFiles.length}をアップロードしています．${formatBytes(
+            compressed.originalBytes
+          )} → ${formatBytes(compressed.compressedBytes)} / ${compressed.width}x${compressed.height}px`
+        );
+        const { error: uploadError } = await supabase.storage.from("fruit-photos").upload(storagePath, compressed.file, {
+          cacheControl: "3600",
+          upsert: false
+        });
+        if (uploadError) {
+          setLoading(false);
+          setMessage(`写真アップロードに失敗しました: ${uploadError.message}`);
+          return;
+        }
+
+        const { data: publicUrl } = supabase.storage.from("fruit-photos").getPublicUrl(storagePath);
+        const { error: photoError } = await supabase.from("photos").insert({
+          fruit_id: fruitId || null,
+          cultivar_id: savedCultivarId,
+          image_url: publicUrl.publicUrl,
+          storage_path: storagePath,
+          photo_type: photoType,
+          caption: photoCaption || null,
+          taken_at: null,
+          uploaded_by: user.id,
+          source_type: "admin",
+          approval_status: "approved",
+          is_main: photoIsMain && index === 0
+        });
+        if (photoError) {
+          setLoading(false);
+          setMessage(`写真レコード登録に失敗しました: ${photoError.message}`);
+          return;
+        }
+      }
+    }
+
+    if (youtubeUrl) {
+      setMessage("YouTubeリンクを登録しています．");
       const { error: videoError } = await supabase.from("videos").insert({
         fruit_id: fruitId || null,
         cultivar_id: savedCultivarId,
@@ -206,6 +218,13 @@ export function CultivarForm({ cultivar, fruits }: { cultivar?: Cultivar | null;
     setLoading(false);
     setSaveSucceeded(true);
     setMessage("保存しました．");
+    setPhotoFiles([]);
+    setPhotoInputKey((current) => current + 1);
+    setPhotoType("果実");
+    setPhotoCaption("");
+    setPhotoIsMain(false);
+    setYoutubeUrl("");
+    setYoutubeTitle("");
     if (!cultivar) {
       router.replace(`/admin/cultivars/${data.id}`);
     }
@@ -275,24 +294,43 @@ export function CultivarForm({ cultivar, fruits }: { cultivar?: Cultivar | null;
       <section className="space-y-3 rounded-lg border border-leaf-100 bg-leaf-50 p-4">
         <div className="flex items-center gap-2 font-bold text-leaf-900">
           <ImagePlus size={18} />
-          写真も同時に追加
+          写真も同時に追加（複数選択可）
         </div>
         <label className="block">
           <span className="text-sm font-semibold text-leaf-900">写真</span>
           <input
+            key={photoInputKey}
             type="file"
             accept="image/*"
-            capture="environment"
-            onChange={(event) => setPhotoFile(event.target.files?.[0] ?? null)}
+            multiple
+            onChange={(event) => setPhotoFiles(Array.from(event.target.files ?? []))}
             className="mt-2 block w-full text-sm"
           />
+          {photoFiles.length > 0 ? (
+            <span className="mt-2 block text-xs font-semibold text-leaf-700">{photoFiles.length}枚選択中</span>
+          ) : null}
+        </label>
+        <label className="block">
+          <span className="text-sm font-semibold text-leaf-900">写真タイプ</span>
+          <select
+            value={photoType}
+            onChange={(event) => setPhotoType(event.target.value)}
+            className="mt-2 w-full rounded-md border border-leaf-100 bg-white px-3 py-3"
+          >
+            {cultivarPhotoTypes.map((type) => (
+              <option key={type} value={type}>
+                {type}
+              </option>
+            ))}
+          </select>
         </label>
         <label className="block">
           <span className="text-sm font-semibold text-leaf-900">写真キャプション</span>
           <input value={photoCaption} onChange={(event) => setPhotoCaption(event.target.value)} className="mt-2 w-full rounded-md border border-leaf-100 bg-white px-3 py-3" />
+          <span className="mt-2 block text-xs text-leaf-900/58">複数選択時は，全写真に同じキャプションを登録します．</span>
         </label>
         <label className="flex items-center justify-between gap-3 rounded-md bg-white p-3">
-          <span className="font-semibold text-leaf-900">メイン写真にする</span>
+          <span className="font-semibold text-leaf-900">先頭の写真をメインにする</span>
           <input type="checkbox" checked={photoIsMain} onChange={(event) => setPhotoIsMain(event.target.checked)} className="h-5 w-5" />
         </label>
       </section>
