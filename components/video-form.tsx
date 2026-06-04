@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { PlaySquare } from "lucide-react";
 import { createClient } from "@/lib/supabase-browser";
-import { getYoutubeThumbnail } from "@/lib/youtube";
+import { getYoutubeKey, getYoutubeThumbnail } from "@/lib/youtube";
 import type { AdminCultivar } from "@/lib/queries";
 import type { Fruit } from "@/types/database";
 
@@ -31,6 +31,19 @@ export function VideoForm({
     setLoading(true);
     setMessage("");
     const supabase = createClient();
+    let duplicateQuery = supabase.from("videos").select("youtube_url");
+    duplicateQuery = cultivarId ? duplicateQuery.eq("cultivar_id", cultivarId) : duplicateQuery.is("cultivar_id", null).eq("fruit_id", fruitId);
+    const { data: existingVideos, error: duplicateError } = await duplicateQuery;
+    if (duplicateError) {
+      setLoading(false);
+      setMessage(`重複確認に失敗しました: ${duplicateError.message}`);
+      return;
+    }
+    if ((existingVideos ?? []).some((video) => getYoutubeKey(video.youtube_url) === getYoutubeKey(youtubeUrl))) {
+      setLoading(false);
+      setMessage("同じYouTubeリンクは既に登録されています．");
+      return;
+    }
     const { error } = await supabase.from("videos").insert({
       fruit_id: fruitId || null,
       cultivar_id: cultivarId || null,

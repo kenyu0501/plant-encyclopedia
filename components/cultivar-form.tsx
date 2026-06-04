@@ -6,7 +6,7 @@ import { useRouter, useSearchParams } from "next/navigation";
 import { ArrowLeft, ImagePlus, PlaySquare, Save, Trash2 } from "lucide-react";
 import { compressImageForUpload, formatBytes } from "@/lib/image-compress";
 import { createClient } from "@/lib/supabase-browser";
-import { getYoutubeThumbnail } from "@/lib/youtube";
+import { getYoutubeKey, getYoutubeThumbnail } from "@/lib/youtube";
 import type { Cultivar, CultivarInsert, Fruit } from "@/types/database";
 
 type Field = keyof Pick<
@@ -172,6 +172,20 @@ export function CultivarForm({ cultivar, fruits }: { cultivar?: Cultivar | null;
 
     if (youtubeUrl) {
       setMessage("YouTubeリンクを登録しています．");
+      const { data: existingVideos, error: existingVideosError } = await supabase
+        .from("videos")
+        .select("youtube_url")
+        .eq("cultivar_id", savedCultivarId);
+      if (existingVideosError) {
+        setLoading(false);
+        setMessage(`YouTube重複確認に失敗しました: ${existingVideosError.message}`);
+        return;
+      }
+      if ((existingVideos ?? []).some((video) => getYoutubeKey(video.youtube_url) === getYoutubeKey(youtubeUrl))) {
+        setLoading(false);
+        setMessage("同じYouTubeリンクは既にこの品種へ登録されています．");
+        return;
+      }
       const { error: videoError } = await supabase.from("videos").insert({
         fruit_id: fruitId || null,
         cultivar_id: savedCultivarId,

@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { ExternalLink, Save, Trash2 } from "lucide-react";
 import { createClient } from "@/lib/supabase-browser";
-import { getYoutubeThumbnail } from "@/lib/youtube";
+import { getYoutubeKey, getYoutubeThumbnail } from "@/lib/youtube";
 import type { AdminCultivar, AdminVideo } from "@/lib/queries";
 import type { Fruit } from "@/types/database";
 
@@ -25,12 +25,24 @@ export function VideoManager({
     );
   }
 
+  const keyCounts = videos.reduce((counts, video) => {
+    const key = getYoutubeKey(video.youtube_url);
+    counts.set(key, (counts.get(key) ?? 0) + 1);
+    return counts;
+  }, new Map<string, number>());
+
   return (
     <section className="space-y-3">
       <h2 className="text-lg font-bold text-leaf-900">登録済みYouTube</h2>
       <div className="grid gap-4">
         {videos.map((video) => (
-          <VideoCard key={video.id} video={video} fruits={fruits} cultivars={cultivars} />
+          <VideoCard
+            key={video.id}
+            video={video}
+            fruits={fruits}
+            cultivars={cultivars}
+            isDuplicate={(keyCounts.get(getYoutubeKey(video.youtube_url)) ?? 0) > 1}
+          />
         ))}
       </div>
     </section>
@@ -40,11 +52,13 @@ export function VideoManager({
 function VideoCard({
   video,
   fruits,
-  cultivars
+  cultivars,
+  isDuplicate
 }: {
   video: AdminVideo;
   fruits: Fruit[];
   cultivars: AdminCultivar[];
+  isDuplicate: boolean;
 }) {
   const router = useRouter();
   const [fruitId, setFruitId] = useState(video.fruit_id ?? "");
@@ -106,7 +120,12 @@ function VideoCard({
     <article className="rounded-lg bg-white/86 p-4 ring-1 ring-leaf-100">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <h3 className="font-bold text-leaf-900">{title || video.youtube_url}</h3>
+          <div className="flex flex-wrap items-center gap-2">
+            <h3 className="font-bold text-leaf-900">{title || video.youtube_url}</h3>
+            {isDuplicate ? (
+              <span className="rounded-md bg-red-50 px-2 py-1 text-xs font-bold text-red-700">重複</span>
+            ) : null}
+          </div>
           <p className="mt-1 text-sm text-leaf-900/58">現在の紐づけ: {targetName}</p>
         </div>
         <a href={video.youtube_url} target="_blank" rel="noreferrer" className="inline-flex items-center gap-1 rounded-md bg-red-50 px-2 py-1 text-xs font-bold text-red-700">

@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase-server";
 import type { Cultivar, CultivarWithFruit, Fruit, FruitWithChildren, Photo, SiteSettings, Video } from "@/types/database";
+import { uniqueYoutubeLinks } from "@/lib/youtube";
 
 export type AdminCultivar = Cultivar & {
   fruits: Pick<Fruit, "name_ja" | "slug"> | null;
@@ -119,7 +120,7 @@ export async function getPublicCultivarBySlugs(fruitSlug: string, cultivarSlug: 
   return {
     ...cultivar,
     photos: (cultivar.photos ?? []).filter((photo) => photo.approval_status === "approved"),
-    videos: (cultivar.videos ?? []).filter((video) => video.is_public)
+    videos: uniqueYoutubeLinks((cultivar.videos ?? []).filter((video) => video.is_public))
   };
 }
 

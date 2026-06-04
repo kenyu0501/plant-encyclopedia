@@ -16,3 +16,18 @@ export function getYoutubeThumbnail(url: string) {
   const id = getYoutubeId(url);
   return id ? `https://img.youtube.com/vi/${id}/hqdefault.jpg` : null;
 }
+
+export function getYoutubeKey(url: string) {
+  return getYoutubeId(url) ?? url.trim().replace(/\/+$/, "").toLowerCase();
+}
+
+export function uniqueYoutubeLinks<T extends { youtube_url: string }>(videos: T[]) {
+  const seen = new Set<string>();
+
+  return videos.filter((video) => {
+    const key = getYoutubeKey(video.youtube_url);
+    if (seen.has(key)) return false;
+    seen.add(key);
+    return true;
+  });
+}
