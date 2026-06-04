@@ -1,8 +1,9 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
-import { ImagePlus, PlaySquare, Save, Trash2 } from "lucide-react";
+import { ArrowLeft, ImagePlus, PlaySquare, Save, Trash2 } from "lucide-react";
 import { compressImageForUpload, formatBytes } from "@/lib/image-compress";
 import { createClient } from "@/lib/supabase-browser";
 import { getYoutubeThumbnail } from "@/lib/youtube";
@@ -77,7 +78,9 @@ export function CultivarForm({ cultivar, fruits }: { cultivar?: Cultivar | null;
   const [youtubeUrl, setYoutubeUrl] = useState("");
   const [youtubeTitle, setYoutubeTitle] = useState("");
   const [message, setMessage] = useState("");
+  const [saveSucceeded, setSaveSucceeded] = useState(false);
   const [loading, setLoading] = useState(false);
+  const parentFruit = fruits.find((fruit) => fruit.id === fruitId);
 
   function update(name: string, value: string) {
     setForm((current) => ({ ...current, [name]: value }));
@@ -87,6 +90,7 @@ export function CultivarForm({ cultivar, fruits }: { cultivar?: Cultivar | null;
     event.preventDefault();
     setLoading(true);
     setMessage("");
+    setSaveSucceeded(false);
     const supabase = createClient();
     const payload = {
       ...form,
@@ -186,7 +190,11 @@ export function CultivarForm({ cultivar, fruits }: { cultivar?: Cultivar | null;
     }
 
     setLoading(false);
-    router.replace(`/admin/cultivars/${data.id}`);
+    setSaveSucceeded(true);
+    setMessage("保存しました．");
+    if (!cultivar) {
+      router.replace(`/admin/cultivars/${data.id}`);
+    }
     router.refresh();
   }
 
@@ -288,7 +296,20 @@ export function CultivarForm({ cultivar, fruits }: { cultivar?: Cultivar | null;
           <input value={youtubeTitle} onChange={(event) => setYoutubeTitle(event.target.value)} className="mt-2 w-full rounded-md border border-leaf-100 bg-white px-3 py-3" />
         </label>
       </section>
-      {message ? <p className="rounded-md bg-red-50 p-3 text-sm text-red-700">{message}</p> : null}
+      {message ? (
+        <p className={`rounded-md p-3 text-sm ${saveSucceeded ? "bg-leaf-50 text-leaf-800" : "bg-red-50 text-red-700"}`}>
+          {message}
+        </p>
+      ) : null}
+      {saveSucceeded && parentFruit ? (
+        <Link
+          href={`/fruits/${parentFruit.slug}#cultivars`}
+          className="inline-flex w-full items-center justify-center gap-2 rounded-md border border-leaf-200 bg-white px-4 py-3 font-semibold text-leaf-800"
+        >
+          <ArrowLeft size={18} />
+          {parentFruit.name_ja}の品種一覧へ戻る
+        </Link>
+      ) : null}
       <div className="flex flex-col gap-3 sm:flex-row">
         <button type="submit" disabled={loading} className="inline-flex flex-1 items-center justify-center gap-2 rounded-md bg-leaf-700 px-4 py-3 font-semibold text-white disabled:opacity-60">
           <Save size={18} />

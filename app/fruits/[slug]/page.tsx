@@ -95,7 +95,7 @@ export default async function FruitDetailPage({ params }: Props) {
         {fruit.public_notes ? <p className="mt-4 rounded-md bg-leaf-50 p-3 text-sm leading-6 text-leaf-900/76">{fruit.public_notes}</p> : null}
       </section>
 
-      <section className="space-y-3">
+      <section id="cultivars" className="scroll-mt-5 space-y-3">
         <div className="flex items-center justify-between gap-3">
           <h2 className="text-lg font-bold text-leaf-900">品種</h2>
           {isAdmin ? (
