@@ -15,7 +15,7 @@ export default async function AdminPage() {
 
   return (
     <div className="space-y-6">
-      <PageHeader title="管理画面" description="果樹ページを親にして、品種・写真・YouTubeを登録します。" />
+      <PageHeader title="管理画面" description="果樹ページを親にして，品種・写真・YouTubeを登録します．" />
       <AdminActions />
 
       <section className="space-y-3">

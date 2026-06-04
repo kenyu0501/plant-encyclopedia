@@ -20,7 +20,7 @@ export function VideoManager({
   if (videos.length === 0) {
     return (
       <section className="rounded-lg bg-white/80 p-5 text-sm text-leaf-900/70 ring-1 ring-leaf-100">
-        まだYouTubeリンクがありません。上のフォームから追加してください。
+        まだYouTubeリンクがありません．上のフォームから追加してください．
       </section>
     );
   }
@@ -62,7 +62,7 @@ function VideoCard({
 
   async function saveVideo() {
     setLoading(true);
-    setMessage("保存しています。");
+    setMessage("保存しています．");
     const supabase = createClient();
     const { error } = await supabase
       .from("videos")
@@ -83,14 +83,14 @@ function VideoCard({
       setMessage(`保存に失敗しました: ${error.message}`);
       return;
     }
-    setMessage("YouTubeリンクを保存しました。");
+    setMessage("YouTubeリンクを保存しました．");
     router.refresh();
   }
 
   async function deleteVideo() {
     if (!confirm("このYouTubeリンクを削除しますか？")) return;
     setLoading(true);
-    setMessage("削除しています。");
+    setMessage("削除しています．");
     const supabase = createClient();
     const { error } = await supabase.from("videos").delete().eq("id", video.id);
     setLoading(false);
@@ -98,7 +98,7 @@ function VideoCard({
       setMessage(`削除に失敗しました: ${error.message}`);
       return;
     }
-    setMessage("削除しました。");
+    setMessage("削除しました．");
     router.refresh();
   }
 

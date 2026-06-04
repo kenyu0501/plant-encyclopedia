@@ -14,7 +14,7 @@ export default async function VideosPage() {
 
   return (
     <div className="space-y-5">
-      <PageHeader title="YouTube追加" description="果樹ページまたは品種ページにYouTubeリンクを紐づけます。" />
+      <PageHeader title="YouTube追加" description="果樹ページまたは品種ページにYouTubeリンクを紐づけます．" />
       <VideoForm fruits={fruits} cultivars={cultivars} />
       <VideoManager videos={videos} fruits={fruits} cultivars={cultivars} />
     </div>

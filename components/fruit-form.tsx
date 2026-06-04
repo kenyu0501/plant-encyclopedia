@@ -32,7 +32,7 @@ const fields: { name: Field; label: string; textarea?: boolean; required?: boole
     label: "URLスラッグ",
     required: true,
     placeholder: "例: dragon-fruit",
-    help: "URLに使う英数字です。新しい果樹ごとに重複しない値にしてください。"
+    help: "URLに使う英数字です．新しい果樹ごとに重複しない値にしてください．"
   },
   { name: "scientific_name", label: "学名" },
   { name: "family_name", label: "科名" },
@@ -85,7 +85,7 @@ export function FruitForm({ fruit }: { fruit?: Fruit | null }) {
   }
 
   async function onDelete() {
-    if (!fruit || !confirm("この果樹を削除しますか？紐づく品種・写真・動画も削除対象になります。")) return;
+    if (!fruit || !confirm("この果樹を削除しますか？紐づく品種・写真・動画も削除対象になります．")) return;
     const supabase = createClient();
     const { error } = await supabase.from("fruits").delete().eq("id", fruit.id);
     if (error) {
@@ -113,7 +113,7 @@ export function FruitForm({ fruit }: { fruit?: Fruit | null }) {
           className="mt-2 w-full rounded-md border border-leaf-100 bg-white px-3 py-3 outline-none focus:border-leaf-600"
         />
         <span className="mt-1 block text-xs leading-5 text-leaf-900/58">
-          小さい数字ほど先に表示されます。未入力の果樹は、表示順が入っている果樹の後ろで名前順になります。
+          小さい数字ほど先に表示されます．未入力の果樹は，表示順が入っている果樹の後ろで名前順になります．
         </span>
       </label>
       {fields.map((field) => (

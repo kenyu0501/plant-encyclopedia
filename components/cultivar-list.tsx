@@ -56,7 +56,7 @@ export function CultivarList({
   if (cultivars.length === 0) {
     return (
       <p className="rounded-lg bg-white/78 p-4 text-sm text-leaf-900/70 ring-1 ring-leaf-100">
-        公開中の品種はまだありません。
+        公開中の品種はまだありません．
       </p>
     );
   }
@@ -222,12 +222,12 @@ function groupByOrigin(cultivars: CultivarWithMedia[]): CultivarGroup[] {
 
 function getColdHardiness(cultivar: CultivarWithMedia) {
   if (cultivar.cold_hardiness) return cultivar.cold_hardiness;
-  const match = cultivar.difficulty?.match(/耐寒温度:\s*([^。]+)。/);
+  const match = cultivar.difficulty?.match(/耐寒温度:\s*([^．]+)．/);
   return match?.[1] ?? null;
 }
 
 function getUseGroup(cultivar: CultivarWithMedia) {
-  const match = cultivar.difficulty?.match(/用途:\s*([^。]+)。/);
+  const match = cultivar.difficulty?.match(/用途:\s*([^．]+)．/);
   return match?.[1] ?? null;
 }
 

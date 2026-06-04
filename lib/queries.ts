@@ -40,7 +40,7 @@ export const defaultSiteSettings: SiteSettings = {
   home_eyebrow: "スマホでひらく栽培メモ",
   home_title: "けんゆーの熱帯果樹図鑑",
   home_description:
-    "果樹ページを親にして、品種・写真・YouTubeを整理する熱帯果樹PWAです。 マンゴー、アボカド、バナナなどを現場で見返しやすい形にまとめます。",
+    "果樹ページを親にして，品種・写真・YouTubeを整理する熱帯果樹PWAです． マンゴー，アボカド，バナナなどを現場で見返しやすい形にまとめます．",
   updated_at: new Date(0).toISOString()
 };
 

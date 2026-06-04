@@ -34,7 +34,7 @@ export function AnalyticsSummary({ analytics }: { analytics: SiteAnalytics | nul
         </ol>
       ) : (
         <p className="rounded-lg bg-leaf-50 p-3 text-sm leading-6 text-leaf-900/68">
-          品種ページの閲覧データが集まると、ここにランキングが表示されます。
+          品種ページの閲覧データが集まると，ここにランキングが表示されます．
         </p>
       )}
     </section>

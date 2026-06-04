@@ -13,7 +13,7 @@ export default async function SettingsPage() {
 
   return (
     <div className="space-y-5">
-      <PageHeader title="トップページ設定" description="トップページ上部の小見出し・タイトル・説明文を編集します。" />
+      <PageHeader title="トップページ設定" description="トップページ上部の小見出し・タイトル・説明文を編集します．" />
       <SiteSettingsForm settings={settings} />
     </div>
   );

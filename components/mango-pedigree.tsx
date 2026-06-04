@@ -65,7 +65,7 @@ export function MangoPedigree() {
       <div>
         <h2 className="text-lg font-bold text-leaf-900">品種の系譜</h2>
         <p className="mt-2 text-sm leading-6 text-leaf-900/70">
-          SSRマーカー解析では、JIRCASで保存されているマンゴー遺伝資源の親子関係が推定され、Hadenを祖先にもつフロリダ系品種が多いことが示されています。
+          SSRマーカー解析では，JIRCASで保存されているマンゴー遺伝資源の親子関係が推定され，Hadenを祖先にもつフロリダ系品種が多いことが示されています．
         </p>
       </div>
 

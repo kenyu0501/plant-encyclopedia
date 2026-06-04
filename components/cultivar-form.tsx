@@ -107,13 +107,13 @@ export function CultivarForm({ cultivar, fruits }: { cultivar?: Cultivar | null;
     const savedCultivarId = data.id;
 
     if (photoFile) {
-      setMessage("写真を圧縮しています。");
+      setMessage("写真を圧縮しています．");
       const {
         data: { user }
       } = await supabase.auth.getUser();
       if (!user) {
         setLoading(false);
-        setMessage("写真追加にはログイン状態の確認が必要です。もう一度ログインしてください。");
+        setMessage("写真追加にはログイン状態の確認が必要です．もう一度ログインしてください．");
         return;
       }
 
@@ -122,13 +122,13 @@ export function CultivarForm({ cultivar, fruits }: { cultivar?: Cultivar | null;
         compressed = await compressImageForUpload(photoFile);
       } catch (compressError) {
         setLoading(false);
-        setMessage(compressError instanceof Error ? compressError.message : "画像圧縮に失敗しました。");
+        setMessage(compressError instanceof Error ? compressError.message : "画像圧縮に失敗しました．");
         return;
       }
 
       const storagePath = `${fruitId}/${savedCultivarId}/${crypto.randomUUID()}.jpg`;
       setMessage(
-        `写真をアップロードしています。${formatBytes(compressed.originalBytes)} → ${formatBytes(
+        `写真をアップロードしています．${formatBytes(compressed.originalBytes)} → ${formatBytes(
           compressed.compressedBytes
         )} / ${compressed.width}x${compressed.height}px`
       );
@@ -167,7 +167,7 @@ export function CultivarForm({ cultivar, fruits }: { cultivar?: Cultivar | null;
     }
 
     if (youtubeUrl) {
-      setMessage("YouTubeリンクを登録しています。");
+      setMessage("YouTubeリンクを登録しています．");
       const { error: videoError } = await supabase.from("videos").insert({
         fruit_id: fruitId || null,
         cultivar_id: savedCultivarId,

@@ -13,7 +13,7 @@ const jpegQuality = 0.82;
 
 export async function compressImageForUpload(file: File): Promise<CompressedImage> {
   if (!file.type.startsWith("image/")) {
-    throw new Error("画像ファイルを選択してください。");
+    throw new Error("画像ファイルを選択してください．");
   }
 
   const image = await loadImage(file);
@@ -27,7 +27,7 @@ export async function compressImageForUpload(file: File): Promise<CompressedImag
 
   const context = canvas.getContext("2d");
   if (!context) {
-    throw new Error("画像を圧縮できませんでした。");
+    throw new Error("画像を圧縮できませんでした．");
   }
 
   context.drawImage(image, 0, 0, width, height);
@@ -36,7 +36,7 @@ export async function compressImageForUpload(file: File): Promise<CompressedImag
     canvas.toBlob(
       (result) => {
         if (result) resolve(result);
-        else reject(new Error("画像を書き出せませんでした。"));
+        else reject(new Error("画像を書き出せませんでした．"));
       },
       "image/jpeg",
       jpegQuality
@@ -74,7 +74,7 @@ function loadImage(file: File) {
     };
     image.onerror = () => {
       URL.revokeObjectURL(url);
-      reject(new Error("画像を読み込めませんでした。別の形式で試してください。"));
+      reject(new Error("画像を読み込めませんでした．別の形式で試してください．"));
     };
 
     image.src = url;

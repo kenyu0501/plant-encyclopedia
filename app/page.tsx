@@ -60,7 +60,7 @@ export default async function HomePage() {
           </div>
         ) : (
           <p className="rounded-lg bg-white/80 p-5 text-sm text-leaf-900/70 ring-1 ring-leaf-100">
-            まだ公開中の果樹がありません。管理画面から登録してください。
+            まだ公開中の果樹がありません．管理画面から登録してください．
           </p>
         )}
       </section>

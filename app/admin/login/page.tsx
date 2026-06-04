@@ -11,7 +11,7 @@ export default async function LoginPage() {
 
   return (
     <div className="space-y-5">
-      <PageHeader title="管理者ログイン" description="果樹・品種・写真・YouTubeを管理するためのログインです。" />
+      <PageHeader title="管理者ログイン" description="果樹・品種・写真・YouTubeを管理するためのログインです．" />
       <LoginForm />
     </div>
   );

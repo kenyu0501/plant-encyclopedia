@@ -33,7 +33,7 @@ export function PhotoUploadForm({
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!file) {
-      setMessage("写真ファイルを選択してください。");
+      setMessage("写真ファイルを選択してください．");
       return;
     }
 
@@ -45,23 +45,23 @@ export function PhotoUploadForm({
     } = await supabase.auth.getUser();
     if (!user) {
       setLoading(false);
-      setMessage("ログイン状態を確認できませんでした。もう一度管理者ログインしてください。");
+      setMessage("ログイン状態を確認できませんでした．もう一度管理者ログインしてください．");
       return;
     }
 
-    setMessage("写真を圧縮しています。");
+    setMessage("写真を圧縮しています．");
     let compressed;
     try {
       compressed = await compressImageForUpload(file);
     } catch (error) {
       setLoading(false);
-      setMessage(error instanceof Error ? error.message : "画像圧縮に失敗しました。");
+      setMessage(error instanceof Error ? error.message : "画像圧縮に失敗しました．");
       return;
     }
 
     const storagePath = `${fruitId}/${cultivarId || "fruit"}/${crypto.randomUUID()}.jpg`;
     setMessage(
-      `Storageへ写真をアップロードしています。${formatBytes(compressed.originalBytes)} → ${formatBytes(
+      `Storageへ写真をアップロードしています．${formatBytes(compressed.originalBytes)} → ${formatBytes(
         compressed.compressedBytes
       )} / ${compressed.width}x${compressed.height}px`
     );
@@ -76,7 +76,7 @@ export function PhotoUploadForm({
       return;
     }
 
-    setMessage("写真レコードをデータベースに登録しています。");
+    setMessage("写真レコードをデータベースに登録しています．");
     const { data: publicUrl } = supabase.storage.from("fruit-photos").getPublicUrl(storagePath);
     const { error } = await supabase.from("photos").insert({
       fruit_id: fruitId || null,
@@ -100,7 +100,7 @@ export function PhotoUploadForm({
 
     setCaption("");
     setFile(null);
-    setMessage("写真をアップロードしました。公開ページを再読み込みすると反映されます。");
+    setMessage("写真をアップロードしました．公開ページを再読み込みすると反映されます．");
     router.refresh();
   }
 

@@ -13,7 +13,7 @@ export default async function NewFruitPage() {
     <div className="space-y-5">
       <PageHeader
         title="果樹追加"
-        description="マンゴー、アボカド、バナナ以外の果樹もここから追加できます。果樹ページを作ると、その下に品種・写真・YouTubeを紐づけられます。"
+        description="マンゴー，アボカド，バナナ以外の果樹もここから追加できます．果樹ページを作ると，その下に品種・写真・YouTubeを紐づけられます．"
       />
       <FruitForm />
     </div>

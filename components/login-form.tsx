@@ -20,7 +20,7 @@ export function LoginForm() {
   async function onSubmit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     setLoading(true);
-    setMessage({ tone: "info", text: "ログイン情報を確認しています。" });
+    setMessage({ tone: "info", text: "ログイン情報を確認しています．" });
     const supabase = createClient();
     const { data, error } = await supabase.auth.signInWithPassword({ email, password });
     if (error) {
@@ -32,14 +32,14 @@ export function LoginForm() {
     const userId = data.user?.id;
     if (!userId) {
       setLoading(false);
-      setMessage({ tone: "error", text: "ログインできましたが、ユーザー情報を取得できませんでした。" });
+      setMessage({ tone: "error", text: "ログインできましたが，ユーザー情報を取得できませんでした．" });
       return;
     }
 
     const configuredAdminIds =
       process.env.NEXT_PUBLIC_ADMIN_USER_IDS?.split(",").map((id) => id.trim()).filter(Boolean) ?? [];
     if (configuredAdminIds.includes(userId)) {
-      setMessage({ tone: "success", text: "管理者としてログインしました。管理画面へ移動します。" });
+      setMessage({ tone: "success", text: "管理者としてログインしました．管理画面へ移動します．" });
       setTimeout(() => {
         router.replace("/admin");
         router.refresh();
@@ -47,7 +47,7 @@ export function LoginForm() {
       return;
     }
 
-    setMessage({ tone: "info", text: "ログイン成功。管理者権限を確認しています。" });
+    setMessage({ tone: "info", text: "ログイン成功．管理者権限を確認しています．" });
     const { data: profile, error: profileError } = await supabase
       .from("profiles")
       .select("role")
@@ -64,12 +64,12 @@ export function LoginForm() {
       setLoading(false);
       setMessage({
         tone: "error",
-        text: `ログインは成功しましたが、このユーザーは管理者に登録されていません。User UID: ${userId}`
+        text: `ログインは成功しましたが，このユーザーは管理者に登録されていません．User UID: ${userId}`
       });
       return;
     }
 
-    setMessage({ tone: "success", text: "管理者としてログインしました。管理画面へ移動します。" });
+    setMessage({ tone: "success", text: "管理者としてログインしました．管理画面へ移動します．" });
     setTimeout(() => {
       router.replace("/admin");
       router.refresh();

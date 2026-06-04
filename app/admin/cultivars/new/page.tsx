@@ -13,7 +13,7 @@ export default async function NewCultivarPage() {
 
   return (
     <div className="space-y-5">
-      <PageHeader title="品種追加" description="品種は必ず親の果樹ページに紐づきます。" />
+      <PageHeader title="品種追加" description="品種は必ず親の果樹ページに紐づきます．" />
       <CultivarForm fruits={fruits} />
     </div>
   );

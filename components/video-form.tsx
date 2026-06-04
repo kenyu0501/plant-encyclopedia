@@ -49,7 +49,7 @@ export function VideoForm({
     setYoutubeUrl("");
     setTitle("");
     setDescription("");
-    setMessage("YouTubeリンクを登録しました。");
+    setMessage("YouTubeリンクを登録しました．");
   }
 
   return (

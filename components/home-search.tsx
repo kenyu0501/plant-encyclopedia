@@ -67,7 +67,7 @@ export function HomeSearch({ entries }: { entries: PublicSearchEntry[] }) {
               ))}
             </div>
           ) : (
-            <p className="p-4 text-sm font-semibold text-leaf-900/56">一致する果樹・品種がありません。</p>
+            <p className="p-4 text-sm font-semibold text-leaf-900/56">一致する果樹・品種がありません．</p>
           )}
         </div>
       ) : null}

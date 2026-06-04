@@ -14,7 +14,7 @@ export default async function PhotosPage() {
 
   return (
     <div className="space-y-5">
-      <PageHeader title="写真追加" description="スマホのカメラ・写真ライブラリからSupabase Storageへアップロードします。" />
+      <PageHeader title="写真追加" description="スマホのカメラ・写真ライブラリからSupabase Storageへアップロードします．" />
       <PhotoUploadForm fruits={fruits} cultivars={cultivars} />
       <PhotoManager photos={photos} />
     </div>

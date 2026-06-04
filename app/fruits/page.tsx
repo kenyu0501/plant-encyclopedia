@@ -14,7 +14,7 @@ export default async function FruitsPage() {
 
   return (
     <div className="space-y-5">
-      <PageHeader title="果樹一覧" description="公開中の熱帯果樹ページです。果樹ページの中に品種ページが紐づきます。" />
+      <PageHeader title="果樹一覧" description="公開中の熱帯果樹ページです．果樹ページの中に品種ページが紐づきます．" />
       {fruits.length > 0 ? (
         <div className="grid gap-4 sm:grid-cols-2">
           {fruits.map((fruit) => (
@@ -23,7 +23,7 @@ export default async function FruitsPage() {
         </div>
       ) : (
         <p className="rounded-lg bg-white/80 p-5 text-leaf-900/70 ring-1 ring-leaf-100">
-          公開中の果樹がありません。
+          公開中の果樹がありません．
         </p>
       )}
     </div>

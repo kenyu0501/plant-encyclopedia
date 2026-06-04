@@ -31,7 +31,7 @@ export function SiteSettingsForm({ settings }: { settings: SiteSettings }) {
       setMessage(error.message);
       return;
     }
-    setMessage("トップページ文言を保存しました。");
+    setMessage("トップページ文言を保存しました．");
     router.refresh();
   }
 

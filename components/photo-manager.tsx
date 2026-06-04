@@ -11,7 +11,7 @@ export function PhotoManager({ photos }: { photos: AdminPhoto[] }) {
   if (photos.length === 0) {
     return (
       <section className="rounded-lg bg-white/80 p-5 text-sm text-leaf-900/70 ring-1 ring-leaf-100">
-        まだ写真がありません。上のフォームから追加してください。
+        まだ写真がありません．上のフォームから追加してください．
       </section>
     );
   }
@@ -42,7 +42,7 @@ function PhotoCard({ photo }: { photo: AdminPhoto }) {
 
   async function savePhoto() {
     setLoading(true);
-    setMessage("保存しています。");
+    setMessage("保存しています．");
     const supabase = createClient();
 
     if (isMain) {
@@ -71,31 +71,31 @@ function PhotoCard({ photo }: { photo: AdminPhoto }) {
       return;
     }
 
-    setMessage("写真情報を保存しました。");
+    setMessage("写真情報を保存しました．");
     router.refresh();
   }
 
   async function replacePhoto() {
     if (!replacementFile) {
-      setMessage("差し替える写真を選択してください。");
+      setMessage("差し替える写真を選択してください．");
       return;
     }
 
     setLoading(true);
-    setMessage("新しい写真を圧縮しています。");
+    setMessage("新しい写真を圧縮しています．");
     const supabase = createClient();
     let compressed;
     try {
       compressed = await compressImageForUpload(replacementFile);
     } catch (error) {
       setLoading(false);
-      setMessage(error instanceof Error ? error.message : "画像圧縮に失敗しました。");
+      setMessage(error instanceof Error ? error.message : "画像圧縮に失敗しました．");
       return;
     }
 
     const storagePath = `${photo.fruit_id ?? "unknown"}/${photo.cultivar_id || "fruit"}/${crypto.randomUUID()}.jpg`;
     setMessage(
-      `新しい写真をアップロードしています。${formatBytes(compressed.originalBytes)} → ${formatBytes(
+      `新しい写真をアップロードしています．${formatBytes(compressed.originalBytes)} → ${formatBytes(
         compressed.compressedBytes
       )} / ${compressed.width}x${compressed.height}px`
     );
@@ -129,7 +129,7 @@ function PhotoCard({ photo }: { photo: AdminPhoto }) {
     await supabase.storage.from("fruit-photos").remove([photo.storage_path]);
     setLoading(false);
     setReplacementFile(null);
-    setMessage("写真を差し替えました。");
+    setMessage("写真を差し替えました．");
     router.refresh();
   }
 
@@ -137,7 +137,7 @@ function PhotoCard({ photo }: { photo: AdminPhoto }) {
     if (!confirm("この写真を削除しますか？")) return;
 
     setLoading(true);
-    setMessage("削除しています。");
+    setMessage("削除しています．");
     const supabase = createClient();
     const { error } = await supabase.from("photos").delete().eq("id", photo.id);
 
@@ -149,7 +149,7 @@ function PhotoCard({ photo }: { photo: AdminPhoto }) {
 
     await supabase.storage.from("fruit-photos").remove([photo.storage_path]);
     setLoading(false);
-    setMessage("写真を削除しました。");
+    setMessage("写真を削除しました．");
     router.refresh();
   }
 
