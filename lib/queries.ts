@@ -200,7 +200,7 @@ export async function getSiteAnalytics(): Promise<SiteAnalytics | null> {
   }).format(new Date());
   const { data, error } = await supabase
     .from("page_views")
-    .select("views, view_date, cultivar_id, cultivars(name_ja, slug, fruits(name_ja, slug))");
+    .select("views, view_date, cultivar_id, cultivars(name_ja, slug, is_public, fruits(name_ja, slug, is_public))");
 
   if (error) {
     console.error(error);
@@ -215,12 +215,20 @@ export async function getSiteAnalytics(): Promise<SiteAnalytics | null> {
       | {
           name_ja: string | null;
           slug: string | null;
-          fruits: { name_ja: string | null; slug: string | null } | { name_ja: string | null; slug: string | null }[] | null;
+          is_public: boolean;
+          fruits:
+            | { name_ja: string | null; slug: string | null; is_public: boolean }
+            | { name_ja: string | null; slug: string | null; is_public: boolean }[]
+            | null;
         }
       | {
           name_ja: string | null;
           slug: string | null;
-          fruits: { name_ja: string | null; slug: string | null } | { name_ja: string | null; slug: string | null }[] | null;
+          is_public: boolean;
+          fruits:
+            | { name_ja: string | null; slug: string | null; is_public: boolean }
+            | { name_ja: string | null; slug: string | null; is_public: boolean }[]
+            | null;
         }[]
       | null;
   };
@@ -236,7 +244,7 @@ export async function getSiteAnalytics(): Promise<SiteAnalytics | null> {
     if (!row.cultivar_id || !row.cultivars) continue;
     const cultivar = Array.isArray(row.cultivars) ? row.cultivars[0] : row.cultivars;
     const fruit = Array.isArray(cultivar.fruits) ? cultivar.fruits[0] : cultivar.fruits;
-    if (!cultivar?.slug || !cultivar.name_ja || !fruit?.slug || !fruit.name_ja) continue;
+    if (!cultivar?.is_public || !fruit?.is_public || !cultivar.slug || !cultivar.name_ja || !fruit.slug || !fruit.name_ja) continue;
 
     const href = `/fruits/${fruit.slug}/cultivars/${cultivar.slug}`;
     const current = cultivarMap.get(href);
