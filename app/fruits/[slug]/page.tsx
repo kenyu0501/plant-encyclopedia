@@ -41,7 +41,7 @@ export default async function FruitDetailPage({ params }: Props) {
     <div className="space-y-6">
       <PageHeader
         title={fruit.name_ja}
-        description={[fruit.name_en, fruit.scientific_name].filter(Boolean).join(" / ")}
+        description={fruit.name_en ?? undefined}
         action={
           isAdmin ? (
             <Link
@@ -82,6 +82,7 @@ export default async function FruitDetailPage({ params }: Props) {
       <section className="rounded-lg bg-white/84 p-5 ring-1 ring-leaf-100">
         <h2 className="font-bold text-leaf-900">果樹情報</h2>
         <div className="mt-4 grid gap-4 text-sm leading-6 text-leaf-900/76">
+          <Info label="学名" value={fruit.scientific_name} italic />
           <Info label="科名" value={fruit.family_name} />
           <Info label="原産地" value={fruit.origin} />
           <Info label="樹形・性質" value={fruit.growth_habit} />
@@ -116,12 +117,12 @@ function isFruitHeroSupplementPhoto(photoType: string | null) {
   return ["メイン下画像", "メイン画像2", "メイン画像3", "栽培暦", "特徴図", "育て方図", "剪定図"].includes(photoType);
 }
 
-function Info({ label, value }: { label: string; value: string | null }) {
+function Info({ label, value, italic = false }: { label: string; value: string | null; italic?: boolean }) {
   if (!value) return null;
   return (
     <div>
       <dt className="font-semibold text-leaf-900">{label}</dt>
-      <dd className="mt-1">{value}</dd>
+      <dd className={`mt-1 ${italic ? "italic" : ""}`}>{value}</dd>
     </div>
   );
 }
