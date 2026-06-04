@@ -2,18 +2,22 @@
 
 import { useEffect } from "react";
 import { usePathname } from "next/navigation";
-import { createClient } from "@/lib/supabase-browser";
 
 export function PageViewTracker() {
   const pathname = usePathname();
 
   useEffect(() => {
-    if (!pathname) return;
+    if (!pathname || pathname.startsWith("/admin") || pathname === "/offline") return;
 
-    const supabase = createClient();
     const path = `${window.location.pathname}${window.location.search}`;
 
-    void supabase.rpc("track_page_view", { p_path: path });
+    void fetch("/api/page-view", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ path }),
+      cache: "no-store",
+      keepalive: true
+    }).catch(() => undefined);
   }, [pathname]);
 
   return null;

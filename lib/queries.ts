@@ -191,7 +191,12 @@ export async function getPublicSearchEntries() {
 
 export async function getSiteAnalytics(): Promise<SiteAnalytics | null> {
   const supabase = await createClient();
-  const today = new Date().toISOString().slice(0, 10);
+  const today = new Intl.DateTimeFormat("en-CA", {
+    timeZone: "Asia/Tokyo",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit"
+  }).format(new Date());
   const { data, error } = await supabase
     .from("page_views")
     .select("views, view_date, cultivar_id, cultivars(name_ja, slug, fruits(name_ja, slug))");
