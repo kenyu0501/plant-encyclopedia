@@ -62,11 +62,19 @@ export function PhotoLightboxGallery({
       </div>
 
       {activePhoto && activeIndex !== null ? (
-        <div className="fixed inset-0 z-50 bg-black/86 p-3 text-white sm:p-6" role="dialog" aria-modal="true">
+        <div
+          className="fixed inset-0 z-50 bg-black/86 p-3 text-white sm:p-6"
+          role="dialog"
+          aria-modal="true"
+          onClick={() => setActiveIndex(null)}
+        >
           <button
             type="button"
-            onClick={() => setActiveIndex(null)}
-            className="absolute right-3 top-3 z-20 inline-flex h-11 w-11 items-center justify-center rounded-full bg-white/14 text-white backdrop-blur"
+            onClick={(event) => {
+              event.stopPropagation();
+              setActiveIndex(null);
+            }}
+            className="absolute right-3 top-3 z-30 inline-flex h-11 w-11 items-center justify-center rounded-full bg-white/18 text-white backdrop-blur transition hover:bg-white/26"
             aria-label="閉じる"
           >
             <X size={24} />
@@ -76,16 +84,22 @@ export function PhotoLightboxGallery({
             <>
               <button
                 type="button"
-                onClick={() => setActiveIndex((current) => moveIndex(current, photos.length, -1))}
-                className="absolute left-3 top-1/2 z-20 inline-flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/14 text-white backdrop-blur"
+                onClick={(event) => {
+                  event.stopPropagation();
+                  setActiveIndex((current) => moveIndex(current, photos.length, -1));
+                }}
+                className="absolute left-3 top-1/2 z-30 inline-flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/18 text-white backdrop-blur transition hover:bg-white/26"
                 aria-label="前の写真"
               >
                 <ChevronLeft size={26} />
               </button>
               <button
                 type="button"
-                onClick={() => setActiveIndex((current) => moveIndex(current, photos.length, 1))}
-                className="absolute right-3 top-1/2 z-20 inline-flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/14 text-white backdrop-blur"
+                onClick={(event) => {
+                  event.stopPropagation();
+                  setActiveIndex((current) => moveIndex(current, photos.length, 1));
+                }}
+                className="absolute right-3 top-1/2 z-30 inline-flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/18 text-white backdrop-blur transition hover:bg-white/26"
                 aria-label="次の写真"
               >
                 <ChevronRight size={26} />
@@ -93,8 +107,7 @@ export function PhotoLightboxGallery({
             </>
           ) : null}
 
-          <button type="button" className="absolute inset-0" onClick={() => setActiveIndex(null)} aria-label="閉じる" />
-          <div className="relative z-10 flex h-full flex-col items-center justify-center gap-3 px-10">
+          <div className="relative z-10 flex h-full flex-col items-center justify-center gap-3 px-10" onClick={(event) => event.stopPropagation()}>
             <div className="relative h-[78vh] w-full max-w-5xl">
               <Image
                 src={getPhotoUrl(activePhoto, "original")}
