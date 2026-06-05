@@ -4,7 +4,8 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ArrowLeft, ImagePlus, PlaySquare, Save, Trash2 } from "lucide-react";
-import { compressImageForUpload, formatBytes } from "@/lib/image-compress";
+import { createImageVariantsForUpload, formatBytes, formatVariantSummary } from "@/lib/image-compress";
+import { uploadPhotoVariants } from "@/lib/photo-upload";
 import { createClient } from "@/lib/supabase-browser";
 import { getYoutubeKey, getYoutubeThumbnail } from "@/lib/youtube";
 import type { Cultivar, CultivarInsert, Fruit } from "@/types/database";
@@ -148,38 +149,31 @@ export function CultivarForm({ cultivar, fruits }: { cultivar?: Cultivar | null;
 
       for (let index = 0; index < photoFiles.length; index += 1) {
         const photoFile = photoFiles[index];
-        setMessage(`写真${index + 1}/${photoFiles.length}を圧縮しています．`);
-        let compressed;
+        setMessage(`写真${index + 1}/${photoFiles.length}を3サイズに圧縮しています．`);
+        let variants;
         try {
-          compressed = await compressImageForUpload(photoFile);
+          variants = await createImageVariantsForUpload(photoFile);
         } catch (compressError) {
           setLoading(false);
           setMessage(compressError instanceof Error ? compressError.message : "画像圧縮に失敗しました．");
           return;
         }
 
-        const storagePath = `${fruitId}/${savedCultivarId}/${crypto.randomUUID()}.jpg`;
+        const basePath = `${fruitId}/${savedCultivarId}/${crypto.randomUUID()}`;
         setMessage(
-          `写真${index + 1}/${photoFiles.length}をアップロードしています．${formatBytes(
-            compressed.originalBytes
-          )} → ${formatBytes(compressed.compressedBytes)} / ${compressed.width}x${compressed.height}px`
+          `写真${index + 1}/${photoFiles.length}をアップロードしています．元画像 ${formatBytes(variants.originalBytes)} → ${formatVariantSummary(variants)}`
         );
-        const { error: uploadError } = await supabase.storage.from("fruit-photos").upload(storagePath, compressed.file, {
-          cacheControl: "3600",
-          upsert: false
-        });
-        if (uploadError) {
+        const uploaded = await uploadPhotoVariants(supabase, basePath, variants);
+        if (uploaded.error || !uploaded.data) {
           setLoading(false);
-          setMessage(`写真アップロードに失敗しました: ${uploadError.message}`);
+          setMessage(`写真アップロードに失敗しました: ${uploaded.error}`);
           return;
         }
 
-        const { data: publicUrl } = supabase.storage.from("fruit-photos").getPublicUrl(storagePath);
         const { error: photoError } = await supabase.from("photos").insert({
           fruit_id: fruitId || null,
           cultivar_id: savedCultivarId,
-          image_url: publicUrl.publicUrl,
-          storage_path: storagePath,
+          ...uploaded.data,
           photo_type: photoType,
           caption: photoCaption || null,
           taken_at: null,

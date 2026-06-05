@@ -3,7 +3,8 @@
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Upload } from "lucide-react";
-import { compressImageForUpload, formatBytes } from "@/lib/image-compress";
+import { createImageVariantsForUpload, formatBytes, formatVariantSummary } from "@/lib/image-compress";
+import { uploadPhotoVariants } from "@/lib/photo-upload";
 import { createClient } from "@/lib/supabase-browser";
 import type { AdminCultivar } from "@/lib/queries";
 import type { Fruit } from "@/types/database";
@@ -49,40 +50,33 @@ export function PhotoUploadForm({
       return;
     }
 
-    setMessage("写真を圧縮しています．");
-    let compressed;
+    setMessage("写真を3サイズに圧縮しています．");
+    let variants;
     try {
-      compressed = await compressImageForUpload(file);
+      variants = await createImageVariantsForUpload(file);
     } catch (error) {
       setLoading(false);
       setMessage(error instanceof Error ? error.message : "画像圧縮に失敗しました．");
       return;
     }
 
-    const storagePath = `${fruitId}/${cultivarId || "fruit"}/${crypto.randomUUID()}.jpg`;
+    const basePath = `${fruitId}/${cultivarId || "fruit"}/${crypto.randomUUID()}`;
     setMessage(
-      `Storageへ写真をアップロードしています．${formatBytes(compressed.originalBytes)} → ${formatBytes(
-        compressed.compressedBytes
-      )} / ${compressed.width}x${compressed.height}px`
+      `Storageへ写真をアップロードしています．元画像 ${formatBytes(variants.originalBytes)} → ${formatVariantSummary(variants)}`
     );
-    const { error: uploadError } = await supabase.storage.from("fruit-photos").upload(storagePath, compressed.file, {
-      cacheControl: "3600",
-      upsert: false
-    });
+    const uploaded = await uploadPhotoVariants(supabase, basePath, variants);
 
-    if (uploadError) {
+    if (uploaded.error || !uploaded.data) {
       setLoading(false);
-      setMessage(`Storageアップロードに失敗しました: ${uploadError.message}`);
+      setMessage(`Storageアップロードに失敗しました: ${uploaded.error}`);
       return;
     }
 
     setMessage("写真レコードをデータベースに登録しています．");
-    const { data: publicUrl } = supabase.storage.from("fruit-photos").getPublicUrl(storagePath);
     const { error } = await supabase.from("photos").insert({
       fruit_id: fruitId || null,
       cultivar_id: cultivarId || null,
-      image_url: publicUrl.publicUrl,
-      storage_path: storagePath,
+      ...uploaded.data,
       photo_type: photoType,
       caption: caption || null,
       taken_at: null,

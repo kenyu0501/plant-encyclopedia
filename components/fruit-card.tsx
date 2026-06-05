@@ -1,5 +1,6 @@
 import Image from "next/image";
 import Link from "next/link";
+import { getPhotoUrl } from "@/lib/photo-url";
 import type { FruitWithChildren } from "@/types/database";
 
 export function FruitCard({ fruit }: { fruit: FruitWithChildren }) {
@@ -10,7 +11,7 @@ export function FruitCard({ fruit }: { fruit: FruitWithChildren }) {
     <Link href={`/fruits/${fruit.slug}`} className="overflow-hidden rounded-lg bg-white/86 shadow-soft ring-1 ring-leaf-100">
       <div className="relative aspect-[4/3] bg-leaf-100">
         {mainPhoto ? (
-          <Image src={mainPhoto.image_url} alt={mainPhoto.caption ?? fruit.name_ja} fill className="object-cover" />
+          <Image src={getPhotoUrl(mainPhoto, "thumb")} alt={mainPhoto.caption ?? fruit.name_ja} fill className="object-cover" sizes="(min-width: 640px) 33vw, 100vw" />
         ) : (
           <div className="flex h-full items-center justify-center text-sm font-semibold text-leaf-700">No photo</div>
         )}

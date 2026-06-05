@@ -6,6 +6,7 @@ import type { ReactNode } from "react";
 import { Apple, BarChart3, Dna, ExternalLink, Flower2, Globe2, ImagePlus, Leaf, Pencil, PlayCircle, Ruler, Scale, Sprout, Thermometer } from "lucide-react";
 import { PageHeader } from "@/components/page-header";
 import { getCurrentUser, isAdminUser } from "@/lib/auth";
+import { getPhotoUrl } from "@/lib/photo-url";
 import { getPublicCultivarBySlugs } from "@/lib/queries";
 
 export const dynamic = "force-dynamic";
@@ -80,7 +81,7 @@ export default async function CultivarDetailPage({ params }: Props) {
 
       {mainPhoto ? (
         <div className="relative aspect-[4/3] overflow-hidden rounded-lg bg-leaf-100">
-          <Image src={mainPhoto.image_url} alt={mainPhoto.caption ?? cultivar.name_ja} fill className="object-cover" priority />
+          <Image src={getPhotoUrl(mainPhoto, "medium")} alt={mainPhoto.caption ?? cultivar.name_ja} fill className="object-cover" priority sizes="100vw" />
         </div>
       ) : null}
 
@@ -98,7 +99,7 @@ export default async function CultivarDetailPage({ params }: Props) {
             {galleryPhotos.map((photo) => (
               <figure key={photo.id} className="overflow-hidden rounded-lg bg-white/84 ring-1 ring-leaf-100">
                 <div className="relative aspect-square bg-leaf-100">
-                  <Image src={photo.image_url} alt={photo.caption ?? cultivar.name_ja} fill className="object-cover" sizes="(min-width: 640px) 33vw, 50vw" />
+                  <Image src={getPhotoUrl(photo, "thumb")} alt={photo.caption ?? cultivar.name_ja} fill className="object-cover" sizes="(min-width: 640px) 33vw, 50vw" />
                 </div>
                 {photo.caption || photo.photo_type ? (
                   <figcaption className="space-y-1 p-2 text-xs leading-5 text-leaf-900/68">

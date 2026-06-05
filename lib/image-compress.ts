@@ -8,15 +8,70 @@ export type CompressedImage = {
   height: number;
 };
 
-const maxLongEdge = 1600;
-const jpegQuality = 0.82;
+export type ImageVariantName = "thumb" | "medium" | "original";
+
+export type ImageVariant = CompressedImage & {
+  name: ImageVariantName;
+  maxLongEdge: number;
+};
+
+export type ImageVariantSet = {
+  originalBytes: number;
+  thumb: ImageVariant;
+  medium: ImageVariant;
+  original: ImageVariant;
+};
+
+const defaultMaxLongEdge = 1600;
+const defaultJpegQuality = 0.82;
+
+const imageVariantSettings: Record<ImageVariantName, { maxLongEdge: number; quality: number }> = {
+  thumb: { maxLongEdge: 360, quality: 0.74 },
+  medium: { maxLongEdge: 900, quality: 0.8 },
+  original: { maxLongEdge: 1600, quality: 0.84 }
+};
 
 export async function compressImageForUpload(file: File): Promise<CompressedImage> {
+  return resizeImage(file, defaultMaxLongEdge, defaultJpegQuality);
+}
+
+export async function createImageVariantsForUpload(file: File): Promise<ImageVariantSet> {
   if (!file.type.startsWith("image/")) {
     throw new Error("画像ファイルを選択してください．");
   }
 
   const image = await loadImage(file);
+  const baseName = file.name.replace(/\.[^.]+$/, "") || "photo";
+
+  const entries = await Promise.all(
+    (Object.entries(imageVariantSettings) as [ImageVariantName, { maxLongEdge: number; quality: number }][])
+      .map(async ([name, settings]) => {
+        const resized = await resizeLoadedImage(image, file, baseName, settings.maxLongEdge, settings.quality, name);
+        return [name, resized] as const;
+      })
+  );
+
+  return Object.fromEntries([["originalBytes", file.size], ...entries]) as ImageVariantSet;
+}
+
+async function resizeImage(file: File, maxLongEdge: number, jpegQuality: number): Promise<CompressedImage> {
+  if (!file.type.startsWith("image/")) {
+    throw new Error("画像ファイルを選択してください．");
+  }
+
+  const image = await loadImage(file);
+  const baseName = file.name.replace(/\.[^.]+$/, "") || "photo";
+  return resizeLoadedImage(image, file, baseName, maxLongEdge, jpegQuality);
+}
+
+async function resizeLoadedImage(
+  image: HTMLImageElement,
+  file: File,
+  baseName: string,
+  maxLongEdge: number,
+  jpegQuality: number,
+  variantName?: ImageVariantName
+): Promise<CompressedImage | ImageVariant> {
   const scale = Math.min(1, maxLongEdge / Math.max(image.naturalWidth, image.naturalHeight));
   const width = Math.max(1, Math.round(image.naturalWidth * scale));
   const height = Math.max(1, Math.round(image.naturalHeight * scale));
@@ -43,24 +98,31 @@ export async function compressImageForUpload(file: File): Promise<CompressedImag
     );
   });
 
-  const baseName = file.name.replace(/\.[^.]+$/, "") || "photo";
-  const compressedFile = new File([blob], `${baseName}.jpg`, {
+  const compressedFile = new File([blob], `${baseName}${variantName ? `-${variantName}` : ""}.jpg`, {
     type: "image/jpeg",
     lastModified: Date.now()
   });
 
-  return {
+  const result = {
     file: compressedFile,
     originalBytes: file.size,
     compressedBytes: compressedFile.size,
     width,
     height
   };
+
+  return variantName ? { ...result, name: variantName, maxLongEdge } : result;
 }
 
 export function formatBytes(bytes: number) {
   if (bytes < 1024 * 1024) return `${Math.round(bytes / 1024)}KB`;
   return `${(bytes / 1024 / 1024).toFixed(1)}MB`;
+}
+
+export function formatVariantSummary(variants: ImageVariantSet) {
+  return `thumb ${formatBytes(variants.thumb.compressedBytes)} / ${variants.thumb.width}x${variants.thumb.height}px，medium ${formatBytes(
+    variants.medium.compressedBytes
+  )} / ${variants.medium.width}x${variants.medium.height}px，original ${formatBytes(variants.original.compressedBytes)} / ${variants.original.width}x${variants.original.height}px`;
 }
 
 function loadImage(file: File) {

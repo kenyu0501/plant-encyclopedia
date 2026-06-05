@@ -198,6 +198,12 @@ export type Photo = {
   cultivar_id: string | null;
   image_url: string;
   storage_path: string;
+  thumbnail_url: string | null;
+  thumbnail_storage_path: string | null;
+  medium_url: string | null;
+  medium_storage_path: string | null;
+  original_url: string | null;
+  original_storage_path: string | null;
   photo_type: string | null;
   caption: string | null;
   taken_at: string | null;

@@ -3,7 +3,9 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { ImageUp, Save, Star, Trash2 } from "lucide-react";
-import { compressImageForUpload, formatBytes } from "@/lib/image-compress";
+import { createImageVariantsForUpload, formatBytes, formatVariantSummary } from "@/lib/image-compress";
+import { getPhotoStoragePaths, getPhotoUrl } from "@/lib/photo-url";
+import { uploadPhotoVariants } from "@/lib/photo-upload";
 import { createClient } from "@/lib/supabase-browser";
 import type { AdminPhoto } from "@/lib/queries";
 
@@ -82,42 +84,32 @@ function PhotoCard({ photo }: { photo: AdminPhoto }) {
     }
 
     setLoading(true);
-    setMessage("新しい写真を圧縮しています．");
+    setMessage("新しい写真を3サイズに圧縮しています．");
     const supabase = createClient();
-    let compressed;
+    let variants;
     try {
-      compressed = await compressImageForUpload(replacementFile);
+      variants = await createImageVariantsForUpload(replacementFile);
     } catch (error) {
       setLoading(false);
       setMessage(error instanceof Error ? error.message : "画像圧縮に失敗しました．");
       return;
     }
 
-    const storagePath = `${photo.fruit_id ?? "unknown"}/${photo.cultivar_id || "fruit"}/${crypto.randomUUID()}.jpg`;
+    const basePath = `${photo.fruit_id ?? "unknown"}/${photo.cultivar_id || "fruit"}/${crypto.randomUUID()}`;
     setMessage(
-      `新しい写真をアップロードしています．${formatBytes(compressed.originalBytes)} → ${formatBytes(
-        compressed.compressedBytes
-      )} / ${compressed.width}x${compressed.height}px`
+      `新しい写真をアップロードしています．元画像 ${formatBytes(variants.originalBytes)} → ${formatVariantSummary(variants)}`
     );
 
-    const { error: uploadError } = await supabase.storage.from("fruit-photos").upload(storagePath, compressed.file, {
-      cacheControl: "3600",
-      upsert: false
-    });
-
-    if (uploadError) {
+    const uploaded = await uploadPhotoVariants(supabase, basePath, variants);
+    if (uploaded.error || !uploaded.data) {
       setLoading(false);
-      setMessage(`差し替えアップロードに失敗しました: ${uploadError.message}`);
+      setMessage(`差し替えアップロードに失敗しました: ${uploaded.error}`);
       return;
     }
 
-    const { data: publicUrl } = supabase.storage.from("fruit-photos").getPublicUrl(storagePath);
     const { error } = await supabase
       .from("photos")
-      .update({
-        image_url: publicUrl.publicUrl,
-        storage_path: storagePath
-      })
+      .update(uploaded.data)
       .eq("id", photo.id);
 
     if (error) {
@@ -126,7 +118,7 @@ function PhotoCard({ photo }: { photo: AdminPhoto }) {
       return;
     }
 
-    await supabase.storage.from("fruit-photos").remove([photo.storage_path]);
+    await supabase.storage.from("fruit-photos").remove(getPhotoStoragePaths(photo));
     setLoading(false);
     setReplacementFile(null);
     setMessage("写真を差し替えました．");
@@ -147,7 +139,7 @@ function PhotoCard({ photo }: { photo: AdminPhoto }) {
       return;
     }
 
-    await supabase.storage.from("fruit-photos").remove([photo.storage_path]);
+    await supabase.storage.from("fruit-photos").remove(getPhotoStoragePaths(photo));
     setLoading(false);
     setMessage("写真を削除しました．");
     router.refresh();
@@ -157,7 +149,7 @@ function PhotoCard({ photo }: { photo: AdminPhoto }) {
     <article className="overflow-hidden rounded-lg bg-white/86 shadow-soft ring-1 ring-leaf-100">
       <div className="relative aspect-[4/3] bg-leaf-100">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={photo.image_url} alt={photo.caption ?? targetName} className="h-full w-full object-cover" />
+        <img src={getPhotoUrl(photo, "thumb")} alt={photo.caption ?? targetName} className="h-full w-full object-cover" />
       </div>
       <div className="space-y-4 p-4">
         <div className="flex items-start justify-between gap-3">
