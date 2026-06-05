@@ -164,7 +164,6 @@ export function PhotoUploadForm({
         <input
           type="file"
           accept="image/*"
-          capture="environment"
           onChange={(event) => setFile(event.target.files?.[0] ?? null)}
           className="mt-3 block w-full text-sm"
         />

@@ -217,7 +217,6 @@ function PhotoCard({ photo }: { photo: AdminPhoto }) {
             <input
               type="file"
               accept="image/*"
-              capture="environment"
               onChange={(event) => setReplacementFile(event.target.files?.[0] ?? null)}
               className="mt-3 block w-full text-sm"
             />
