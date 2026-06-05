@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { ImageUp, Save, Star, Trash2 } from "lucide-react";
+import { PhotoDateBadge } from "@/components/photo-date-badge";
 import { formatDateStampForImage, todayDateInputValue } from "@/lib/date-stamp";
 import { createImageVariantsForUpload, formatBytes, formatVariantSummary } from "@/lib/image-compress";
 import { getPhotoStoragePaths, getPhotoUrl } from "@/lib/photo-url";
@@ -117,7 +118,10 @@ function PhotoCard({ photo }: { photo: AdminPhoto }) {
 
     const { error } = await supabase
       .from("photos")
-      .update(uploaded.data)
+      .update({
+        ...uploaded.data,
+        taken_at: dateStampEnabled ? dateStampDate : null
+      })
       .eq("id", photo.id);
 
     if (error) {
@@ -158,6 +162,7 @@ function PhotoCard({ photo }: { photo: AdminPhoto }) {
       <div className="relative aspect-[4/3] bg-leaf-100">
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img src={getPhotoUrl(photo, "thumb")} alt={photo.caption ?? targetName} className="h-full w-full object-cover" />
+        <PhotoDateBadge photo={photo} />
       </div>
       <div className="space-y-4 p-4">
         <div className="flex items-start justify-between gap-3">

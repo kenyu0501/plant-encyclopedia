@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { Pencil } from "lucide-react";
 import { CultivarList } from "@/components/cultivar-list";
 import { MangoPedigree } from "@/components/mango-pedigree";
+import { PhotoDateBadge } from "@/components/photo-date-badge";
 import { PageHeader } from "@/components/page-header";
 import { getCurrentUser, isAdminUser } from "@/lib/auth";
 import { getPhotoUrl } from "@/lib/photo-url";
@@ -59,6 +60,7 @@ export default async function FruitDetailPage({ params }: Props) {
       {mainPhoto ? (
         <div className="relative aspect-[4/3] overflow-hidden rounded-lg bg-leaf-100">
           <Image src={getPhotoUrl(mainPhoto, "medium")} alt={mainPhoto.caption ?? fruit.name_ja} fill className="object-cover" priority sizes="100vw" />
+          <PhotoDateBadge photo={mainPhoto} className="bottom-3 right-3 text-sm" />
         </div>
       ) : null}
 
@@ -68,6 +70,7 @@ export default async function FruitDetailPage({ params }: Props) {
             <figure key={photo.id} className="overflow-hidden rounded-lg bg-white/84 ring-1 ring-leaf-100">
               <div className="relative aspect-[4/3] bg-leaf-100">
                 <Image src={getPhotoUrl(photo, "thumb")} alt={photo.caption ?? `${fruit.name_ja} メイン画像${index + 2}`} fill className="object-cover" sizes="(min-width: 640px) 33vw, 100vw" />
+                <PhotoDateBadge photo={photo} />
               </div>
               <figcaption className="space-y-1 p-3 text-xs leading-5 text-leaf-900/68">
                 <span className="inline-flex rounded-md bg-leaf-50 px-2 py-1 font-semibold">

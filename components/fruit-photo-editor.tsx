@@ -81,7 +81,7 @@ export function FruitPhotoEditor({ fruit, photos }: { fruit: Fruit; photos: Admi
         ...uploaded.data,
         photo_type: photoType,
         caption: caption || null,
-        taken_at: null,
+        taken_at: dateStampEnabled ? dateStampDate : null,
         uploaded_by: user.id,
         source_type: "admin",
         approval_status: "approved",

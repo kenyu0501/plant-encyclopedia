@@ -84,7 +84,7 @@ export function PhotoUploadForm({
       ...uploaded.data,
       photo_type: photoType,
       caption: caption || null,
-      taken_at: null,
+      taken_at: dateStampEnabled ? dateStampDate : null,
       uploaded_by: user?.id ?? null,
       source_type: "admin",
       approval_status: "approved",
