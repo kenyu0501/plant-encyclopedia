@@ -3,7 +3,8 @@
 import { useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 import { Upload } from "lucide-react";
-import { formatDateStampForImage, todayDateInputValue } from "@/lib/date-stamp";
+import { formatDateStampForImage } from "@/lib/date-stamp";
+import { extractExifDateInputValue } from "@/lib/exif-date";
 import { createImageVariantsForUpload, formatBytes, formatVariantSummary } from "@/lib/image-compress";
 import { uploadPhotoVariants } from "@/lib/photo-upload";
 import { createClient } from "@/lib/supabase-browser";
@@ -27,8 +28,8 @@ export function PhotoUploadForm({
   const [photoType, setPhotoType] = useState(initialCultivarId ? "果実" : "fruit");
   const [isMain, setIsMain] = useState(false);
   const [file, setFile] = useState<File | null>(null);
-  const [dateStampEnabled, setDateStampEnabled] = useState(true);
-  const [dateStampDate, setDateStampDate] = useState(todayDateInputValue);
+  const [dateStampEnabled, setDateStampEnabled] = useState(false);
+  const [dateStampDate, setDateStampDate] = useState("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -57,7 +58,7 @@ export function PhotoUploadForm({
     let variants;
     try {
       variants = await createImageVariantsForUpload(file, {
-        dateStamp: dateStampEnabled ? formatDateStampForImage(dateStampDate) : null
+        dateStamp: dateStampEnabled && dateStampDate ? formatDateStampForImage(dateStampDate) : null
       });
     } catch (error) {
       setLoading(false);
@@ -84,7 +85,7 @@ export function PhotoUploadForm({
       ...uploaded.data,
       photo_type: photoType,
       caption: caption || null,
-      taken_at: dateStampEnabled ? dateStampDate : null,
+      taken_at: dateStampEnabled && dateStampDate ? dateStampDate : null,
       uploaded_by: user?.id ?? null,
       source_type: "admin",
       approval_status: "approved",
@@ -99,8 +100,23 @@ export function PhotoUploadForm({
 
     setCaption("");
     setFile(null);
+    setDateStampEnabled(false);
+    setDateStampDate("");
     setMessage("写真をアップロードしました．公開ページを再読み込みすると反映されます．");
     router.refresh();
+  }
+
+  async function onFileChange(selectedFile: File | null) {
+    setFile(selectedFile);
+    if (!selectedFile) {
+      setDateStampEnabled(false);
+      setDateStampDate("");
+      return;
+    }
+
+    const exifDate = await extractExifDateInputValue(selectedFile);
+    setDateStampDate(exifDate ?? "");
+    setDateStampEnabled(Boolean(exifDate));
   }
 
   return (
@@ -169,7 +185,7 @@ export function PhotoUploadForm({
         <input
           type="file"
           accept="image/*"
-          onChange={(event) => setFile(event.target.files?.[0] ?? null)}
+          onChange={(event) => void onFileChange(event.target.files?.[0] ?? null)}
           className="mt-3 block w-full text-sm"
         />
       </label>
@@ -190,7 +206,9 @@ export function PhotoUploadForm({
           disabled={!dateStampEnabled}
           className="mt-3 w-full rounded-md border border-leaf-100 bg-white px-3 py-3 disabled:opacity-50"
         />
-        <span className="mt-2 block text-xs text-leaf-900/58">写真に直接焼き込まれます．</span>
+        <span className="mt-2 block text-xs text-leaf-900/58">
+          EXIFの撮影日が読めた場合だけ自動でONになります．手入力した場合も撮影日として保存されます．
+        </span>
       </div>
       <label className="flex items-center justify-between gap-3 rounded-md bg-fruit-100 p-3">
         <span className="font-semibold text-leaf-900">メイン写真にする</span>

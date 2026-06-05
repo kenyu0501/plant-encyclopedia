@@ -4,7 +4,8 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ArrowLeft, ImagePlus, PlaySquare, Save, Trash2 } from "lucide-react";
-import { formatDateStampForImage, todayDateInputValue } from "@/lib/date-stamp";
+import { formatDateStampForImage } from "@/lib/date-stamp";
+import { extractExifDateInputValue } from "@/lib/exif-date";
 import { createImageVariantsForUpload, formatBytes, formatVariantSummary } from "@/lib/image-compress";
 import { uploadPhotoVariants } from "@/lib/photo-upload";
 import { createClient } from "@/lib/supabase-browser";
@@ -81,8 +82,8 @@ export function CultivarForm({ cultivar, fruits }: { cultivar?: Cultivar | null;
   const [photoType, setPhotoType] = useState("果実");
   const [photoCaption, setPhotoCaption] = useState("");
   const [photoIsMain, setPhotoIsMain] = useState(false);
-  const [dateStampEnabled, setDateStampEnabled] = useState(true);
-  const [dateStampDate, setDateStampDate] = useState(todayDateInputValue);
+  const [dateStampEnabled, setDateStampEnabled] = useState(false);
+  const [dateStampDate, setDateStampDate] = useState("");
   const [youtubeUrl, setYoutubeUrl] = useState("");
   const [youtubeTitle, setYoutubeTitle] = useState("");
   const [message, setMessage] = useState("");
@@ -156,7 +157,7 @@ export function CultivarForm({ cultivar, fruits }: { cultivar?: Cultivar | null;
         let variants;
         try {
           variants = await createImageVariantsForUpload(photoFile, {
-            dateStamp: dateStampEnabled ? formatDateStampForImage(dateStampDate) : null
+            dateStamp: dateStampEnabled && dateStampDate ? formatDateStampForImage(dateStampDate) : null
           });
         } catch (compressError) {
           setLoading(false);
@@ -181,7 +182,7 @@ export function CultivarForm({ cultivar, fruits }: { cultivar?: Cultivar | null;
           ...uploaded.data,
           photo_type: photoType,
           caption: photoCaption || null,
-          taken_at: dateStampEnabled ? dateStampDate : null,
+          taken_at: dateStampEnabled && dateStampDate ? dateStampDate : null,
           uploaded_by: user.id,
           source_type: "admin",
           approval_status: "approved",
@@ -222,12 +223,27 @@ export function CultivarForm({ cultivar, fruits }: { cultivar?: Cultivar | null;
     setPhotoType("果実");
     setPhotoCaption("");
     setPhotoIsMain(false);
+    setDateStampEnabled(false);
+    setDateStampDate("");
     setYoutubeUrl("");
     setYoutubeTitle("");
     if (!cultivar) {
       router.replace(`/admin/cultivars/${data.id}`);
     }
     router.refresh();
+  }
+
+  async function onPhotoFilesChange(selectedFiles: File[]) {
+    setPhotoFiles(selectedFiles);
+    if (selectedFiles.length === 0) {
+      setDateStampEnabled(false);
+      setDateStampDate("");
+      return;
+    }
+
+    const exifDate = await findFirstExifDate(selectedFiles);
+    setDateStampDate(exifDate ?? "");
+    setDateStampEnabled(Boolean(exifDate));
   }
 
   async function onDelete() {
@@ -302,7 +318,7 @@ export function CultivarForm({ cultivar, fruits }: { cultivar?: Cultivar | null;
             type="file"
             accept="image/*"
             multiple
-            onChange={(event) => setPhotoFiles(Array.from(event.target.files ?? []))}
+            onChange={(event) => void onPhotoFilesChange(Array.from(event.target.files ?? []))}
             className="mt-2 block w-full text-sm"
           />
           {photoFiles.length > 0 ? (
@@ -345,7 +361,9 @@ export function CultivarForm({ cultivar, fruits }: { cultivar?: Cultivar | null;
             disabled={!dateStampEnabled}
             className="mt-3 w-full rounded-md border border-leaf-100 bg-white px-3 py-3 disabled:opacity-50"
           />
-          <span className="mt-2 block text-xs text-leaf-900/58">選択した写真すべてに同じ日付を焼き込みます．</span>
+          <span className="mt-2 block text-xs text-leaf-900/58">
+            EXIFの撮影日が読めた場合だけ自動でONになります．複数選択時は，同じ撮影日を全写真に使います．
+          </span>
         </div>
         <label className="flex items-center justify-between gap-3 rounded-md bg-white p-3">
           <span className="font-semibold text-leaf-900">先頭の写真をメインにする</span>
@@ -394,4 +412,12 @@ export function CultivarForm({ cultivar, fruits }: { cultivar?: Cultivar | null;
       </div>
     </form>
   );
+}
+
+async function findFirstExifDate(files: File[]) {
+  for (const file of files) {
+    const exifDate = await extractExifDateInputValue(file);
+    if (exifDate) return exifDate;
+  }
+  return null;
 }

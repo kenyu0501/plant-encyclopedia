@@ -4,7 +4,8 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { ImageUp, Save, Star, Trash2 } from "lucide-react";
 import { PhotoDateBadge } from "@/components/photo-date-badge";
-import { formatDateStampForImage, todayDateInputValue } from "@/lib/date-stamp";
+import { formatDateStampForImage } from "@/lib/date-stamp";
+import { extractExifDateInputValue } from "@/lib/exif-date";
 import { createImageVariantsForUpload, formatBytes, formatVariantSummary } from "@/lib/image-compress";
 import { getPhotoStoragePaths, getPhotoUrl } from "@/lib/photo-url";
 import { uploadPhotoVariants } from "@/lib/photo-upload";
@@ -41,8 +42,8 @@ function PhotoCard({ photo }: { photo: AdminPhoto }) {
   const [approvalStatus, setApprovalStatus] = useState(photo.approval_status);
   const [isMain, setIsMain] = useState(photo.is_main);
   const [replacementFile, setReplacementFile] = useState<File | null>(null);
-  const [dateStampEnabled, setDateStampEnabled] = useState(true);
-  const [dateStampDate, setDateStampDate] = useState(todayDateInputValue);
+  const [dateStampEnabled, setDateStampEnabled] = useState(false);
+  const [dateStampDate, setDateStampDate] = useState("");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -96,7 +97,7 @@ function PhotoCard({ photo }: { photo: AdminPhoto }) {
     let variants;
     try {
       variants = await createImageVariantsForUpload(replacementFile, {
-        dateStamp: dateStampEnabled ? formatDateStampForImage(dateStampDate) : null
+        dateStamp: dateStampEnabled && dateStampDate ? formatDateStampForImage(dateStampDate) : null
       });
     } catch (error) {
       setLoading(false);
@@ -120,7 +121,7 @@ function PhotoCard({ photo }: { photo: AdminPhoto }) {
       .from("photos")
       .update({
         ...uploaded.data,
-        taken_at: dateStampEnabled ? dateStampDate : null
+        taken_at: dateStampEnabled && dateStampDate ? dateStampDate : null
       })
       .eq("id", photo.id);
 
@@ -133,8 +134,23 @@ function PhotoCard({ photo }: { photo: AdminPhoto }) {
     await supabase.storage.from("fruit-photos").remove(getPhotoStoragePaths(photo));
     setLoading(false);
     setReplacementFile(null);
+    setDateStampEnabled(false);
+    setDateStampDate("");
     setMessage("写真を差し替えました．");
     router.refresh();
+  }
+
+  async function onReplacementFileChange(selectedFile: File | null) {
+    setReplacementFile(selectedFile);
+    if (!selectedFile) {
+      setDateStampEnabled(false);
+      setDateStampDate("");
+      return;
+    }
+
+    const exifDate = await extractExifDateInputValue(selectedFile);
+    setDateStampDate(exifDate ?? "");
+    setDateStampEnabled(Boolean(exifDate));
   }
 
   async function deletePhoto() {
@@ -227,7 +243,7 @@ function PhotoCard({ photo }: { photo: AdminPhoto }) {
             <input
               type="file"
               accept="image/*"
-              onChange={(event) => setReplacementFile(event.target.files?.[0] ?? null)}
+              onChange={(event) => void onReplacementFileChange(event.target.files?.[0] ?? null)}
               className="mt-3 block w-full text-sm"
             />
           </label>
@@ -248,6 +264,7 @@ function PhotoCard({ photo }: { photo: AdminPhoto }) {
               disabled={!dateStampEnabled}
               className="mt-3 w-full rounded-md border border-leaf-100 bg-white px-3 py-3 disabled:opacity-50"
             />
+            <span className="mt-2 block text-xs text-leaf-900/58">EXIFの撮影日が読めた場合だけ自動でONになります．</span>
           </div>
           <button
             type="button"

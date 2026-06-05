@@ -14,9 +14,8 @@ export function PhotoDateBadge({ photo, className = "" }: { photo: Photo; classN
 }
 
 export function getPhotoDateLabel(photo: Photo) {
-  const value = photo.taken_at || photo.created_at;
-  if (!value) return null;
-  const datePart = value.slice(0, 10);
+  if (!photo.taken_at) return null;
+  const datePart = photo.taken_at.slice(0, 10);
   const [year, month, day] = datePart.split("-");
   if (!year || !month || !day) return null;
   return `${year}/${month}/${day}`;
