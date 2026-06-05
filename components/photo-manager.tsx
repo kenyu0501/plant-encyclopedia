@@ -9,6 +9,8 @@ import { uploadPhotoVariants } from "@/lib/photo-upload";
 import { createClient } from "@/lib/supabase-browser";
 import type { AdminPhoto } from "@/lib/queries";
 
+const photoTypes = ["fruit", "メイン下画像", "メイン画像2", "メイン画像3", "栽培暦", "特徴図", "育て方図", "剪定図", "果実", "果実断面", "花", "枝葉", "新芽", "木の様子", "樹皮", "糖度計", "収穫物", "栽培記録", "その他"];
+
 export function PhotoManager({ photos }: { photos: AdminPhoto[] }) {
   if (photos.length === 0) {
     return (
@@ -41,6 +43,7 @@ function PhotoCard({ photo }: { photo: AdminPhoto }) {
   const [loading, setLoading] = useState(false);
 
   const targetName = photo.cultivars?.name_ja ?? photo.fruits?.name_ja ?? "未設定";
+  const photoTypeOptions = photoType && !photoTypes.includes(photoType) ? [photoType, ...photoTypes] : photoTypes;
 
   async function savePhoto() {
     setLoading(true);
@@ -176,11 +179,18 @@ function PhotoCard({ photo }: { photo: AdminPhoto }) {
 
         <label className="block">
           <span className="text-sm font-semibold text-leaf-900">写真タイプ</span>
-          <input
+          <select
             value={photoType}
             onChange={(event) => setPhotoType(event.target.value)}
             className="mt-2 w-full rounded-md border border-leaf-100 bg-white px-3 py-3 outline-none focus:border-leaf-600"
-          />
+          >
+            <option value="">未設定</option>
+            {photoTypeOptions.map((type) => (
+              <option key={type} value={type}>
+                {type === "fruit" ? "通常写真" : type}
+              </option>
+            ))}
+          </select>
         </label>
 
         <label className="block">
