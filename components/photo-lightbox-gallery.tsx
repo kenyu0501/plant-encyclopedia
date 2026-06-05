@@ -107,8 +107,8 @@ export function PhotoLightboxGallery({
             </>
           ) : null}
 
-          <div className="relative z-10 flex h-full flex-col items-center justify-center gap-3 px-10" onClick={(event) => event.stopPropagation()}>
-            <div className="relative h-[78vh] w-full max-w-5xl">
+          <div className="relative z-10 flex h-full flex-col items-center justify-center gap-3 px-10">
+            <div className="relative h-[78vh] w-full max-w-5xl" onClick={(event) => event.stopPropagation()}>
               <Image
                 src={getPhotoUrl(activePhoto, "original")}
                 alt={activePhoto.caption ?? altFallback}
@@ -120,7 +120,7 @@ export function PhotoLightboxGallery({
               <DateBadge photo={activePhoto} className="bottom-3 right-3 text-sm" />
             </div>
             {activePhoto.caption || activePhoto.photo_type ? (
-              <div className="max-w-3xl text-center text-sm leading-6 text-white/82">
+              <div className="max-w-3xl text-center text-sm leading-6 text-white/82" onClick={(event) => event.stopPropagation()}>
                 {activePhoto.photo_type ? <span className="font-semibold">{activePhoto.photo_type}</span> : null}
                 {activePhoto.caption ? <p>{activePhoto.caption}</p> : null}
               </div>
