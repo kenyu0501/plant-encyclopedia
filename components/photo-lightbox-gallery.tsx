@@ -76,6 +76,8 @@ export function PhotoLightboxGallery({
             type="button"
             className="absolute inset-0 z-20 cursor-default"
             onClick={() => setActiveIndex(null)}
+            onMouseDown={() => setActiveIndex(null)}
+            onTouchStart={() => setActiveIndex(null)}
             aria-label="背景をクリックして閉じる"
           />
 
