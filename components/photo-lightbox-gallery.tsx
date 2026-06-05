@@ -49,7 +49,6 @@ export function PhotoLightboxGallery({
               aria-label={`${photo.caption ?? altFallback}を拡大表示`}
             >
               <Image src={getPhotoUrl(photo, "thumb")} alt={photo.caption ?? altFallback} fill className="object-cover" sizes={sizes} />
-              <DateBadge photo={photo} />
             </button>
             {photo.caption || photo.photo_type ? (
               <figcaption className="space-y-1 p-2 text-xs leading-5 text-leaf-900/68">
@@ -133,7 +132,6 @@ export function PhotoLightboxGallery({
                 sizes="100vw"
                 priority
               />
-              <DateBadge photo={activePhoto} className="bottom-3 right-3 text-sm" />
             </div>
             {activePhoto.caption || activePhoto.photo_type ? (
               <div className="pointer-events-auto max-w-3xl text-center text-sm leading-6 text-white/82" data-lightbox-interactive>
@@ -151,21 +149,4 @@ export function PhotoLightboxGallery({
 function moveIndex(current: number | null, length: number, direction: -1 | 1) {
   if (current === null || length === 0) return current;
   return (current + direction + length) % length;
-}
-
-function DateBadge({ photo, className = "" }: { photo: Photo; className?: string }) {
-  const label = getPhotoDateLabel(photo);
-  if (!label) return null;
-  return (
-    <span className={`pointer-events-none absolute bottom-2 right-2 z-10 rounded-sm bg-black/55 px-2 py-1 text-xs font-bold leading-none text-white shadow-sm ${className}`}>
-      {label}
-    </span>
-  );
-}
-
-function getPhotoDateLabel(photo: Photo) {
-  if (!photo.taken_at) return null;
-  const [year, month, day] = photo.taken_at.slice(0, 10).split("-");
-  if (!year || !month || !day) return null;
-  return `${year}/${month}/${day}`;
 }

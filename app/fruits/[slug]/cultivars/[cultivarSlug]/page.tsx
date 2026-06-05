@@ -5,7 +5,6 @@ import { notFound } from "next/navigation";
 import type { ReactNode } from "react";
 import { Apple, BarChart3, Dna, ExternalLink, Flower2, Globe2, ImagePlus, Leaf, Pencil, PlayCircle, Ruler, Scale, Sprout, Thermometer } from "lucide-react";
 import { PageHeader } from "@/components/page-header";
-import { PhotoDateBadge } from "@/components/photo-date-badge";
 import { PhotoLightboxGallery } from "@/components/photo-lightbox-gallery";
 import { getCurrentUser, isAdminUser } from "@/lib/auth";
 import { getPhotoUrl } from "@/lib/photo-url";
@@ -84,7 +83,6 @@ export default async function CultivarDetailPage({ params }: Props) {
       {mainPhoto ? (
         <div className="relative aspect-[4/3] overflow-hidden rounded-lg bg-leaf-100">
           <Image src={getPhotoUrl(mainPhoto, "medium")} alt={mainPhoto.caption ?? cultivar.name_ja} fill className="object-cover" priority sizes="100vw" />
-          <PhotoDateBadge photo={mainPhoto} className="bottom-3 right-3 text-sm" />
         </div>
       ) : null}
 

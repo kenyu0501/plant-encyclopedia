@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { PlayCircle } from "lucide-react";
-import { PhotoDateBadge } from "@/components/photo-date-badge";
 import { getPhotoUrl } from "@/lib/photo-url";
 import type { CultivarWithMedia } from "@/types/database";
 
@@ -28,7 +27,6 @@ export function CultivarCard({ fruitSlug, cultivar }: { fruitSlug: string; culti
           <>
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={getPhotoUrl(mainPhoto, "thumb")} alt={mainPhoto.caption ?? cultivar.name_ja} className="h-full w-full object-cover" loading="lazy" />
-            <PhotoDateBadge photo={mainPhoto} className="bottom-1 right-1 px-1.5 py-0.5 text-[10px]" />
           </>
         ) : (
           <div className="flex h-full items-center justify-center px-2 text-center text-xs font-semibold text-leaf-900/38">

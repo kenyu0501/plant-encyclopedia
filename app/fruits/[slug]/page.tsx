@@ -5,7 +5,6 @@ import { notFound } from "next/navigation";
 import { Pencil } from "lucide-react";
 import { CultivarList } from "@/components/cultivar-list";
 import { MangoPedigree } from "@/components/mango-pedigree";
-import { PhotoDateBadge } from "@/components/photo-date-badge";
 import { PhotoLightboxGallery } from "@/components/photo-lightbox-gallery";
 import { PageHeader } from "@/components/page-header";
 import { getCurrentUser, isAdminUser } from "@/lib/auth";
@@ -61,7 +60,6 @@ export default async function FruitDetailPage({ params }: Props) {
       {mainPhoto ? (
         <div className="relative aspect-[4/3] overflow-hidden rounded-lg bg-leaf-100">
           <Image src={getPhotoUrl(mainPhoto, "medium")} alt={mainPhoto.caption ?? fruit.name_ja} fill className="object-cover" priority sizes="100vw" />
-          <PhotoDateBadge photo={mainPhoto} className="bottom-3 right-3 text-sm" />
         </div>
       ) : null}
 
