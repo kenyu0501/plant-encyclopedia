@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { ImageUp, Save, Star, Trash2 } from "lucide-react";
+import { formatDateStampForImage, todayDateInputValue } from "@/lib/date-stamp";
 import { createImageVariantsForUpload, formatBytes, formatVariantSummary } from "@/lib/image-compress";
 import { getPhotoStoragePaths, getPhotoUrl } from "@/lib/photo-url";
 import { uploadPhotoVariants } from "@/lib/photo-upload";
@@ -39,6 +40,8 @@ function PhotoCard({ photo }: { photo: AdminPhoto }) {
   const [approvalStatus, setApprovalStatus] = useState(photo.approval_status);
   const [isMain, setIsMain] = useState(photo.is_main);
   const [replacementFile, setReplacementFile] = useState<File | null>(null);
+  const [dateStampEnabled, setDateStampEnabled] = useState(true);
+  const [dateStampDate, setDateStampDate] = useState(todayDateInputValue);
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -91,7 +94,9 @@ function PhotoCard({ photo }: { photo: AdminPhoto }) {
     const supabase = createClient();
     let variants;
     try {
-      variants = await createImageVariantsForUpload(replacementFile);
+      variants = await createImageVariantsForUpload(replacementFile, {
+        dateStamp: dateStampEnabled ? formatDateStampForImage(dateStampDate) : null
+      });
     } catch (error) {
       setLoading(false);
       setMessage(error instanceof Error ? error.message : "画像圧縮に失敗しました．");
@@ -221,6 +226,24 @@ function PhotoCard({ photo }: { photo: AdminPhoto }) {
               className="mt-3 block w-full text-sm"
             />
           </label>
+          <div className="mt-3 rounded-md bg-white p-3">
+            <label className="flex items-center justify-between gap-3">
+              <span className="font-semibold text-leaf-900">右下に日付を入れる</span>
+              <input
+                type="checkbox"
+                checked={dateStampEnabled}
+                onChange={(event) => setDateStampEnabled(event.target.checked)}
+                className="h-5 w-5"
+              />
+            </label>
+            <input
+              type="date"
+              value={dateStampDate}
+              onChange={(event) => setDateStampDate(event.target.value)}
+              disabled={!dateStampEnabled}
+              className="mt-3 w-full rounded-md border border-leaf-100 bg-white px-3 py-3 disabled:opacity-50"
+            />
+          </div>
           <button
             type="button"
             onClick={replacePhoto}

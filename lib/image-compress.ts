@@ -22,6 +22,10 @@ export type ImageVariantSet = {
   original: ImageVariant;
 };
 
+export type ImageVariantOptions = {
+  dateStamp?: string | null;
+};
+
 const defaultMaxLongEdge = 1600;
 const defaultJpegQuality = 0.82;
 
@@ -35,7 +39,7 @@ export async function compressImageForUpload(file: File): Promise<CompressedImag
   return resizeImage(file, defaultMaxLongEdge, defaultJpegQuality);
 }
 
-export async function createImageVariantsForUpload(file: File): Promise<ImageVariantSet> {
+export async function createImageVariantsForUpload(file: File, options: ImageVariantOptions = {}): Promise<ImageVariantSet> {
   if (!file.type.startsWith("image/")) {
     throw new Error("画像ファイルを選択してください．");
   }
@@ -46,7 +50,7 @@ export async function createImageVariantsForUpload(file: File): Promise<ImageVar
   const entries = await Promise.all(
     (Object.entries(imageVariantSettings) as [ImageVariantName, { maxLongEdge: number; quality: number }][])
       .map(async ([name, settings]) => {
-        const resized = await resizeLoadedImage(image, file, baseName, settings.maxLongEdge, settings.quality, name);
+        const resized = await resizeLoadedImage(image, file, baseName, settings.maxLongEdge, settings.quality, name, options);
         return [name, resized] as const;
       })
   );
@@ -70,7 +74,8 @@ async function resizeLoadedImage(
   baseName: string,
   maxLongEdge: number,
   jpegQuality: number,
-  variantName?: ImageVariantName
+  variantName?: ImageVariantName,
+  options: ImageVariantOptions = {}
 ): Promise<CompressedImage | ImageVariant> {
   const scale = Math.min(1, maxLongEdge / Math.max(image.naturalWidth, image.naturalHeight));
   const width = Math.max(1, Math.round(image.naturalWidth * scale));
@@ -86,6 +91,9 @@ async function resizeLoadedImage(
   }
 
   context.drawImage(image, 0, 0, width, height);
+  if (options.dateStamp) {
+    drawDateStamp(context, options.dateStamp, width, height);
+  }
 
   const blob = await new Promise<Blob>((resolve, reject) => {
     canvas.toBlob(
@@ -112,6 +120,33 @@ async function resizeLoadedImage(
   };
 
   return variantName ? { ...result, name: variantName, maxLongEdge } : result;
+}
+
+function drawDateStamp(context: CanvasRenderingContext2D, text: string, width: number, height: number) {
+  const fontSize = Math.min(42, Math.max(14, Math.round(Math.min(width, height) * 0.045)));
+  const paddingX = Math.round(fontSize * 0.58);
+  const paddingY = Math.round(fontSize * 0.36);
+  const margin = Math.round(fontSize * 0.7);
+
+  context.save();
+  context.font = `700 ${fontSize}px Arial, sans-serif`;
+  context.textBaseline = "alphabetic";
+
+  const metrics = context.measureText(text);
+  const textWidth = Math.ceil(metrics.width);
+  const textHeight = fontSize;
+  const boxWidth = textWidth + paddingX * 2;
+  const boxHeight = textHeight + paddingY * 2;
+  const x = Math.max(margin, width - boxWidth - margin);
+  const y = Math.max(margin, height - boxHeight - margin);
+
+  context.fillStyle = "rgba(0, 0, 0, 0.48)";
+  context.fillRect(x, y, boxWidth, boxHeight);
+  context.fillStyle = "rgba(255, 255, 255, 0.96)";
+  context.shadowColor = "rgba(0, 0, 0, 0.35)";
+  context.shadowBlur = Math.max(2, Math.round(fontSize * 0.12));
+  context.fillText(text, x + paddingX, y + paddingY + textHeight * 0.82);
+  context.restore();
 }
 
 export function formatBytes(bytes: number) {

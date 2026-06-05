@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { ImagePlus } from "lucide-react";
+import { formatDateStampForImage, todayDateInputValue } from "@/lib/date-stamp";
 import { createImageVariantsForUpload, formatBytes, formatVariantSummary } from "@/lib/image-compress";
 import { uploadPhotoVariants } from "@/lib/photo-upload";
 import { createClient } from "@/lib/supabase-browser";
@@ -19,6 +20,8 @@ export function FruitPhotoEditor({ fruit, photos }: { fruit: Fruit; photos: Admi
   const [photoType, setPhotoType] = useState("メイン下画像");
   const [caption, setCaption] = useState("");
   const [isMain, setIsMain] = useState(false);
+  const [dateStampEnabled, setDateStampEnabled] = useState(true);
+  const [dateStampDate, setDateStampDate] = useState(todayDateInputValue);
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
 
@@ -52,7 +55,9 @@ export function FruitPhotoEditor({ fruit, photos }: { fruit: Fruit; photos: Admi
 
       let variants;
       try {
-        variants = await createImageVariantsForUpload(file);
+        variants = await createImageVariantsForUpload(file, {
+          dateStamp: dateStampEnabled ? formatDateStampForImage(dateStampDate) : null
+        });
       } catch (error) {
         setLoading(false);
         setMessage(error instanceof Error ? error.message : "画像圧縮に失敗しました．");
@@ -146,6 +151,26 @@ export function FruitPhotoEditor({ fruit, photos }: { fruit: Fruit; photos: Admi
           />
           {files.length > 0 ? <span className="mt-2 block text-xs font-semibold text-leaf-700">{files.length}枚選択中</span> : null}
         </label>
+
+        <div className="rounded-md bg-leaf-50 p-3">
+          <label className="flex items-center justify-between gap-3">
+            <span className="font-semibold text-leaf-900">右下に日付を入れる</span>
+            <input
+              type="checkbox"
+              checked={dateStampEnabled}
+              onChange={(event) => setDateStampEnabled(event.target.checked)}
+              className="h-5 w-5"
+            />
+          </label>
+          <input
+            type="date"
+            value={dateStampDate}
+            onChange={(event) => setDateStampDate(event.target.value)}
+            disabled={!dateStampEnabled}
+            className="mt-3 w-full rounded-md border border-leaf-100 bg-white px-3 py-3 disabled:opacity-50"
+          />
+          <span className="mt-2 block text-xs text-leaf-900/58">選択した写真すべてに同じ日付を焼き込みます．</span>
+        </div>
 
         <label className="flex items-center justify-between gap-3 rounded-md bg-fruit-100 p-3">
           <span className="font-semibold text-leaf-900">先頭の写真をメイン画像にする</span>

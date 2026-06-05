@@ -4,6 +4,7 @@ import { useState } from "react";
 import Link from "next/link";
 import { useRouter, useSearchParams } from "next/navigation";
 import { ArrowLeft, ImagePlus, PlaySquare, Save, Trash2 } from "lucide-react";
+import { formatDateStampForImage, todayDateInputValue } from "@/lib/date-stamp";
 import { createImageVariantsForUpload, formatBytes, formatVariantSummary } from "@/lib/image-compress";
 import { uploadPhotoVariants } from "@/lib/photo-upload";
 import { createClient } from "@/lib/supabase-browser";
@@ -80,6 +81,8 @@ export function CultivarForm({ cultivar, fruits }: { cultivar?: Cultivar | null;
   const [photoType, setPhotoType] = useState("果実");
   const [photoCaption, setPhotoCaption] = useState("");
   const [photoIsMain, setPhotoIsMain] = useState(false);
+  const [dateStampEnabled, setDateStampEnabled] = useState(true);
+  const [dateStampDate, setDateStampDate] = useState(todayDateInputValue);
   const [youtubeUrl, setYoutubeUrl] = useState("");
   const [youtubeTitle, setYoutubeTitle] = useState("");
   const [message, setMessage] = useState("");
@@ -152,7 +155,9 @@ export function CultivarForm({ cultivar, fruits }: { cultivar?: Cultivar | null;
         setMessage(`写真${index + 1}/${photoFiles.length}を3サイズに圧縮しています．`);
         let variants;
         try {
-          variants = await createImageVariantsForUpload(photoFile);
+          variants = await createImageVariantsForUpload(photoFile, {
+            dateStamp: dateStampEnabled ? formatDateStampForImage(dateStampDate) : null
+          });
         } catch (compressError) {
           setLoading(false);
           setMessage(compressError instanceof Error ? compressError.message : "画像圧縮に失敗しました．");
@@ -323,6 +328,25 @@ export function CultivarForm({ cultivar, fruits }: { cultivar?: Cultivar | null;
           <input value={photoCaption} onChange={(event) => setPhotoCaption(event.target.value)} className="mt-2 w-full rounded-md border border-leaf-100 bg-white px-3 py-3" />
           <span className="mt-2 block text-xs text-leaf-900/58">複数選択時は，全写真に同じキャプションを登録します．</span>
         </label>
+        <div className="rounded-md bg-white p-3">
+          <label className="flex items-center justify-between gap-3">
+            <span className="font-semibold text-leaf-900">右下に日付を入れる</span>
+            <input
+              type="checkbox"
+              checked={dateStampEnabled}
+              onChange={(event) => setDateStampEnabled(event.target.checked)}
+              className="h-5 w-5"
+            />
+          </label>
+          <input
+            type="date"
+            value={dateStampDate}
+            onChange={(event) => setDateStampDate(event.target.value)}
+            disabled={!dateStampEnabled}
+            className="mt-3 w-full rounded-md border border-leaf-100 bg-white px-3 py-3 disabled:opacity-50"
+          />
+          <span className="mt-2 block text-xs text-leaf-900/58">選択した写真すべてに同じ日付を焼き込みます．</span>
+        </div>
         <label className="flex items-center justify-between gap-3 rounded-md bg-white p-3">
           <span className="font-semibold text-leaf-900">先頭の写真をメインにする</span>
           <input type="checkbox" checked={photoIsMain} onChange={(event) => setPhotoIsMain(event.target.checked)} className="h-5 w-5" />
