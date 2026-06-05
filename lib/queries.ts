@@ -239,8 +239,9 @@ export async function getSiteAnalytics(): Promise<SiteAnalytics | null> {
     .filter((row) => row.view_date === today)
     .reduce((sum, row) => sum + (row.views ?? 0), 0);
   const cultivarMap = new Map<string, SiteAnalytics["topCultivars"][number]>();
+  const todayRows = rows.filter((row) => row.view_date === today);
 
-  for (const row of rows) {
+  for (const row of todayRows) {
     if (!row.cultivar_id || !row.cultivars) continue;
     const cultivar = Array.isArray(row.cultivars) ? row.cultivars[0] : row.cultivars;
     const fruit = Array.isArray(cultivar.fruits) ? cultivar.fruits[0] : cultivar.fruits;
