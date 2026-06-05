@@ -68,7 +68,7 @@ export function PhotoLightboxGallery({
           aria-modal="true"
           onPointerDownCapture={(event) => {
             const target = event.target;
-            if (target instanceof HTMLElement && target.closest("[data-lightbox-interactive]")) return;
+            if (target instanceof Element && target.closest("[data-lightbox-interactive]")) return;
             setActiveIndex(null);
           }}
         >
