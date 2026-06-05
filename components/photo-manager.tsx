@@ -189,7 +189,7 @@ function PhotoCard({ photo }: { photo: AdminPhoto }) {
           {isMain ? (
             <span className="inline-flex items-center gap-1 rounded-md bg-fruit-100 px-2 py-1 text-xs font-bold text-leaf-900">
               <Star size={13} />
-              メイン
+              上部に大きく表示
             </span>
           ) : null}
         </div>
@@ -233,7 +233,10 @@ function PhotoCard({ photo }: { photo: AdminPhoto }) {
         </label>
 
         <label className="flex items-center justify-between gap-3 rounded-md bg-fruit-100 p-3">
-          <span className="font-semibold text-leaf-900">メイン写真にする</span>
+          <span>
+            <span className="block font-semibold text-leaf-900">上部に大きく表示する</span>
+            <span className="mt-1 block text-xs text-leaf-900/58">OFFの写真は小さい写真一覧に表示されます．</span>
+          </span>
           <input type="checkbox" checked={isMain} onChange={(event) => setIsMain(event.target.checked)} className="h-5 w-5" />
         </label>
 
