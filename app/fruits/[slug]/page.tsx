@@ -6,6 +6,7 @@ import { Pencil } from "lucide-react";
 import { CultivarList } from "@/components/cultivar-list";
 import { MangoPedigree } from "@/components/mango-pedigree";
 import { PhotoDateBadge } from "@/components/photo-date-badge";
+import { PhotoLightboxGallery } from "@/components/photo-lightbox-gallery";
 import { PageHeader } from "@/components/page-header";
 import { getCurrentUser, isAdminUser } from "@/lib/auth";
 import { getPhotoUrl } from "@/lib/photo-url";
@@ -65,21 +66,14 @@ export default async function FruitDetailPage({ params }: Props) {
       ) : null}
 
       {galleryPhotos.length > 0 ? (
-        <section className="grid gap-3 sm:grid-cols-3">
-          {galleryPhotos.map((photo, index) => (
-            <figure key={photo.id} className="overflow-hidden rounded-lg bg-white/84 ring-1 ring-leaf-100">
-              <div className="relative aspect-[4/3] bg-leaf-100">
-                <Image src={getPhotoUrl(photo, "thumb")} alt={photo.caption ?? `${fruit.name_ja} メイン画像${index + 2}`} fill className="object-cover" sizes="(min-width: 640px) 33vw, 100vw" />
-                <PhotoDateBadge photo={photo} />
-              </div>
-              <figcaption className="space-y-1 p-3 text-xs leading-5 text-leaf-900/68">
-                <span className="inline-flex rounded-md bg-leaf-50 px-2 py-1 font-semibold">
-                  {photo.photo_type || `メイン画像${index + 2}`}
-                </span>
-                {photo.caption ? <p>{photo.caption}</p> : null}
-              </figcaption>
-            </figure>
-          ))}
+        <section>
+          <PhotoLightboxGallery
+            photos={galleryPhotos}
+            altFallback={fruit.name_ja}
+            gridClassName="grid gap-3 sm:grid-cols-3"
+            aspectClassName="aspect-[4/3]"
+            sizes="(min-width: 640px) 33vw, 100vw"
+          />
         </section>
       ) : null}
 

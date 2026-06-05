@@ -6,6 +6,7 @@ import type { ReactNode } from "react";
 import { Apple, BarChart3, Dna, ExternalLink, Flower2, Globe2, ImagePlus, Leaf, Pencil, PlayCircle, Ruler, Scale, Sprout, Thermometer } from "lucide-react";
 import { PageHeader } from "@/components/page-header";
 import { PhotoDateBadge } from "@/components/photo-date-badge";
+import { PhotoLightboxGallery } from "@/components/photo-lightbox-gallery";
 import { getCurrentUser, isAdminUser } from "@/lib/auth";
 import { getPhotoUrl } from "@/lib/photo-url";
 import { getPublicCultivarBySlugs } from "@/lib/queries";
@@ -97,22 +98,7 @@ export default async function CultivarDetailPage({ params }: Props) {
               </Link>
             ) : null}
           </div>
-          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-            {galleryPhotos.map((photo) => (
-              <figure key={photo.id} className="overflow-hidden rounded-lg bg-white/84 ring-1 ring-leaf-100">
-                <div className="relative aspect-square bg-leaf-100">
-                  <Image src={getPhotoUrl(photo, "thumb")} alt={photo.caption ?? cultivar.name_ja} fill className="object-cover" sizes="(min-width: 640px) 33vw, 50vw" />
-                  <PhotoDateBadge photo={photo} />
-                </div>
-                {photo.caption || photo.photo_type ? (
-                  <figcaption className="space-y-1 p-2 text-xs leading-5 text-leaf-900/68">
-                    {photo.photo_type ? <span className="inline-flex rounded-md bg-leaf-50 px-2 py-1 font-semibold">{photo.photo_type}</span> : null}
-                    {photo.caption ? <p>{photo.caption}</p> : null}
-                  </figcaption>
-                ) : null}
-              </figure>
-            ))}
-          </div>
+          <PhotoLightboxGallery photos={galleryPhotos} altFallback={cultivar.name_ja} />
         </section>
       ) : isAdmin ? (
         <section className="rounded-lg border border-dashed border-leaf-200 bg-white/70 p-4">
