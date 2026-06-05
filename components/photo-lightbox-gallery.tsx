@@ -66,6 +66,11 @@ export function PhotoLightboxGallery({
           className="fixed inset-0 z-50 bg-black/86 p-3 text-white sm:p-6"
           role="dialog"
           aria-modal="true"
+          onPointerDownCapture={(event) => {
+            const target = event.target;
+            if (target instanceof HTMLElement && target.closest("[data-lightbox-interactive]")) return;
+            setActiveIndex(null);
+          }}
         >
           <button
             type="button"
@@ -82,6 +87,7 @@ export function PhotoLightboxGallery({
             }}
             className="absolute right-3 top-3 z-30 inline-flex h-11 w-11 items-center justify-center rounded-full bg-white/18 text-white backdrop-blur transition hover:bg-white/26"
             aria-label="閉じる"
+            data-lightbox-interactive
           >
             <X size={24} />
           </button>
@@ -96,6 +102,7 @@ export function PhotoLightboxGallery({
                 }}
                 className="absolute left-3 top-1/2 z-30 inline-flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/18 text-white backdrop-blur transition hover:bg-white/26"
                 aria-label="前の写真"
+                data-lightbox-interactive
               >
                 <ChevronLeft size={26} />
               </button>
@@ -107,6 +114,7 @@ export function PhotoLightboxGallery({
                 }}
                 className="absolute right-3 top-1/2 z-30 inline-flex h-11 w-11 -translate-y-1/2 items-center justify-center rounded-full bg-white/18 text-white backdrop-blur transition hover:bg-white/26"
                 aria-label="次の写真"
+                data-lightbox-interactive
               >
                 <ChevronRight size={26} />
               </button>
@@ -114,7 +122,7 @@ export function PhotoLightboxGallery({
           ) : null}
 
           <div className="pointer-events-none relative z-10 flex h-full flex-col items-center justify-center gap-3 px-10">
-            <div className="pointer-events-auto relative h-[78vh] w-full max-w-5xl">
+            <div className="pointer-events-auto relative h-[78vh] w-full max-w-5xl" data-lightbox-interactive>
               <Image
                 src={getPhotoUrl(activePhoto, "original")}
                 alt={activePhoto.caption ?? altFallback}
@@ -126,7 +134,7 @@ export function PhotoLightboxGallery({
               <DateBadge photo={activePhoto} className="bottom-3 right-3 text-sm" />
             </div>
             {activePhoto.caption || activePhoto.photo_type ? (
-              <div className="pointer-events-auto max-w-3xl text-center text-sm leading-6 text-white/82">
+              <div className="pointer-events-auto max-w-3xl text-center text-sm leading-6 text-white/82" data-lightbox-interactive>
                 {activePhoto.photo_type ? <span className="font-semibold">{activePhoto.photo_type}</span> : null}
                 {activePhoto.caption ? <p>{activePhoto.caption}</p> : null}
               </div>
