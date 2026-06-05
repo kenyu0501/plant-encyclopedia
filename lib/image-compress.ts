@@ -26,9 +26,9 @@ const defaultMaxLongEdge = 1600;
 const defaultJpegQuality = 0.82;
 
 const imageVariantSettings: Record<ImageVariantName, { maxLongEdge: number; quality: number }> = {
-  thumb: { maxLongEdge: 360, quality: 0.74 },
-  medium: { maxLongEdge: 900, quality: 0.8 },
-  original: { maxLongEdge: 1600, quality: 0.84 }
+  thumb: { maxLongEdge: 320, quality: 0.68 },
+  medium: { maxLongEdge: 900, quality: 0.74 },
+  original: { maxLongEdge: 1200, quality: 0.78 }
 };
 
 export async function compressImageForUpload(file: File): Promise<CompressedImage> {
