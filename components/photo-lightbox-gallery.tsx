@@ -66,8 +66,14 @@ export function PhotoLightboxGallery({
           className="fixed inset-0 z-50 bg-black/86 p-3 text-white sm:p-6"
           role="dialog"
           aria-modal="true"
-          onClick={() => setActiveIndex(null)}
         >
+          <button
+            type="button"
+            className="absolute inset-0 z-0 cursor-default"
+            onClick={() => setActiveIndex(null)}
+            aria-label="背景をクリックして閉じる"
+          />
+
           <button
             type="button"
             onClick={(event) => {
@@ -107,8 +113,8 @@ export function PhotoLightboxGallery({
             </>
           ) : null}
 
-          <div className="relative z-10 flex h-full flex-col items-center justify-center gap-3 px-10">
-            <div className="relative h-[78vh] w-full max-w-5xl" onClick={(event) => event.stopPropagation()}>
+          <div className="pointer-events-none relative z-10 flex h-full flex-col items-center justify-center gap-3 px-10">
+            <div className="pointer-events-auto relative h-[78vh] w-full max-w-5xl">
               <Image
                 src={getPhotoUrl(activePhoto, "original")}
                 alt={activePhoto.caption ?? altFallback}
@@ -120,7 +126,7 @@ export function PhotoLightboxGallery({
               <DateBadge photo={activePhoto} className="bottom-3 right-3 text-sm" />
             </div>
             {activePhoto.caption || activePhoto.photo_type ? (
-              <div className="max-w-3xl text-center text-sm leading-6 text-white/82" onClick={(event) => event.stopPropagation()}>
+              <div className="pointer-events-auto max-w-3xl text-center text-sm leading-6 text-white/82">
                 {activePhoto.photo_type ? <span className="font-semibold">{activePhoto.photo_type}</span> : null}
                 {activePhoto.caption ? <p>{activePhoto.caption}</p> : null}
               </div>
