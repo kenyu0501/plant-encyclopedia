@@ -36,7 +36,8 @@ export default async function FruitDetailPage({ params }: Props) {
   const photos = [...(fruit.photos ?? [])].sort((a, b) => Number(b.is_main) - Number(a.is_main));
   const galleryPhotos = photos
     .filter((photo) => photo.id !== mainPhoto?.id)
-    .filter((photo) => isFruitPagePhoto(photo.photo_type));
+    .filter((photo) => isFruitPagePhoto(photo.photo_type))
+    .slice(0, 6);
 
   return (
     <div className="space-y-6">
