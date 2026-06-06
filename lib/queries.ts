@@ -64,7 +64,7 @@ export async function getPublicFruits(limit?: number) {
   return (data as FruitWithChildren[]).map((fruit) => ({
     ...fruit,
     photos: (fruit.photos ?? []).filter((photo) => photo.approval_status === "approved"),
-    videos: (fruit.videos ?? []).filter((video) => video.is_public),
+    videos: uniqueYoutubeLinks((fruit.videos ?? []).filter((video) => video.is_public && !video.cultivar_id)),
     cultivars: (fruit.cultivars ?? []).filter((cultivar) => cultivar.is_public !== false)
   }));
 }
@@ -89,7 +89,7 @@ export async function getPublicFruitBySlug(slug: string) {
   return {
     ...fruit,
     photos: (fruit.photos ?? []).filter((photo) => photo.approval_status === "approved"),
-    videos: (fruit.videos ?? []).filter((video) => video.is_public),
+    videos: uniqueYoutubeLinks((fruit.videos ?? []).filter((video) => video.is_public && !video.cultivar_id)),
     cultivars: (fruit.cultivars ?? [])
       .filter((cultivar) => cultivar.is_public)
       .map((cultivar) => ({

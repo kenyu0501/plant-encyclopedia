@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { Pencil } from "lucide-react";
+import { ExternalLink, Pencil, PlayCircle } from "lucide-react";
 import { CultivarList } from "@/components/cultivar-list";
 import { MangoPedigree } from "@/components/mango-pedigree";
 import { PhotoLightboxGallery } from "@/components/photo-lightbox-gallery";
@@ -104,6 +104,41 @@ export default async function FruitDetailPage({ params }: Props) {
       </section>
 
       {fruit.slug === "mango" ? <MangoPedigree /> : null}
+
+      {fruit.videos && fruit.videos.length > 0 ? (
+        <section className="space-y-3">
+          <div className="flex items-center justify-between gap-3">
+            <h2 className="text-lg font-bold text-leaf-900">関連YouTube</h2>
+            {isAdmin ? (
+              <Link href={`/admin/fruits/${fruit.id}`} className="text-sm font-semibold text-leaf-700">
+                YouTube管理
+              </Link>
+            ) : null}
+          </div>
+          <div className="grid gap-3">
+            {fruit.videos.map((video) => (
+              <a
+                key={video.id}
+                href={video.youtube_url}
+                target="_blank"
+                rel="noreferrer"
+                className="flex items-center gap-3 rounded-lg bg-white/84 p-4 ring-1 ring-leaf-100"
+              >
+                <PlayCircle className="shrink-0 text-fruit-600" size={24} />
+                <span className="min-w-0 flex-1 font-semibold text-leaf-900">{video.title || video.youtube_url}</span>
+                <ExternalLink className="shrink-0" size={16} />
+              </a>
+            ))}
+          </div>
+        </section>
+      ) : isAdmin ? (
+        <section className="rounded-lg border border-dashed border-leaf-200 bg-white/70 p-4">
+          <Link href={`/admin/fruits/${fruit.id}`} className="inline-flex w-full items-center justify-center gap-2 rounded-md bg-leaf-700 px-4 py-3 text-sm font-semibold text-white">
+            <PlayCircle size={17} />
+            この果樹にYouTubeを追加
+          </Link>
+        </section>
+      ) : null}
     </div>
   );
 }

@@ -9,13 +9,21 @@ import type { Fruit } from "@/types/database";
 
 export function VideoForm({
   fruits,
-  cultivars
+  cultivars,
+  initialFruitId,
+  initialCultivarId = "",
+  lockFruit = false,
+  lockCultivar = false
 }: {
   fruits: Fruit[];
   cultivars: AdminCultivar[];
+  initialFruitId?: string;
+  initialCultivarId?: string;
+  lockFruit?: boolean;
+  lockCultivar?: boolean;
 }) {
-  const [fruitId, setFruitId] = useState(fruits[0]?.id ?? "");
-  const [cultivarId, setCultivarId] = useState("");
+  const [fruitId, setFruitId] = useState(initialFruitId ?? fruits[0]?.id ?? "");
+  const [cultivarId, setCultivarId] = useState(initialCultivarId);
   const [youtubeUrl, setYoutubeUrl] = useState("");
   const [title, setTitle] = useState("");
   const [description, setDescription] = useState("");
@@ -30,6 +38,11 @@ export function VideoForm({
     event.preventDefault();
     setLoading(true);
     setMessage("");
+    if (!fruitId) {
+      setLoading(false);
+      setMessage("果樹を選択してください．");
+      return;
+    }
     const supabase = createClient();
     let duplicateQuery = supabase.from("videos").select("youtube_url");
     duplicateQuery = cultivarId ? duplicateQuery.eq("cultivar_id", cultivarId) : duplicateQuery.is("cultivar_id", null).eq("fruit_id", fruitId);
@@ -67,27 +80,42 @@ export function VideoForm({
 
   return (
     <form onSubmit={onSubmit} className="space-y-4 rounded-lg bg-white/86 p-5 ring-1 ring-leaf-100">
-      <label className="block">
-        <span className="text-sm font-semibold text-leaf-900">果樹</span>
-        <select value={fruitId} onChange={(event) => setFruitId(event.target.value)} className="mt-2 w-full rounded-md border border-leaf-100 bg-white px-3 py-3">
-          {fruits.map((fruit) => (
-            <option key={fruit.id} value={fruit.id}>
-              {fruit.name_ja}
-            </option>
-          ))}
-        </select>
-      </label>
-      <label className="block">
-        <span className="text-sm font-semibold text-leaf-900">品種に紐づける</span>
-        <select value={cultivarId} onChange={(event) => setCultivarId(event.target.value)} className="mt-2 w-full rounded-md border border-leaf-100 bg-white px-3 py-3">
-          <option value="">果樹ページの動画</option>
-          {filteredCultivars.map((cultivar) => (
-            <option key={cultivar.id} value={cultivar.id}>
-              {cultivar.name_ja}
-            </option>
-          ))}
-        </select>
-      </label>
+      {lockFruit ? (
+        <div className="rounded-md bg-leaf-50 p-3 text-sm text-leaf-900/70">
+          紐づけ先: <span className="font-semibold text-leaf-900">{fruits.find((fruit) => fruit.id === fruitId)?.name_ja ?? "果樹ページ"}</span>
+        </div>
+      ) : (
+        <label className="block">
+          <span className="text-sm font-semibold text-leaf-900">果樹</span>
+          <select
+            value={fruitId}
+            onChange={(event) => {
+              setFruitId(event.target.value);
+              setCultivarId("");
+            }}
+            className="mt-2 w-full rounded-md border border-leaf-100 bg-white px-3 py-3"
+          >
+            {fruits.map((fruit) => (
+              <option key={fruit.id} value={fruit.id}>
+                {fruit.name_ja}
+              </option>
+            ))}
+          </select>
+        </label>
+      )}
+      {lockCultivar ? null : (
+        <label className="block">
+          <span className="text-sm font-semibold text-leaf-900">品種に紐づける</span>
+          <select value={cultivarId} onChange={(event) => setCultivarId(event.target.value)} className="mt-2 w-full rounded-md border border-leaf-100 bg-white px-3 py-3">
+            <option value="">果樹ページの動画</option>
+            {filteredCultivars.map((cultivar) => (
+              <option key={cultivar.id} value={cultivar.id}>
+                {cultivar.name_ja}
+              </option>
+            ))}
+          </select>
+        </label>
+      )}
       <label className="block">
         <span className="text-sm font-semibold text-leaf-900">YouTube URL</span>
         <input required type="url" value={youtubeUrl} onChange={(event) => setYoutubeUrl(event.target.value)} className="mt-2 w-full rounded-md border border-leaf-100 bg-white px-3 py-3" />
