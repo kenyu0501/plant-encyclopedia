@@ -14,6 +14,7 @@ export function CultivarCard({ fruitSlug, cultivar }: { fruitSlug: string; culti
   const mangoFruitWeight = fruitSlug === "mango" ? getFruitWeightSummary(cultivar.fruit_size, cultivar.description) : null;
   const harvestSummary = cultivar.harvest_season ?? (fruitSlug === "mango" ? getMaturityDays(cultivar.taste, cultivar.description) : null);
   const useGroup = fruitSlug === "banana" ? getUseGroup(cultivar) : null;
+  const coffeeSpecies = fruitSlug === "coffee" ? getCoffeeSpecies(cultivar) : null;
   const mainPhoto = cultivar.photos?.find((photo) => photo.is_main) ?? cultivar.photos?.[0];
   const mainVideo = cultivar.videos?.[0];
 
@@ -44,8 +45,9 @@ export function CultivarCard({ fruitSlug, cultivar }: { fruitSlug: string; culti
             <span className="rounded-md bg-fruit-100 px-2 py-1 text-xs font-bold text-leaf-900">販売</span>
           ) : null}
         </div>
-        {coldHardiness || floweringType || plantHeightType || genomeGroup || yieldLevel || originGroup || mangoSugar || mangoFruitWeight || harvestSummary || useGroup ? (
+        {coldHardiness || floweringType || plantHeightType || genomeGroup || yieldLevel || originGroup || mangoSugar || mangoFruitWeight || harvestSummary || useGroup || coffeeSpecies ? (
           <div className="mt-3 flex flex-wrap gap-2 text-xs font-semibold text-leaf-900/64">
+            {coffeeSpecies ? <span className="rounded-md bg-fruit-100 px-2 py-1">{coffeeSpecies}</span> : null}
             {originGroup ? <span className="rounded-md bg-leaf-50 px-2 py-1">{originGroup}</span> : null}
             {useGroup ? <span className="rounded-md bg-leaf-50 px-2 py-1">{useGroup}</span> : null}
             {coldHardiness ? <span className="rounded-md bg-leaf-50 px-2 py-1">耐寒温度 {coldHardiness}</span> : null}
@@ -79,6 +81,14 @@ function getColdHardiness(cultivar: CultivarWithMedia) {
 function getUseGroup(cultivar: CultivarWithMedia) {
   const match = cultivar.difficulty?.match(/用途:\s*([^．]+)．/);
   return match?.[1] ?? null;
+}
+
+function getCoffeeSpecies(cultivar: CultivarWithMedia) {
+  const text = [cultivar.difficulty, cultivar.description, cultivar.name_ja, cultivar.name_en].filter(Boolean).join(" ");
+  if (/リベリカ|liberica/i.test(text)) return "リベリカ";
+  if (/ロブスタ|カネフォラ|canephora|robusta/i.test(text)) return "ロブスタ";
+  if (/アラビカ|arabica/i.test(text)) return "アラビカ";
+  return null;
 }
 
 function shortHarvest(value: string) {

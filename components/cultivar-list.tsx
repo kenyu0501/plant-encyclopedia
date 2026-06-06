@@ -2,11 +2,11 @@
 
 import { useMemo, useState } from "react";
 import type { ReactNode } from "react";
-import { BarChart3, Dna, Flower2, Globe2, Tags, Thermometer, ListFilter, Ruler } from "lucide-react";
+import { BarChart3, Coffee, Dna, Flower2, Globe2, Tags, Thermometer, ListFilter, Ruler } from "lucide-react";
 import { CultivarCard } from "@/components/cultivar-card";
 import type { CultivarWithMedia } from "@/types/database";
 
-type ViewMode = "name" | "cold" | "flowering" | "origin" | "use" | "height" | "genome" | "yield";
+type ViewMode = "name" | "cold" | "flowering" | "origin" | "use" | "height" | "genome" | "yield" | "coffeeSpecies";
 type CultivarGroup = {
   label: string;
   rank: number;
@@ -27,6 +27,7 @@ export function CultivarList({
   const hasHeightView = fruitSlug === "banana" && cultivars.some((cultivar) => cultivar.plant_height_type);
   const hasGenomeView = fruitSlug === "banana" && cultivars.some((cultivar) => cultivar.genome_group);
   const hasYieldView = fruitSlug === "banana" && cultivars.some((cultivar) => cultivar.yield_level);
+  const hasCoffeeSpeciesView = fruitSlug === "coffee" && cultivars.some((cultivar) => getCoffeeSpecies(cultivar));
   const [viewMode, setViewMode] = useState<ViewMode>("name");
 
   const sortedCultivars = useMemo(
@@ -41,6 +42,7 @@ export function CultivarList({
   const heightGroups = useMemo(() => groupByField(cultivars, "plant_height_type", heightRank, "背丈未設定"), [cultivars]);
   const genomeGroups = useMemo(() => groupByField(cultivars, "genome_group", genomeRank, "ゲノム未設定"), [cultivars]);
   const yieldGroups = useMemo(() => groupByField(cultivars, "yield_level", yieldRank, "収量未設定"), [cultivars]);
+  const coffeeSpeciesGroups = useMemo(() => groupByCoffeeSpecies(cultivars), [cultivars]);
   const availableModes: ViewMode[] = [
     "name",
     ...(hasColdView ? (["cold"] as const) : []),
@@ -49,7 +51,8 @@ export function CultivarList({
     ...(hasUseView ? (["use"] as const) : []),
     ...(hasHeightView ? (["height"] as const) : []),
     ...(hasGenomeView ? (["genome"] as const) : []),
-    ...(hasYieldView ? (["yield"] as const) : [])
+    ...(hasYieldView ? (["yield"] as const) : []),
+    ...(hasCoffeeSpeciesView ? (["coffeeSpecies"] as const) : [])
   ];
   const activeMode = availableModes.includes(viewMode) ? viewMode : "name";
 
@@ -73,6 +76,7 @@ export function CultivarList({
           {hasHeightView ? <ModeButton active={activeMode === "height"} icon={<Ruler size={16} />} label="背丈別" onClick={() => setViewMode("height")} /> : null}
           {hasGenomeView ? <ModeButton active={activeMode === "genome"} icon={<Dna size={16} />} label="ゲノム別" onClick={() => setViewMode("genome")} /> : null}
           {hasYieldView ? <ModeButton active={activeMode === "yield"} icon={<BarChart3 size={16} />} label="収量別" onClick={() => setViewMode("yield")} /> : null}
+          {hasCoffeeSpeciesView ? <ModeButton active={activeMode === "coffeeSpecies"} icon={<Coffee size={16} />} label="種別" onClick={() => setViewMode("coffeeSpecies")} /> : null}
         </div>
       ) : null}
 
@@ -90,6 +94,8 @@ export function CultivarList({
         <GroupedCultivars fruitSlug={fruitSlug} groups={genomeGroups} />
       ) : activeMode === "yield" ? (
         <GroupedCultivars fruitSlug={fruitSlug} groups={yieldGroups} />
+      ) : activeMode === "coffeeSpecies" ? (
+        <GroupedCultivars fruitSlug={fruitSlug} groups={coffeeSpeciesGroups} />
       ) : (
         <div className="grid gap-3 sm:grid-cols-2">
           {sortedCultivars.map((cultivar) => (
@@ -135,6 +141,23 @@ function groupByUse(cultivars: CultivarWithMedia[]): CultivarGroup[] {
     .map(([label, items]) => ({
       label,
       rank: useRank(label),
+      cultivars: items.sort((a, b) => a.name_ja.localeCompare(b.name_ja, "ja"))
+    }))
+    .sort((a, b) => a.rank - b.rank || a.label.localeCompare(b.label, "ja"));
+}
+
+function groupByCoffeeSpecies(cultivars: CultivarWithMedia[]): CultivarGroup[] {
+  const groups = new Map<string, CultivarWithMedia[]>();
+
+  for (const cultivar of cultivars) {
+    const species = getCoffeeSpecies(cultivar) ?? "種別未設定";
+    groups.set(species, [...(groups.get(species) ?? []), cultivar]);
+  }
+
+  return Array.from(groups.entries())
+    .map(([label, items]) => ({
+      label,
+      rank: coffeeSpeciesRank(label),
       cultivars: items.sort((a, b) => a.name_ja.localeCompare(b.name_ja, "ja"))
     }))
     .sort((a, b) => a.rank - b.rank || a.label.localeCompare(b.label, "ja"));
@@ -231,6 +254,14 @@ function getUseGroup(cultivar: CultivarWithMedia) {
   return match?.[1] ?? null;
 }
 
+function getCoffeeSpecies(cultivar: CultivarWithMedia) {
+  const text = [cultivar.difficulty, cultivar.description, cultivar.name_ja, cultivar.name_en].filter(Boolean).join(" ");
+  if (/リベリカ|liberica/i.test(text)) return "リベリカ";
+  if (/ロブスタ|カネフォラ|canephora|robusta/i.test(text)) return "ロブスタ";
+  if (/アラビカ|arabica/i.test(text)) return "アラビカ";
+  return null;
+}
+
 function coldRank(label: string) {
   const numbers = Array.from(label.matchAll(/-?\d+(?:\.\d+)?/g)).map((match) => Number(match[0]));
   if (numbers.length === 0) return Number.POSITIVE_INFINITY;
@@ -308,6 +339,12 @@ function genomeRank(label: string) {
 
 function yieldRank(label: string) {
   const order = ["多い", "豊産性", "中", "普通", "少ない", "不明", "収量未設定"];
+  const index = order.indexOf(label);
+  return index === -1 ? order.length : index;
+}
+
+function coffeeSpeciesRank(label: string) {
+  const order = ["アラビカ", "ロブスタ", "リベリカ", "種別未設定"];
   const index = order.indexOf(label);
   return index === -1 ? order.length : index;
 }

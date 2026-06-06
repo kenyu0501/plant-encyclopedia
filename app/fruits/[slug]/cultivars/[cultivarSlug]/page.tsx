@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { ReactNode } from "react";
-import { Apple, BarChart3, Dna, ExternalLink, Flower2, Globe2, ImagePlus, Leaf, Pencil, PlayCircle, Ruler, Scale, Sprout, Thermometer } from "lucide-react";
+import { Apple, BarChart3, Coffee, Dna, ExternalLink, Flower2, Globe2, ImagePlus, Leaf, Pencil, PlayCircle, Ruler, Scale, Sprout, Thermometer } from "lucide-react";
 import { PageHeader } from "@/components/page-header";
 import { PhotoLightboxGallery } from "@/components/photo-lightbox-gallery";
 import { getCurrentUser, isAdminUser } from "@/lib/auth";
@@ -50,7 +50,9 @@ export default async function CultivarDetailPage({ params }: Props) {
     floweringType: cultivar.flowering_type,
     plantHeightType: cultivar.plant_height_type,
     genomeGroup: cultivar.genome_group,
-    yieldLevel: cultivar.yield_level
+    yieldLevel: cultivar.yield_level,
+    difficulty: cultivar.difficulty,
+    treeVigor: cultivar.tree_vigor
   });
 
   return (
@@ -157,6 +159,7 @@ export default async function CultivarDetailPage({ params }: Props) {
             {isBanana ? <Info label="背丈" value={cultivar.plant_height_type} /> : null}
             {isBanana ? <Info label="ゲノム構成" value={cultivar.genome_group} /> : null}
             {isBanana ? <Info label="収量" value={cultivar.yield_level} /> : null}
+            {fruitSlug === "coffee" ? <Info label="種別" value={getCoffeeSpecies(cultivar)} /> : null}
             <Info label="樹勢" value={cultivar.tree_vigor} />
             <Info label="難易度" value={cultivar.difficulty} />
             <Info label="沖縄適性" value={cultivar.okinawa_suitability} />
@@ -206,7 +209,9 @@ function getPrimaryStats({
   floweringType,
   plantHeightType,
   genomeGroup,
-  yieldLevel
+  yieldLevel,
+  difficulty,
+  treeVigor
 }: {
   fruitSlug: string;
   origin: string | null;
@@ -219,6 +224,8 @@ function getPrimaryStats({
   plantHeightType: string | null;
   genomeGroup: string | null;
   yieldLevel: string | null;
+  difficulty: string | null;
+  treeVigor: string | null;
 }) {
   if (fruitSlug === "banana") {
     return [
@@ -245,11 +252,35 @@ function getPrimaryStats({
     ];
   }
 
+  if (fruitSlug === "coffee") {
+    return [
+      { label: "種別", value: getCoffeeSpecies({ difficulty, description }), icon: <Coffee size={18} /> },
+      { label: "収穫期", value: harvestSeason, icon: <Apple size={18} /> },
+      { label: "収量", value: yieldLevel, icon: <BarChart3 size={18} /> },
+      { label: "樹姿", value: treeVigor, icon: <Ruler size={18} /> }
+    ];
+  }
+
   return [
     { label: "耐寒温度目安", value: coldHardiness, icon: <Sprout size={18} /> },
     { label: "開花型", value: floweringType, icon: <Leaf size={18} /> },
     { label: "収穫期", value: harvestSeason, icon: <Apple size={18} /> }
   ];
+}
+
+type CultivarLike = {
+  difficulty: string | null;
+  description: string | null;
+  name_ja?: string | null;
+  name_en?: string | null;
+};
+
+function getCoffeeSpecies(cultivar: CultivarLike) {
+  const text = [cultivar.difficulty, cultivar.description, cultivar.name_ja, cultivar.name_en].filter(Boolean).join(" ");
+  if (/リベリカ|liberica/i.test(text)) return "リベリカ";
+  if (/ロブスタ|カネフォラ|canephora|robusta/i.test(text)) return "ロブスタ";
+  if (/アラビカ|arabica/i.test(text)) return "アラビカ";
+  return null;
 }
 
 function getMangoSugar(taste: string | null, description: string | null) {
