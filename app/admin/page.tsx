@@ -38,7 +38,7 @@ export default async function AdminPage() {
         </div>
       </section>
 
-      <AdminCultivarList cultivars={cultivars} />
+      <AdminCultivarList cultivars={cultivars} fruits={fruits} />
     </div>
   );
 }
