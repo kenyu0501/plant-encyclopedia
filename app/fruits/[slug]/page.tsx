@@ -36,8 +36,7 @@ export default async function FruitDetailPage({ params }: Props) {
   const photos = [...(fruit.photos ?? [])].sort((a, b) => Number(b.is_main) - Number(a.is_main));
   const galleryPhotos = photos
     .filter((photo) => photo.id !== mainPhoto?.id)
-    .filter((photo) => isFruitHeroSupplementPhoto(photo.photo_type))
-    .slice(0, 6);
+    .filter((photo) => isFruitPagePhoto(photo.photo_type));
 
   return (
     <div className="space-y-6">
@@ -143,9 +142,23 @@ export default async function FruitDetailPage({ params }: Props) {
   );
 }
 
-function isFruitHeroSupplementPhoto(photoType: string | null) {
-  if (!photoType) return false;
-  return ["メイン下画像", "メイン画像2", "メイン画像3", "栽培暦", "特徴図", "育て方図", "剪定図"].includes(photoType);
+function isFruitPagePhoto(photoType: string | null) {
+  if (!photoType) return true;
+  return [
+    "fruit",
+    "メイン下画像",
+    "メイン画像2",
+    "メイン画像3",
+    "栽培暦",
+    "特徴図",
+    "育て方図",
+    "剪定図",
+    "果実",
+    "枝葉",
+    "花",
+    "木の様子",
+    "その他"
+  ].includes(photoType);
 }
 
 function Info({ label, value, italic = false }: { label: string; value: string | null; italic?: boolean }) {
