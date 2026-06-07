@@ -247,6 +247,7 @@ function getPrimaryStats({
     return [
       { label: "産地", value: origin, icon: <Globe2 size={18} /> },
       { label: "糖度", value: getMangoSugar(taste, description), icon: <BarChart3 size={18} /> },
+      { label: "酸度", value: getMangoAcidity(taste, description), icon: <Leaf size={18} /> },
       { label: "収穫期", value: harvestSeason ?? getMaturityDays(taste, description), icon: <Apple size={18} /> },
       { label: "果実重", value: getFruitWeightSummary(fruitSize, description), icon: <Scale size={18} /> }
     ];
@@ -287,6 +288,12 @@ function getMangoSugar(taste: string | null, description: string | null) {
   const text = [taste, description].filter(Boolean).join(" ");
   const match = text.match(/糖度[^0-9]*(\d+(?:\.\d+)?)\s*度?/);
   return match ? `${match[1]}度` : null;
+}
+
+function getMangoAcidity(taste: string | null, description: string | null) {
+  const text = [taste, description].filter(Boolean).join(" ");
+  const match = text.match(/酸度[^0-9]*(\d+(?:\.\d+)?)\s*%/);
+  return match ? `${match[1]}%` : null;
 }
 
 function getMaturityDays(taste: string | null, description: string | null) {

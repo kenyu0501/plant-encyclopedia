@@ -11,6 +11,7 @@ export function CultivarCard({ fruitSlug, cultivar }: { fruitSlug: string; culti
   const yieldLevel = fruitSlug === "banana" ? cultivar.yield_level : null;
   const originGroup = fruitSlug === "mango" ? getOriginGroup(cultivar) : null;
   const mangoSugar = fruitSlug === "mango" ? getMangoSugar(cultivar.taste, cultivar.description) : null;
+  const mangoAcidity = fruitSlug === "mango" ? getMangoAcidity(cultivar.taste, cultivar.description) : null;
   const mangoFruitWeight = fruitSlug === "mango" ? getFruitWeightSummary(cultivar.fruit_size, cultivar.description) : null;
   const harvestSummary = cultivar.harvest_season ?? (fruitSlug === "mango" ? getMaturityDays(cultivar.taste, cultivar.description) : null);
   const useGroup = fruitSlug === "banana" ? getUseGroup(cultivar) : null;
@@ -45,7 +46,7 @@ export function CultivarCard({ fruitSlug, cultivar }: { fruitSlug: string; culti
             <span className="rounded-md bg-fruit-100 px-2 py-1 text-xs font-bold text-leaf-900">販売</span>
           ) : null}
         </div>
-        {coldHardiness || floweringType || plantHeightType || genomeGroup || yieldLevel || originGroup || mangoSugar || mangoFruitWeight || harvestSummary || useGroup || coffeeSpecies ? (
+        {coldHardiness || floweringType || plantHeightType || genomeGroup || yieldLevel || originGroup || mangoSugar || mangoAcidity || mangoFruitWeight || harvestSummary || useGroup || coffeeSpecies ? (
           <div className="mt-3 flex flex-wrap gap-2 text-xs font-semibold text-leaf-900/64">
             {coffeeSpecies ? <span className="rounded-md bg-fruit-100 px-2 py-1">{coffeeSpecies}</span> : null}
             {originGroup ? <span className="rounded-md bg-leaf-50 px-2 py-1">{originGroup}</span> : null}
@@ -53,6 +54,7 @@ export function CultivarCard({ fruitSlug, cultivar }: { fruitSlug: string; culti
             {coldHardiness ? <span className="rounded-md bg-leaf-50 px-2 py-1">耐寒温度 {coldHardiness}</span> : null}
             {floweringType ? <span className="rounded-md bg-leaf-50 px-2 py-1">開花 {floweringType}</span> : null}
             {mangoSugar ? <span className="rounded-md bg-fruit-100 px-2 py-1">糖度 {mangoSugar}</span> : null}
+            {mangoAcidity ? <span className="rounded-md bg-leaf-50 px-2 py-1">酸度 {mangoAcidity}</span> : null}
             {plantHeightType ? <span className="rounded-md bg-leaf-50 px-2 py-1">背丈 {plantHeightType}</span> : null}
             {genomeGroup ? <span className="rounded-md bg-leaf-50 px-2 py-1">ゲノム {genomeGroup}</span> : null}
             {yieldLevel ? <span className="rounded-md bg-fruit-100 px-2 py-1">収量 {yieldLevel}</span> : null}
@@ -110,6 +112,12 @@ function getMangoSugar(taste: string | null, description: string | null) {
   const text = [taste, description].filter(Boolean).join(" ");
   const match = text.match(/糖度[^0-9]*(\d+(?:\.\d+)?)\s*度?/);
   return match ? `${match[1]}度` : null;
+}
+
+function getMangoAcidity(taste: string | null, description: string | null) {
+  const text = [taste, description].filter(Boolean).join(" ");
+  const match = text.match(/酸度[^0-9]*(\d+(?:\.\d+)?)\s*%/);
+  return match ? `${match[1]}%` : null;
 }
 
 function getMaturityDays(taste: string | null, description: string | null) {
