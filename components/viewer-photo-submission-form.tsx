@@ -354,6 +354,7 @@ export function ViewerPhotoSubmissionForm({
       <div className="rounded-md bg-fruit-100 p-3 text-sm leading-6 text-leaf-900/76">
         <span className="font-semibold text-leaf-900">投稿前の確認</span>
         <p className="mt-1">投稿写真は承認待ちとして保存され，管理者が確認するまで公開ページには表示されません．</p>
+        <p className="mt-1">承認された後の写真は，投稿者側では編集できなくなります．</p>
       </div>
 
       {message ? <MessageBox message={message} /> : null}
