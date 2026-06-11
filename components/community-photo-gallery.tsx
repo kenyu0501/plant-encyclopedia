@@ -47,11 +47,11 @@ export function CommunityPhotoGallery({ items }: { items: CommunityPhotoItem[] }
               type="button"
               onClick={() => setActiveIndex(index)}
               className="relative block aspect-[4/3] w-full bg-leaf-100"
-              aria-label={`${item.photo.caption ?? item.cultivarName ?? item.fruitName}を拡大表示`}
+              aria-label={`${item.photo.caption ?? item.photo.photo_type ?? "投稿写真"}を拡大表示`}
             >
               <Image
                 src={getPhotoUrl(item.photo, "thumb")}
-                alt={item.photo.caption ?? item.cultivarName ?? item.fruitName}
+                alt={item.photo.caption ?? item.photo.photo_type ?? "投稿写真"}
                 fill
                 className="object-cover"
                 sizes="(min-width: 640px) 50vw, 100vw"
@@ -121,7 +121,7 @@ export function CommunityPhotoGallery({ items }: { items: CommunityPhotoItem[] }
             <div className="pointer-events-auto relative h-[72vh] w-full max-w-5xl" data-community-lightbox-interactive>
               <Image
                 src={getPhotoUrl(activeItem.photo, "original")}
-                alt={activeItem.photo.caption ?? activeItem.cultivarName ?? activeItem.fruitName}
+                alt={activeItem.photo.caption ?? activeItem.photo.photo_type ?? "投稿写真"}
                 fill
                 className="object-contain"
                 sizes="100vw"
@@ -143,14 +143,6 @@ function CommunityPhotoMeta({ item, compact = false }: { item: CommunityPhotoIte
   return (
     <div className={compact ? "space-y-2 text-white/86" : "space-y-3 p-4 text-sm leading-6 text-leaf-900/74"}>
       <div className="flex flex-wrap gap-2">
-        <span className={compact ? "font-semibold text-white" : "rounded-md bg-leaf-50 px-2 py-1 font-semibold text-leaf-900"}>
-          {item.fruitName}
-        </span>
-        {item.cultivarName ? (
-          <span className={compact ? "font-semibold text-white" : "rounded-md bg-fruit-100 px-2 py-1 font-semibold text-leaf-900"}>
-            {item.cultivarName}
-          </span>
-        ) : null}
         {photo.photo_type ? (
           <span className={compact ? "text-white/76" : "rounded-md bg-white px-2 py-1 font-semibold text-leaf-900 ring-1 ring-leaf-100"}>
             {photo.photo_type}
