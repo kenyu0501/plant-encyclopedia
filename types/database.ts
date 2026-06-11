@@ -208,6 +208,8 @@ export type Photo = {
   caption: string | null;
   taken_at: string | null;
   uploaded_by: string | null;
+  contributor_name: string | null;
+  location_name: string | null;
   source_type: string;
   approval_status: "pending" | "approved" | "rejected";
   is_main: boolean;

@@ -61,15 +61,15 @@ export default async function CultivarDetailPage({ params }: Props) {
         title={cultivar.name_ja}
         description={`${cultivar.fruits.name_ja}の品種${cultivar.name_en ? ` / ${cultivar.name_en}` : ""}`}
         action={
-          isAdmin ? (
-            <div className="flex flex-wrap gap-2">
+            <div className="flex flex-wrap justify-end gap-2">
               <Link
-                href={`/admin/photos?fruit_id=${cultivar.fruit_id}&cultivar_id=${cultivar.id}`}
+                href={`/submit-photo?fruit_id=${cultivar.fruit_id}&cultivar_id=${cultivar.id}`}
                 className="inline-flex items-center gap-2 rounded-md border border-leaf-200 bg-white px-3 py-2 text-sm font-semibold text-leaf-800"
               >
                 <ImagePlus size={16} />
-                写真追加
+                写真投稿
               </Link>
+          {isAdmin ? (
             <Link
               href={`/admin/cultivars/${cultivar.id}`}
               className="inline-flex items-center gap-2 rounded-md bg-leaf-700 px-3 py-2 text-sm font-semibold text-white"
@@ -77,8 +77,8 @@ export default async function CultivarDetailPage({ params }: Props) {
               <Pencil size={16} />
               編集
             </Link>
+          ) : null}
             </div>
-          ) : null
         }
       />
 

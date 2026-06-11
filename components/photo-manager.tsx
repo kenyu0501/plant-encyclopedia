@@ -13,11 +13,17 @@ import type { AdminPhoto } from "@/lib/queries";
 
 const photoTypes = ["fruit", "メイン下画像", "メイン画像2", "メイン画像3", "栽培暦", "特徴図", "育て方図", "剪定図", "果実", "果実断面", "花", "枝葉", "新芽", "木の様子", "樹皮", "糖度計", "収穫物", "栽培記録", "その他"];
 
-export function PhotoManager({ photos }: { photos: AdminPhoto[] }) {
+export function PhotoManager({
+  photos,
+  emptyMessage = "まだ写真がありません．上のフォームから追加してください．"
+}: {
+  photos: AdminPhoto[];
+  emptyMessage?: string;
+}) {
   if (photos.length === 0) {
     return (
       <section className="rounded-lg bg-white/80 p-5 text-sm text-leaf-900/70 ring-1 ring-leaf-100">
-        まだ写真がありません．上のフォームから追加してください．
+        {emptyMessage}
       </section>
     );
   }
@@ -189,6 +195,31 @@ function PhotoCard({ photo }: { photo: AdminPhoto }) {
               <Star size={13} />
               上部に大きく表示
             </span>
+          ) : null}
+        </div>
+
+        <div className="grid gap-2 rounded-md bg-leaf-50 p-3 text-xs leading-5 text-leaf-900/72">
+          <p>
+            <span className="font-semibold text-leaf-900">投稿元: </span>
+            {photo.source_type === "viewer" ? "閲覧者投稿" : "管理者"}
+          </p>
+          {photo.contributor_name ? (
+            <p>
+              <span className="font-semibold text-leaf-900">ペンネーム: </span>
+              {photo.contributor_name}
+            </p>
+          ) : null}
+          {photo.location_name ? (
+            <p>
+              <span className="font-semibold text-leaf-900">産地・撮影場所: </span>
+              {photo.location_name}
+            </p>
+          ) : null}
+          {photo.taken_at ? (
+            <p>
+              <span className="font-semibold text-leaf-900">撮影日: </span>
+              {photo.taken_at}
+            </p>
           ) : null}
         </div>
 

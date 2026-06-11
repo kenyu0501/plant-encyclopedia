@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ExternalLink, Pencil, PlayCircle } from "lucide-react";
+import { ExternalLink, ImagePlus, Pencil, PlayCircle } from "lucide-react";
 import { CultivarList } from "@/components/cultivar-list";
 import { MangoPedigree } from "@/components/mango-pedigree";
 import { PhotoLightboxGallery } from "@/components/photo-lightbox-gallery";
@@ -45,7 +45,15 @@ export default async function FruitDetailPage({ params }: Props) {
         title={fruit.name_ja}
         description={fruit.name_en ?? undefined}
         action={
-          isAdmin ? (
+          <div className="flex flex-wrap justify-end gap-2">
+            <Link
+              href={`/submit-photo?fruit_id=${fruit.id}`}
+              className="inline-flex items-center gap-2 rounded-md border border-leaf-200 bg-white px-3 py-2 text-sm font-semibold text-leaf-800"
+            >
+              <ImagePlus size={16} />
+              写真投稿
+            </Link>
+          {isAdmin ? (
             <Link
               href={`/admin/fruits/${fruit.id}`}
               className="inline-flex items-center gap-2 rounded-md bg-leaf-700 px-3 py-2 text-sm font-semibold text-white"
@@ -54,6 +62,8 @@ export default async function FruitDetailPage({ params }: Props) {
               編集
             </Link>
           ) : null
+          }
+          </div>
         }
       />
 

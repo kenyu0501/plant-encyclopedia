@@ -11,6 +11,10 @@ export type AdminPhoto = Photo & {
   cultivars: Pick<Cultivar, "name_ja" | "slug"> | null;
 };
 
+export type PublicFruitOption = Pick<Fruit, "id" | "name_ja" | "slug"> & {
+  cultivars: Pick<Cultivar, "id" | "fruit_id" | "name_ja" | "slug">[];
+};
+
 export type AdminVideo = Video & {
   fruits: Pick<Fruit, "name_ja" | "slug"> | null;
   cultivars: Pick<Cultivar, "name_ja" | "slug"> | null;
@@ -199,6 +203,31 @@ export async function getPublicSearchEntries() {
     }));
 
   return [...fruitEntries, ...cultivarEntries];
+}
+
+export async function getPublicFruitOptions() {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("fruits")
+    .select("id, name_ja, slug, cultivars(id, fruit_id, name_ja, slug, is_public)")
+    .eq("is_public", true)
+    .order("display_order", { ascending: true, nullsFirst: false })
+    .order("name_ja", { ascending: true })
+    .order("name_ja", { referencedTable: "cultivars", ascending: true });
+
+  if (error) {
+    console.error(error);
+    return [];
+  }
+
+  return ((data ?? []) as (Pick<Fruit, "id" | "name_ja" | "slug"> & {
+    cultivars: (Pick<Cultivar, "id" | "fruit_id" | "name_ja" | "slug" | "is_public"> & { is_public: boolean })[];
+  })[]).map((fruit) => ({
+    ...fruit,
+    cultivars: (fruit.cultivars ?? [])
+      .filter((cultivar) => cultivar.is_public)
+      .map(({ is_public: _isPublic, ...cultivar }) => cultivar)
+  }));
 }
 
 export async function getSiteAnalytics(): Promise<SiteAnalytics | null> {
@@ -430,6 +459,21 @@ export async function getAdminPhotos() {
   const { data, error } = await supabase
     .from("photos")
     .select("*, fruits(name_ja, slug), cultivars(name_ja, slug)")
+    .order("created_at", { ascending: false });
+  if (error) {
+    console.error(error);
+    return [];
+  }
+  return data as AdminPhoto[];
+}
+
+export async function getPendingViewerPhotos() {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("photos")
+    .select("*, fruits(name_ja, slug), cultivars(name_ja, slug)")
+    .eq("source_type", "viewer")
+    .eq("approval_status", "pending")
     .order("created_at", { ascending: false });
   if (error) {
     console.error(error);

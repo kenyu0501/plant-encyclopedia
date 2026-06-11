@@ -77,11 +77,16 @@ create table if not exists public.photos (
   caption text,
   taken_at date,
   uploaded_by uuid references auth.users(id) on delete set null,
+  contributor_name text,
+  location_name text,
   source_type text not null default 'admin',
   approval_status text not null default 'approved' check (approval_status in ('pending', 'approved', 'rejected')),
   is_main boolean not null default false,
   created_at timestamptz not null default now(),
-  check (fruit_id is not null or cultivar_id is not null)
+  check (fruit_id is not null or cultivar_id is not null),
+  constraint photos_caption_length_check check (caption is null or char_length(caption) <= 100),
+  constraint photos_contributor_name_length_check check (contributor_name is null or char_length(contributor_name) <= 40),
+  constraint photos_location_name_length_check check (location_name is null or char_length(location_name) <= 80)
 );
 
 create table if not exists public.videos (
@@ -110,6 +115,7 @@ create index if not exists fruits_public_slug_idx on public.fruits (is_public, s
 create index if not exists cultivars_public_slug_idx on public.cultivars (fruit_id, is_public, slug);
 create index if not exists photos_fruit_idx on public.photos (fruit_id, approval_status);
 create index if not exists photos_cultivar_idx on public.photos (cultivar_id, approval_status);
+create index if not exists photos_viewer_pending_idx on public.photos (source_type, approval_status, created_at desc) where source_type = 'viewer';
 create index if not exists videos_fruit_idx on public.videos (fruit_id, is_public);
 create index if not exists videos_cultivar_idx on public.videos (cultivar_id, is_public);
 
@@ -137,6 +143,22 @@ $$;
 grant select on public.site_settings to anon, authenticated;
 grant insert, update, delete on public.site_settings to authenticated;
 grant execute on function public.is_admin() to anon, authenticated;
+grant select, insert on public.photos to authenticated;
+
+create or replace function public.viewer_photo_submissions_today()
+returns integer
+language sql
+security definer
+set search_path = public
+as $$
+  select count(*)::integer
+  from public.photos
+  where uploaded_by = auth.uid()
+    and source_type = 'viewer'
+    and created_at >= date_trunc('day', now());
+$$;
+
+grant execute on function public.viewer_photo_submissions_today() to authenticated;
 
 drop policy if exists "profiles own read" on public.profiles;
 create policy "profiles own read" on public.profiles
@@ -232,6 +254,45 @@ for all using (
   )
 );
 
+drop policy if exists "viewers read own photo submissions" on public.photos;
+create policy "viewers read own photo submissions" on public.photos
+for select using (
+  auth.uid() is not null
+  and uploaded_by = auth.uid()
+  and source_type = 'viewer'
+);
+
+drop policy if exists "viewers create pending photo submissions" on public.photos;
+create policy "viewers create pending photo submissions" on public.photos
+for insert with check (
+  auth.uid() is not null
+  and uploaded_by = auth.uid()
+  and source_type = 'viewer'
+  and approval_status = 'pending'
+  and is_main = false
+  and contributor_name is not null
+  and char_length(btrim(contributor_name)) between 1 and 40
+  and (caption is null or char_length(caption) <= 100)
+  and (location_name is null or char_length(location_name) <= 80)
+  and public.viewer_photo_submissions_today() < 20
+  and exists (
+    select 1
+    from public.fruits
+    where fruits.id = photos.fruit_id
+      and fruits.is_public = true
+  )
+  and (
+    cultivar_id is null
+    or exists (
+      select 1
+      from public.cultivars
+      where cultivars.id = photos.cultivar_id
+        and cultivars.fruit_id = photos.fruit_id
+        and cultivars.is_public = true
+    )
+  )
+);
+
 drop policy if exists "public videos are readable" on public.videos;
 create policy "public videos are readable" on public.videos
 for select using (
@@ -302,6 +363,15 @@ for insert with check (
     where profiles.id = auth.uid()
       and profiles.role = 'admin'
   )
+);
+
+drop policy if exists "viewers upload own pending fruit photos" on storage.objects;
+create policy "viewers upload own pending fruit photos" on storage.objects
+for insert with check (
+  bucket_id = 'fruit-photos'
+  and auth.uid() is not null
+  and (storage.foldername(name))[1] = 'viewer-submissions'
+  and (storage.foldername(name))[2] = auth.uid()::text
 );
 
 drop policy if exists "admins update fruit photos" on storage.objects;

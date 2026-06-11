@@ -2,13 +2,13 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Home, Leaf, Lock, PlusCircle } from "lucide-react";
+import { Camera, Home, Leaf, Lock } from "lucide-react";
 
 const items = [
   { href: "/", label: "ホーム", icon: Home },
   { href: "/fruits", label: "果樹", icon: Leaf },
-  { href: "/admin", label: "管理", icon: Lock },
-  { href: "/admin/photos", label: "写真", icon: PlusCircle }
+  { href: "/submit-photo", label: "投稿", icon: Camera },
+  { href: "/admin", label: "管理", icon: Lock }
 ];
 
 export function BottomNav() {
