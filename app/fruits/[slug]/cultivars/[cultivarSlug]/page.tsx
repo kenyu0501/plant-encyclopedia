@@ -4,6 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { ReactNode } from "react";
 import { Apple, BarChart3, Coffee, Dna, ExternalLink, Flower2, Globe2, ImagePlus, Leaf, Pencil, PlayCircle, Ruler, Scale, Sprout, Thermometer } from "lucide-react";
+import { CommunityPhotoGallery, type CommunityPhotoItem } from "@/components/community-photo-gallery";
 import { PageHeader } from "@/components/page-header";
 import { PhotoLightboxGallery } from "@/components/photo-lightbox-gallery";
 import { getCurrentUser, isAdminUser } from "@/lib/auth";
@@ -31,9 +32,17 @@ export default async function CultivarDetailPage({ params }: Props) {
 
   const user = await getCurrentUser();
   const isAdmin = await isAdminUser(user);
-  const mainPhoto = cultivar.photos?.find((photo) => photo.is_main) ?? cultivar.photos?.[0];
-  const photos = [...(cultivar.photos ?? [])].sort((a, b) => Number(b.is_main) - Number(a.is_main));
+  const officialPhotos = (cultivar.photos ?? []).filter((photo) => photo.source_type !== "viewer");
+  const mainPhoto = officialPhotos.find((photo) => photo.is_main) ?? officialPhotos[0];
+  const photos = [...officialPhotos].sort((a, b) => Number(b.is_main) - Number(a.is_main));
   const galleryPhotos = mainPhoto ? photos.filter((photo) => photo.id !== mainPhoto.id) : photos;
+  const communityPhotos: CommunityPhotoItem[] = (cultivar.photos ?? [])
+    .filter((photo) => photo.source_type === "viewer")
+    .map((photo) => ({
+      photo,
+      fruitName: cultivar.fruits?.name_ja ?? "",
+      cultivarName: cultivar.name_ja
+    }));
   const fruitSlug = cultivar.fruits.slug;
   const isBanana = fruitSlug === "banana";
   const isAvocado = fruitSlug === "avocado";
@@ -108,6 +117,8 @@ export default async function CultivarDetailPage({ params }: Props) {
           </Link>
         </section>
       ) : null}
+
+      <CommunityPhotoGallery items={communityPhotos} />
 
       {cultivar.videos && cultivar.videos.length > 0 ? (
         <section className="space-y-3">

@@ -3,6 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ExternalLink, ImagePlus, Pencil, PlayCircle } from "lucide-react";
+import { CommunityPhotoGallery, type CommunityPhotoItem } from "@/components/community-photo-gallery";
 import { CultivarList } from "@/components/cultivar-list";
 import { MangoPedigree } from "@/components/mango-pedigree";
 import { PhotoLightboxGallery } from "@/components/photo-lightbox-gallery";
@@ -32,12 +33,27 @@ export default async function FruitDetailPage({ params }: Props) {
 
   const user = await getCurrentUser();
   const isAdmin = await isAdminUser(user);
-  const mainPhoto = fruit.photos?.find((photo) => photo.is_main) ?? fruit.photos?.[0];
-  const photos = [...(fruit.photos ?? [])].sort((a, b) => Number(b.is_main) - Number(a.is_main));
+  const officialPhotos = (fruit.photos ?? []).filter((photo) => photo.source_type !== "viewer");
+  const mainPhoto = officialPhotos.find((photo) => photo.is_main) ?? officialPhotos[0];
+  const photos = [...officialPhotos].sort((a, b) => Number(b.is_main) - Number(a.is_main));
   const galleryPhotos = photos
     .filter((photo) => photo.id !== mainPhoto?.id)
     .filter((photo) => isFruitPagePhoto(photo.photo_type))
     .slice(0, 6);
+  const communityPhotos: CommunityPhotoItem[] = [
+    ...(fruit.photos ?? [])
+      .filter((photo) => photo.source_type === "viewer")
+      .map((photo) => ({ photo, fruitName: fruit.name_ja, cultivarName: null })),
+    ...(fruit.cultivars ?? []).flatMap((cultivar) =>
+      (cultivar.photos ?? [])
+        .filter((photo) => photo.source_type === "viewer")
+        .map((photo) => ({
+          photo,
+          fruitName: fruit.name_ja,
+          cultivarName: cultivar.name_ja
+        }))
+    )
+  ];
 
   return (
     <div className="space-y-6">
@@ -84,6 +100,8 @@ export default async function FruitDetailPage({ params }: Props) {
           />
         </section>
       ) : null}
+
+      <CommunityPhotoGallery items={communityPhotos} />
 
       <section className="rounded-lg bg-white/84 p-5 ring-1 ring-leaf-100">
         <h2 className="font-bold text-leaf-900">果樹情報</h2>
