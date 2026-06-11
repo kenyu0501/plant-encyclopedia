@@ -29,3 +29,53 @@ textarea {
 .safe-bottom {
   padding-bottom: calc(5.5rem + env(safe-area-inset-bottom));
 }
+
+.fruit-bounce {
+  animation: fruit-bounce 0.82s cubic-bezier(0.34, 1.56, 0.64, 1) infinite;
+  transform-origin: center bottom;
+}
+
+.loading-dot {
+  display: inline-block;
+  width: 0.42rem;
+  height: 0.42rem;
+  border-radius: 9999px;
+  background: #2f855a;
+  animation: loading-dot 0.96s ease-in-out infinite;
+}
+
+@keyframes fruit-bounce {
+  0%,
+  100% {
+    transform: translateY(0) scale(1);
+  }
+
+  42% {
+    transform: translateY(-0.7rem) scale(1.04);
+  }
+
+  58% {
+    transform: translateY(0.05rem) scale(0.96);
+  }
+}
+
+@keyframes loading-dot {
+  0%,
+  100% {
+    opacity: 0.35;
+    transform: translateY(0);
+  }
+
+  50% {
+    opacity: 1;
+    transform: translateY(-0.22rem);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .fruit-bounce,
+  .loading-dot {
+    animation-duration: 1ms;
+    animation-iteration-count: 1;
+  }
+}
