@@ -2,7 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
-import { Camera, CheckCircle2, LogIn, Mail, Send, Upload } from "lucide-react";
+import { Camera, CheckCircle2, Mail, Send, Upload } from "lucide-react";
 import { createImageVariantsForUpload, formatBytes, formatVariantSummary } from "@/lib/image-compress";
 import { uploadPhotoVariants } from "@/lib/photo-upload";
 import { createClient } from "@/lib/supabase-browser";
@@ -44,23 +44,6 @@ export function ViewerPhotoSubmissionForm({
   const selectedFruit = fruits.find((fruit) => fruit.id === fruitId);
   const filteredCultivars = useMemo(() => selectedFruit?.cultivars ?? [], [selectedFruit]);
   const captionRemaining = 100 - caption.length;
-
-  async function signInWithGoogle() {
-    setLoading(true);
-    setMessage({ tone: "info", text: "Googleログインへ移動します．" });
-    const supabase = createClient();
-    const origin = window.location.origin;
-    const { error } = await supabase.auth.signInWithOAuth({
-      provider: "google",
-      options: {
-        redirectTo: `${origin}/auth/callback?next=/submit-photo`
-      }
-    });
-    if (error) {
-      setLoading(false);
-      setMessage({ tone: "error", text: `Googleログインを開始できませんでした: ${error.message}` });
-    }
-  }
 
   async function sendMagicLink(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -195,16 +178,6 @@ export function ViewerPhotoSubmissionForm({
             </p>
           </div>
         </div>
-
-        <button
-          type="button"
-          onClick={signInWithGoogle}
-          disabled={loading}
-          className="inline-flex w-full items-center justify-center gap-2 rounded-md bg-leaf-700 px-4 py-3 font-semibold text-white disabled:opacity-60"
-        >
-          <LogIn size={18} />
-          Googleでログイン
-        </button>
 
         <form onSubmit={sendMagicLink} className="space-y-3 rounded-md bg-leaf-50 p-4">
           <label className="block">
