@@ -36,6 +36,17 @@ export type SiteAnalytics = {
   }[];
 };
 
+export type SeasonalCultivar = {
+  id: string;
+  fruitName: string;
+  fruitSlug: string;
+  cultivarName: string;
+  cultivarSlug: string;
+  harvestSeason: string | null;
+  taste: string | null;
+  href: string;
+};
+
 export const defaultSiteSettings: SiteSettings = {
   id: "home",
   home_eyebrow: "スマホでひらく栽培メモ",
@@ -264,6 +275,127 @@ export async function getSiteAnalytics(): Promise<SiteAnalytics | null> {
       .sort((a, b) => b.views - a.views)
       .slice(0, 5)
   };
+}
+
+export async function getSeasonalCultivars(month = getTokyoMonth(), limit = 8): Promise<SeasonalCultivar[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("cultivars")
+    .select("id, name_ja, slug, harvest_season, taste, fruits!inner(name_ja, slug, is_public)")
+    .eq("is_public", true)
+    .eq("fruits.is_public", true)
+    .not("harvest_season", "is", null)
+    .order("name_ja", { ascending: true });
+
+  if (error) {
+    console.error(error);
+    return [];
+  }
+
+  type SeasonalRow = Pick<Cultivar, "id" | "name_ja" | "slug" | "harvest_season" | "taste"> & {
+    fruits: Pick<Fruit, "name_ja" | "slug" | "is_public"> | Pick<Fruit, "name_ja" | "slug" | "is_public">[] | null;
+  };
+
+  return ((data ?? []) as SeasonalRow[])
+    .map((cultivar) => ({ ...cultivar, fruit: Array.isArray(cultivar.fruits) ? cultivar.fruits[0] : cultivar.fruits }))
+    .filter((cultivar) => cultivar.fruit?.is_public && (isHarvestSeasonForMonth(cultivar.harvest_season, month) || isFruitSeasonForMonth(cultivar.fruit.slug, month)))
+    .map((cultivar) => ({
+      id: cultivar.id,
+      fruitName: cultivar.fruit?.name_ja ?? "",
+      fruitSlug: cultivar.fruit?.slug ?? "",
+      cultivarName: cultivar.name_ja,
+      cultivarSlug: cultivar.slug,
+      harvestSeason: isHarvestSeasonForMonth(cultivar.harvest_season, month)
+        ? cultivar.harvest_season
+        : getFruitSeasonLabel(cultivar.fruit?.slug ?? ""),
+      taste: cultivar.taste,
+      href: `/fruits/${cultivar.fruit?.slug}/cultivars/${cultivar.slug}`
+    }))
+    .sort((a, b) => seasonalFruitRank(a.fruitSlug) - seasonalFruitRank(b.fruitSlug) || a.cultivarName.localeCompare(b.cultivarName, "ja"))
+    .filter(createPerFruitLimitFilter(2))
+    .slice(0, limit);
+}
+
+function getTokyoMonth() {
+  const month = new Intl.DateTimeFormat("en-US", {
+    timeZone: "Asia/Tokyo",
+    month: "numeric"
+  }).format(new Date());
+  return Number(month);
+}
+
+function isHarvestSeasonForMonth(value: string | null, month: number) {
+  if (!value) return false;
+  const text = value.normalize("NFKC");
+
+  for (const range of Array.from(text.matchAll(/(1[0-2]|[1-9])\s*(?:月)?\s*[〜~\-ー－–]\s*(1[0-2]|[1-9])\s*月?/g))) {
+    if (isMonthInRange(month, Number(range[1]), Number(range[2]))) return true;
+  }
+
+  for (const match of Array.from(text.matchAll(/(1[0-2]|[1-9])\s*月/g))) {
+    if (Number(match[1]) === month) return true;
+  }
+
+  return seasonWordsForMonth(month).some((word) => text.includes(word));
+}
+
+function isMonthInRange(month: number, start: number, end: number) {
+  if (start <= end) return month >= start && month <= end;
+  return month >= start || month <= end;
+}
+
+function seasonWordsForMonth(month: number) {
+  const words = ["周年", "通年"];
+  if ([3, 4, 5].includes(month)) words.push("春", "晩春");
+  if ([6, 7, 8].includes(month)) words.push("夏", "初夏", "梅雨", "盛夏");
+  if ([9, 10, 11].includes(month)) words.push("秋", "初秋", "晩秋");
+  if ([12, 1, 2].includes(month)) words.push("冬", "初冬", "晩冬");
+  return words;
+}
+
+function isFruitSeasonForMonth(slug: string, month: number) {
+  const months = fruitSeasonMonths(slug);
+  return months.includes(month);
+}
+
+function fruitSeasonMonths(slug: string) {
+  const seasons: Record<string, number[]> = {
+    mango: [6, 7, 8],
+    banana: [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12],
+    guava: [7, 8, 9, 10],
+    avocado: [9, 10, 11, 12, 1, 2],
+    "white-sapote": [3, 4, 5],
+    coffee: [11, 12, 1, 2]
+  };
+  return seasons[slug] ?? [];
+}
+
+function getFruitSeasonLabel(slug: string) {
+  const labels: Record<string, string> = {
+    mango: "果樹の旬目安: 6〜8月",
+    banana: "果樹の旬目安: 周年",
+    guava: "果樹の旬目安: 7〜10月",
+    avocado: "果樹の旬目安: 9〜2月",
+    "white-sapote": "果樹の旬目安: 3〜5月",
+    coffee: "果樹の旬目安: 11〜2月"
+  };
+  return labels[slug] ?? null;
+}
+
+function createPerFruitLimitFilter(maxPerFruit: number) {
+  const counts = new Map<string, number>();
+  return (item: SeasonalCultivar) => {
+    const count = counts.get(item.fruitSlug) ?? 0;
+    if (count >= maxPerFruit) return false;
+    counts.set(item.fruitSlug, count + 1);
+    return true;
+  };
+}
+
+function seasonalFruitRank(slug: string) {
+  const order = ["mango", "banana", "avocado", "white-sapote", "guava", "coffee"];
+  const index = order.indexOf(slug);
+  return index === -1 ? order.length : index;
 }
 
 export async function getAdminFruits() {

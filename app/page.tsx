@@ -3,16 +3,19 @@ import { ArrowRight } from "lucide-react";
 import { AnalyticsSummary } from "@/components/analytics-summary";
 import { FruitCard } from "@/components/fruit-card";
 import { HomeSearch } from "@/components/home-search";
-import { getPublicFruits, getPublicSearchEntries, getSiteAnalytics, getSiteSettings } from "@/lib/queries";
+import { SeasonalCultivars } from "@/components/seasonal-cultivars";
+import { getPublicFruits, getPublicSearchEntries, getSeasonalCultivars, getSiteAnalytics, getSiteSettings } from "@/lib/queries";
 
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
-  const [fruits, settings, searchEntries, analytics] = await Promise.all([
+  const currentMonth = getTokyoMonth();
+  const [fruits, settings, searchEntries, analytics, seasonalCultivars] = await Promise.all([
     getPublicFruits(6),
     getSiteSettings(),
     getPublicSearchEntries(),
-    getSiteAnalytics()
+    getSiteAnalytics(),
+    getSeasonalCultivars(currentMonth, 8)
   ]);
 
   return (
@@ -45,6 +48,8 @@ export default async function HomePage() {
 
       <AnalyticsSummary analytics={analytics} />
 
+      <SeasonalCultivars items={seasonalCultivars} month={currentMonth} />
+
       <section className="space-y-4">
         <div className="flex items-center justify-between gap-4">
           <h2 className="text-xl font-bold text-leaf-900">公開中の果樹</h2>
@@ -66,4 +71,12 @@ export default async function HomePage() {
       </section>
     </div>
   );
+}
+
+function getTokyoMonth() {
+  const month = new Intl.DateTimeFormat("en-US", {
+    timeZone: "Asia/Tokyo",
+    month: "numeric"
+  }).format(new Date());
+  return Number(month);
 }
