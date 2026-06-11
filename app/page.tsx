@@ -3,17 +3,22 @@ import { ArrowRight } from "lucide-react";
 import { AnalyticsSummary } from "@/components/analytics-summary";
 import { FruitCard } from "@/components/fruit-card";
 import { HomeSearch } from "@/components/home-search";
-import { getPublicFruits, getPublicSearchEntries, getSiteAnalytics, getSiteSettings } from "@/lib/queries";
+import { PendingSubmissionsNotice } from "@/components/pending-submissions-notice";
+import { getCurrentUser, isAdminUser } from "@/lib/auth";
+import { getPendingViewerPhotoCount, getPublicFruits, getPublicSearchEntries, getSiteAnalytics, getSiteSettings } from "@/lib/queries";
 
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
-  const [fruits, settings, searchEntries, analytics] = await Promise.all([
+  const [fruits, settings, searchEntries, analytics, user] = await Promise.all([
     getPublicFruits(6),
     getSiteSettings(),
     getPublicSearchEntries(),
-    getSiteAnalytics()
+    getSiteAnalytics(),
+    getCurrentUser()
   ]);
+  const isAdmin = await isAdminUser(user);
+  const pendingViewerPhotoCount = isAdmin ? await getPendingViewerPhotoCount() : 0;
 
   return (
     <div className="space-y-8">
@@ -44,6 +49,8 @@ export default async function HomePage() {
       </section>
 
       <AnalyticsSummary analytics={analytics} />
+
+      <PendingSubmissionsNotice count={pendingViewerPhotoCount} />
 
       <section className="space-y-4">
         <div className="flex items-center justify-between gap-4">

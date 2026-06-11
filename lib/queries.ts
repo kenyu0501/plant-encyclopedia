@@ -15,6 +15,11 @@ export type PublicFruitOption = Pick<Fruit, "id" | "name_ja" | "slug"> & {
   cultivars: Pick<Cultivar, "id" | "fruit_id" | "name_ja" | "slug">[];
 };
 
+export type ViewerPhotoSubmission = Photo & {
+  fruits: Pick<Fruit, "name_ja" | "slug"> | null;
+  cultivars: Pick<Cultivar, "name_ja" | "slug"> | null;
+};
+
 export type AdminVideo = Video & {
   fruits: Pick<Fruit, "name_ja" | "slug"> | null;
   cultivars: Pick<Cultivar, "name_ja" | "slug"> | null;
@@ -480,6 +485,35 @@ export async function getPendingViewerPhotos() {
     return [];
   }
   return data as AdminPhoto[];
+}
+
+export async function getPendingViewerPhotoCount() {
+  const supabase = await createClient();
+  const { count, error } = await supabase
+    .from("photos")
+    .select("id", { count: "exact", head: true })
+    .eq("source_type", "viewer")
+    .eq("approval_status", "pending");
+  if (error) {
+    console.error(error);
+    return 0;
+  }
+  return count ?? 0;
+}
+
+export async function getOwnViewerPhotoSubmissions(userId: string) {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("photos")
+    .select("*, fruits(name_ja, slug), cultivars(name_ja, slug)")
+    .eq("source_type", "viewer")
+    .eq("uploaded_by", userId)
+    .order("created_at", { ascending: false });
+  if (error) {
+    console.error(error);
+    return [];
+  }
+  return data as ViewerPhotoSubmission[];
 }
 
 export async function getAdminVideos() {

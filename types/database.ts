@@ -117,6 +117,21 @@ export type Database = {
         Args: { p_path: string };
         Returns: null;
       };
+      update_own_pending_photo_submission: {
+        Args: {
+          p_photo_id: string;
+          p_caption: string | null;
+          p_taken_at: string | null;
+          p_contributor_name: string;
+          p_location_name: string | null;
+          p_photo_type: string | null;
+        };
+        Returns: boolean;
+      };
+      withdraw_own_pending_photo_submission: {
+        Args: { p_photo_id: string };
+        Returns: boolean;
+      };
     };
     Enums: Record<string, never>;
     CompositeTypes: Record<string, never>;
