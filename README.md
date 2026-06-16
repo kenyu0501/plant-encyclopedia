@@ -55,6 +55,15 @@ npm run dev
 - `/admin/photos` 写真アップロード
 - `/admin/videos` YouTube登録
 
+## コンテンツデータ
+
+果樹ページ本文と品種データは `content/` に置きます。
+
+- `content/fruits/*.md` 果樹詳細ページ本文
+- `content/cultivars/*.json` 果樹に紐づく品種データ
+
+アテモヤの加筆本文は `content/fruits/atemoya.md`、品種データは `content/cultivars/atemoya.json` にあります。
+
 ## Supabase Storage
 
 `supabase/schema.sql` は `fruit-photos` bucketをpublic bucketとして作成します。写真レコード自体は `photos.approval_status = 'approved'` のものだけ一般公開ページに表示されます。
