@@ -1,0 +1,130 @@
+{
+  "fruitSlug": "atemoya",
+  "cultivars": [
+    {
+      "slug": "gefner",
+      "nameJa": "ジェフナー",
+      "nameEn": "Gefner",
+      "aliases": ["Geffner", "ジェフナー"],
+      "type": "major",
+      "originOrUse": "フロリダ、ハワイ、台湾、日本の小笠原資料などで重要な品種。",
+      "description": "比較的自然着果しやすく、果実品質がよい品種として扱われる。台湾の鳳梨釋迦でも主要品種として重要。小笠原の試験ではピンクスマンモスより小果になりやすいが、糖度と酸度が高く良食味で有望とされる。",
+      "cultivationNotes": "果実肥大には摘果、着果枝の摘芯、人工受粉などの管理が有効。小笠原の試験では結実後に10葉を残して摘芯することで肥大促進が確認された。",
+      "sourceNotes": ["UF/IFAS", "東京都小笠原農業センター", "台湾・台東区農業改良場関連資料"]
+    },
+    {
+      "slug": "pinks-mammoth",
+      "nameJa": "ピンクスマンモス",
+      "nameEn": "Pink's Mammoth",
+      "aliases": ["Pinks Mammoth", "Pink Mammoth", "Mammoth", "ピンクス・マンモス"],
+      "type": "major",
+      "originOrUse": "オーストラリア系の代表的品種。日本の小笠原資料にも登場する。",
+      "description": "大果で食味がよく、樹勢が強い品種として扱われる。高品質果を得るには人工受粉や樹勢管理が重要。",
+      "cultivationNotes": "人工受粉が必要になりやすい。小笠原では剪定時期を調整して収穫期を広げる技術が検討されている。",
+      "sourceNotes": ["Queensland DPI", "東京都小笠原農業センター", "UF/IFAS"]
+    },
+    {
+      "slug": "hillary-white",
+      "nameJa": "ヒラリーホワイト",
+      "nameEn": "Hillary White",
+      "aliases": ["Hillary White"],
+      "type": "major",
+      "originOrUse": "オーストラリアの主要品種。Pinks Mammoth の枝変わりとされる。",
+      "description": "Pinks Mammoth より早生で多収になりやすいことから、オーストラリアでは親品種をかなり置き換えた品種として紹介される。",
+      "cultivationNotes": "自然受粉だけでは不十分になりやすく、商業栽培では人工受粉が重要。",
+      "sourceNotes": ["Queensland DPI"]
+    },
+    {
+      "slug": "african-pride",
+      "nameJa": "アフリカンプライド",
+      "nameEn": "African Pride",
+      "aliases": ["Kaller", "African Pride"],
+      "type": "major",
+      "originOrUse": "オーストラリアの主要品種の一つ。",
+      "description": "若木期から結実しやすく、収量の立ち上がりが早い品種として紹介される。一方、フロリダの資料では人工受粉なしでは果実数が少なくなりやすく、熟期の内部障害にも注意が必要とされる。",
+      "cultivationNotes": "早生・多収性を評価しつつ、地域ごとの内部障害、着果性、人工受粉の必要性を確認して選ぶ。",
+      "sourceNotes": ["Queensland DPI", "UF/IFAS"]
+    },
+    {
+      "slug": "page",
+      "nameJa": "ページ",
+      "nameEn": "Page",
+      "aliases": ["Page"],
+      "type": "known",
+      "originOrUse": "フロリダの資料で商業的に知られる品種として登場する。",
+      "description": "果実生産は良好とされるが、成熟時に樹上で裂果しやすい傾向がある。",
+      "cultivationNotes": "裂果を避けるため、収穫適期の見極めと水分管理が重要。",
+      "sourceNotes": ["UF/IFAS"]
+    },
+    {
+      "slug": "bradley",
+      "nameJa": "ブラッドリー",
+      "nameEn": "Bradley",
+      "aliases": ["Bradley"],
+      "type": "known",
+      "originOrUse": "フロリダやプエルトリコの比較試験で名前が挙がる品種。",
+      "description": "フロリダの資料では、人工受粉なしでは果実数が少なくなりやすい品種として紹介される。",
+      "cultivationNotes": "地域試験やコレクションでの評価情報を添えて掲載するとよい。",
+      "sourceNotes": ["UF/IFAS", "Puerto Rico trial"]
+    },
+    {
+      "slug": "priestly",
+      "nameJa": "プリーストリー",
+      "nameEn": "Priestly",
+      "aliases": ["Priestly"],
+      "type": "known",
+      "originOrUse": "フロリダの品種リスト、プエルトリコの比較試験に登場する。",
+      "description": "主要商業品種というより、試験・収集品種として扱うとよい。",
+      "cultivationNotes": "地域適応性の情報は限定的。",
+      "sourceNotes": ["UF/IFAS", "Puerto Rico trial"]
+    },
+    {
+      "slug": "lisa",
+      "nameJa": "リサ",
+      "nameEn": "Lisa",
+      "aliases": ["Lisa"],
+      "type": "known",
+      "originOrUse": "プエルトリコの比較試験に登場する系統。",
+      "description": "プエルトリコの試験では Geffner とともに市場性果実収量が高かったとされる。",
+      "cultivationNotes": "日本での栽培情報は限られるため、試験系統として掲載するのが無難。",
+      "sourceNotes": ["Puerto Rico trial"]
+    },
+    {
+      "slug": "taitung-no-3-green-treasure",
+      "nameJa": "臺東3號 / 綠寶",
+      "nameEn": "Taitung No. 3 / Green Treasure",
+      "aliases": ["臺東3號", "綠寶", "台東3号", "緑宝"],
+      "type": "major",
+      "originOrUse": "台湾で育成された番荔枝属品種。Gefner を母本、臺東1號を父本として育成されたとされる。",
+      "description": "大果、高糖度、耐性、貯運性などが特徴として紹介される台湾系品種。",
+      "cultivationNotes": "台湾の鳳梨釋迦系品種として、Gefner と関連づけて掲載すると理解しやすい。",
+      "sourceNotes": ["台湾・台東区農業改良場関連資料"]
+    }
+  ],
+  "additionalNamedCultivars": [
+    "Bernitski",
+    "Caves",
+    "Chirimorinon A",
+    "Chirimorinon B",
+    "Chirimorinon C",
+    "Hette",
+    "Island Gem",
+    "Lindstrom",
+    "Kabri",
+    "Malali",
+    "Malamud",
+    "Stermer",
+    "Martin",
+    "Paxton",
+    "MHRS Gold",
+    "MHRS Red",
+    "Palethorpe",
+    "R11-T3",
+    "R11-T4",
+    "R11-T6",
+    "Ruby Queen",
+    "Bullock's Heart",
+    "47-18",
+    "75-9"
+  ]
+}
