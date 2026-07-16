@@ -4,17 +4,20 @@ import { AnalyticsSummary } from "@/components/analytics-summary";
 import { FruitCard } from "@/components/fruit-card";
 import { HomeSearch } from "@/components/home-search";
 import { PendingSubmissionsNotice } from "@/components/pending-submissions-notice";
+import { RecentlyViewedCultivars } from "@/components/recently-viewed-cultivars";
+import { RecentlyUpdatedCultivars } from "@/components/recently-updated-cultivars";
 import { getCurrentUser, isAdminUser } from "@/lib/auth";
-import { getPendingViewerPhotoCount, getPublicFruits, getPublicSearchEntries, getSiteAnalytics, getSiteSettings } from "@/lib/queries";
+import { getPendingViewerPhotoCount, getPublicFruits, getPublicSearchEntries, getRecentlyUpdatedCultivars, getSiteAnalytics, getSiteSettings } from "@/lib/queries";
 
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
-  const [fruits, settings, searchEntries, analytics, user] = await Promise.all([
+  const [fruits, settings, searchEntries, analytics, recentlyUpdatedCultivars, user] = await Promise.all([
     getPublicFruits(6),
     getSiteSettings(),
     getPublicSearchEntries(),
     getSiteAnalytics(),
+    getRecentlyUpdatedCultivars(),
     getCurrentUser()
   ]);
   const isAdmin = await isAdminUser(user);
@@ -49,6 +52,10 @@ export default async function HomePage() {
       </section>
 
       <AnalyticsSummary analytics={analytics} />
+
+      <RecentlyViewedCultivars />
+
+      <RecentlyUpdatedCultivars items={recentlyUpdatedCultivars} />
 
       <PendingSubmissionsNotice count={pendingViewerPhotoCount} />
 

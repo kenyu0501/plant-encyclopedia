@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import { ExternalLink, ImagePlus, Pencil, PlayCircle } from "lucide-react";
 import { CommunityPhotoGallery, type CommunityPhotoItem } from "@/components/community-photo-gallery";
 import { CultivarList } from "@/components/cultivar-list";
+import { CultivarComparison } from "@/components/cultivar-comparison";
 import { MangoPedigree } from "@/components/mango-pedigree";
 import { PhotoLightboxGallery } from "@/components/photo-lightbox-gallery";
 import { PageHeader } from "@/components/page-header";
@@ -128,6 +129,7 @@ export default async function FruitDetailPage({ params }: Props) {
             </Link>
           ) : null}
         </div>
+        <CultivarComparison fruitName={fruit.name_ja} fruitSlug={fruit.slug} cultivars={fruit.cultivars ?? []} />
         <CultivarList fruitSlug={fruit.slug} cultivars={fruit.cultivars ?? []} />
       </section>
 

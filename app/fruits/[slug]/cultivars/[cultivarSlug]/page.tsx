@@ -7,6 +7,7 @@ import { Apple, BarChart3, Coffee, Dna, ExternalLink, Flower2, Globe2, ImagePlus
 import { CommunityPhotoGallery, type CommunityPhotoItem } from "@/components/community-photo-gallery";
 import { PageHeader } from "@/components/page-header";
 import { PhotoLightboxGallery } from "@/components/photo-lightbox-gallery";
+import { RecentCultivarTracker } from "@/components/recent-cultivar-tracker";
 import { getCurrentUser, isAdminUser } from "@/lib/auth";
 import { getPhotoUrl } from "@/lib/photo-url";
 import { getPublicCultivarBySlugs } from "@/lib/queries";
@@ -66,6 +67,12 @@ export default async function CultivarDetailPage({ params }: Props) {
 
   return (
     <div className="space-y-6">
+      <RecentCultivarTracker
+        id={cultivar.id}
+        fruitName={cultivar.fruits.name_ja}
+        cultivarName={cultivar.name_ja}
+        href={`/fruits/${fruitSlug}/cultivars/${cultivar.slug}`}
+      />
       <PageHeader
         title={cultivar.name_ja}
         description={`${cultivar.fruits.name_ja}の品種${cultivar.name_en ? ` / ${cultivar.name_en}` : ""}`}

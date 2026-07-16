@@ -34,15 +34,53 @@ export type PublicSearchEntry = {
   keywords: string;
 };
 
+export type AnalyticsPeriodKey = "24h" | "7d" | "30d";
+
+export type AnalyticsCultivarItem = {
+  fruitName: string;
+  cultivarName: string;
+  href: string;
+  views: number;
+  previousRank: number | null;
+  rankChange: number | null;
+};
+
 export type SiteAnalytics = {
-  todayViews: number;
   totalViews: number;
-  topCultivars: {
-    fruitName: string;
-    cultivarName: string;
-    href: string;
-    views: number;
-  }[];
+  periods: Record<
+    AnalyticsPeriodKey,
+    {
+      views: number;
+      previousViews: number;
+      topCultivars: AnalyticsCultivarItem[];
+    }
+  >;
+};
+
+type AnalyticsRow = {
+  views: number | null;
+  view_hour?: string | null;
+  cultivar_id: string | null;
+  cultivars:
+    | {
+        name_ja: string | null;
+        slug: string | null;
+        is_public: boolean;
+        fruits:
+          | { name_ja: string | null; slug: string | null; is_public: boolean }
+          | { name_ja: string | null; slug: string | null; is_public: boolean }[]
+          | null;
+      }
+    | {
+        name_ja: string | null;
+        slug: string | null;
+        is_public: boolean;
+        fruits:
+          | { name_ja: string | null; slug: string | null; is_public: boolean }
+          | { name_ja: string | null; slug: string | null; is_public: boolean }[]
+          | null;
+      }[]
+    | null;
 };
 
 export type SeasonalCultivar = {
@@ -54,6 +92,15 @@ export type SeasonalCultivar = {
   harvestSeason: string | null;
   taste: string | null;
   href: string;
+};
+
+export type RecentlyUpdatedCultivar = {
+  id: string;
+  fruitName: string;
+  cultivarName: string;
+  nameEn: string | null;
+  href: string;
+  updatedAt: string;
 };
 
 export const defaultSiteSettings: SiteSettings = {
@@ -237,59 +284,138 @@ export async function getPublicFruitOptions() {
 
 export async function getSiteAnalytics(): Promise<SiteAnalytics | null> {
   const supabase = await createClient();
-  const today = new Intl.DateTimeFormat("en-CA", {
-    timeZone: "Asia/Tokyo",
-    year: "numeric",
-    month: "2-digit",
-    day: "2-digit"
-  }).format(new Date());
-  const { data, error } = await supabase
-    .from("page_views")
-    .select("views, view_date, cultivar_id, cultivars(name_ja, slug, is_public, fruits(name_ja, slug, is_public))");
+  const currentHour = new Date();
+  currentHour.setMinutes(0, 0, 0);
+  const oldestIncludedHour = new Date(currentHour.getTime() - (30 * 24 * 2 - 1) * 60 * 60 * 1000).toISOString();
+  const dailyAnalyticsSelect =
+    "views, cultivar_id, cultivars(name_ja, slug, is_public, fruits(name_ja, slug, is_public))";
+  const hourlyAnalyticsSelect =
+    "id, views, view_hour, cultivar_id, cultivars(name_ja, slug, is_public, fruits(name_ja, slug, is_public))";
+  const dailyResultPromise = supabase.from("page_views").select(dailyAnalyticsSelect);
+  const recentData: unknown[] = [];
+  let recentError: { message?: string } | null = null;
+  const pageSize = 1000;
 
-  if (error) {
-    console.error(error);
+  for (let from = 0; ; from += pageSize) {
+    const hourlyResult = await supabase
+      .from("page_view_hourly")
+      .select(hourlyAnalyticsSelect)
+      .gte("view_hour", oldestIncludedHour)
+      .order("view_hour", { ascending: true })
+      .order("id", { ascending: true })
+      .range(from, from + pageSize - 1);
+
+    if (hourlyResult.error) {
+      recentError = hourlyResult.error;
+      break;
+    }
+
+    const page = hourlyResult.data ?? [];
+    recentData.push(...page);
+    if (page.length < pageSize) break;
+  }
+
+  const { data, error } = await dailyResultPromise;
+
+  if (error || recentError) {
+    console.error(error ?? recentError);
     return null;
   }
 
-  type AnalyticsRow = {
-    views: number | null;
-    view_date: string | null;
-    cultivar_id: string | null;
-    cultivars:
-      | {
-          name_ja: string | null;
-          slug: string | null;
-          is_public: boolean;
-          fruits:
-            | { name_ja: string | null; slug: string | null; is_public: boolean }
-            | { name_ja: string | null; slug: string | null; is_public: boolean }[]
-            | null;
-        }
-      | {
-          name_ja: string | null;
-          slug: string | null;
-          is_public: boolean;
-          fruits:
-            | { name_ja: string | null; slug: string | null; is_public: boolean }
-            | { name_ja: string | null; slug: string | null; is_public: boolean }[]
-            | null;
-        }[]
-      | null;
+  const rows = (data ?? []) as unknown as AnalyticsRow[];
+  const recentRows = recentData as AnalyticsRow[];
+  const totalViews = rows.reduce((sum, row) => sum + (row.views ?? 0), 0);
+
+  return {
+    totalViews,
+    periods: {
+      "24h": buildAnalyticsPeriod(recentRows, currentHour.getTime(), 24),
+      "7d": buildAnalyticsPeriod(recentRows, currentHour.getTime(), 7 * 24),
+      "30d": buildAnalyticsPeriod(recentRows, currentHour.getTime(), 30 * 24)
+    }
+  };
+}
+
+export async function getRecentlyUpdatedCultivars(limit = 6): Promise<RecentlyUpdatedCultivar[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("cultivars")
+    .select("id, name_ja, name_en, slug, updated_at, fruits!inner(name_ja, slug, is_public)")
+    .eq("is_public", true)
+    .eq("fruits.is_public", true)
+    .order("updated_at", { ascending: false })
+    .limit(limit);
+
+  if (error) {
+    console.error(error);
+    return [];
+  }
+
+  type UpdatedCultivarRow = Pick<Cultivar, "id" | "name_ja" | "name_en" | "slug" | "updated_at"> & {
+    fruits: Pick<Fruit, "name_ja" | "slug"> | Pick<Fruit, "name_ja" | "slug">[] | null;
   };
 
-  const rows = (data ?? []) as unknown as AnalyticsRow[];
-  const totalViews = rows.reduce((sum, row) => sum + (row.views ?? 0), 0);
-  const todayViews = rows
-    .filter((row) => row.view_date === today)
-    .reduce((sum, row) => sum + (row.views ?? 0), 0);
-  const cultivarMap = new Map<string, SiteAnalytics["topCultivars"][number]>();
-  const todayRows = rows.filter((row) => row.view_date === today);
+  return ((data ?? []) as UpdatedCultivarRow[])
+    .map((cultivar) => ({
+      cultivar,
+      fruit: Array.isArray(cultivar.fruits) ? cultivar.fruits[0] : cultivar.fruits
+    }))
+    .filter((item): item is { cultivar: UpdatedCultivarRow; fruit: Pick<Fruit, "name_ja" | "slug"> } => Boolean(item.fruit))
+    .map(({ cultivar, fruit }) => ({
+      id: cultivar.id,
+      fruitName: fruit.name_ja,
+      cultivarName: cultivar.name_ja,
+      nameEn: cultivar.name_en,
+      href: `/fruits/${fruit.slug}/cultivars/${cultivar.slug}`,
+      updatedAt: cultivar.updated_at
+    }));
+}
 
-  for (const row of todayRows) {
+function buildAnalyticsPeriod(rows: AnalyticsRow[], currentHourMs: number, hours: number) {
+  const hourMs = 60 * 60 * 1000;
+  const currentStartMs = currentHourMs - (hours - 1) * hourMs;
+  const previousStartMs = currentHourMs - (hours * 2 - 1) * hourMs;
+  const currentRows = rows.filter((row) => {
+    const viewedAt = row.view_hour ? Date.parse(row.view_hour) : Number.NaN;
+    return Number.isFinite(viewedAt) && viewedAt >= currentStartMs;
+  });
+  const previousRows = rows.filter((row) => {
+    const viewedAt = row.view_hour ? Date.parse(row.view_hour) : Number.NaN;
+    return Number.isFinite(viewedAt) && viewedAt >= previousStartMs && viewedAt < currentStartMs;
+  });
+  const currentCultivars = aggregateAnalyticsCultivars(currentRows);
+  const previousCultivars = Array.from(aggregateAnalyticsCultivars(previousRows).values()).sort(
+    (a, b) => b.views - a.views || a.cultivarName.localeCompare(b.cultivarName, "ja")
+  );
+  const previousRanks = new Map(previousCultivars.map((item, index) => [item.href, index + 1]));
+
+  return {
+    views: currentRows.reduce((sum, row) => sum + (row.views ?? 0), 0),
+    previousViews: previousRows.reduce((sum, row) => sum + (row.views ?? 0), 0),
+    topCultivars: Array.from(currentCultivars.values())
+      .sort((a, b) => b.views - a.views || a.cultivarName.localeCompare(b.cultivarName, "ja"))
+      .slice(0, 5)
+      .map((item, index) => {
+        const previousRank = previousRanks.get(item.href) ?? null;
+        return {
+          ...item,
+          previousRank,
+          rankChange: previousRank === null ? null : previousRank - (index + 1)
+        };
+      })
+  };
+}
+
+function aggregateAnalyticsCultivars(rows: AnalyticsRow[]) {
+  const cultivarMap = new Map<
+    string,
+    Pick<AnalyticsCultivarItem, "fruitName" | "cultivarName" | "href" | "views">
+  >();
+
+  for (const row of rows) {
     if (!row.cultivar_id || !row.cultivars) continue;
     const cultivar = Array.isArray(row.cultivars) ? row.cultivars[0] : row.cultivars;
-    const fruit = Array.isArray(cultivar.fruits) ? cultivar.fruits[0] : cultivar.fruits;
+    const fruit = Array.isArray(cultivar?.fruits) ? cultivar.fruits[0] : cultivar?.fruits;
     if (!cultivar?.is_public || !fruit?.is_public || !cultivar.slug || !cultivar.name_ja || !fruit.slug || !fruit.name_ja) continue;
 
     const href = `/fruits/${fruit.slug}/cultivars/${cultivar.slug}`;
@@ -302,13 +428,7 @@ export async function getSiteAnalytics(): Promise<SiteAnalytics | null> {
     });
   }
 
-  return {
-    todayViews,
-    totalViews,
-    topCultivars: Array.from(cultivarMap.values())
-      .sort((a, b) => b.views - a.views)
-      .slice(0, 5)
-  };
+  return cultivarMap;
 }
 
 export async function getSeasonalCultivars(month = getTokyoMonth(), limit = 8): Promise<SeasonalCultivar[]> {
