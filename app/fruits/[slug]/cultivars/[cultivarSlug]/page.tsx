@@ -8,9 +8,11 @@ import { CommunityPhotoGallery, type CommunityPhotoItem } from "@/components/com
 import { PageHeader } from "@/components/page-header";
 import { PhotoLightboxGallery } from "@/components/photo-lightbox-gallery";
 import { RecentCultivarTracker } from "@/components/recent-cultivar-tracker";
+import { ShareButtons } from "@/components/share-buttons";
 import { getCurrentUser, isAdminUser } from "@/lib/auth";
 import { getPhotoUrl } from "@/lib/photo-url";
 import { getPublicCultivarBySlugs } from "@/lib/queries";
+import { getAbsoluteUrl, getMetadataDescription } from "@/lib/site-url";
 
 export const dynamic = "force-dynamic";
 
@@ -21,8 +23,32 @@ type Props = {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug, cultivarSlug } = await params;
   const cultivar = await getPublicCultivarBySlugs(slug, cultivarSlug);
+  if (!cultivar || !cultivar.fruits) return { title: "品種詳細" };
+
+  const title = `${cultivar.name_ja}｜${cultivar.fruits.name_ja}の品種`;
+  const description = getMetadataDescription(cultivar.description, cultivar.taste, cultivar.kenyu_comment);
+  const url = getAbsoluteUrl(`/fruits/${cultivar.fruits.slug}/cultivars/${cultivar.slug}`);
+  const officialPhotos = (cultivar.photos ?? []).filter((photo) => photo.source_type !== "viewer");
+  const mainPhoto = officialPhotos.find((photo) => photo.is_main) ?? officialPhotos[0];
+  const image = mainPhoto ? getPhotoUrl(mainPhoto, "medium") : null;
+
   return {
-    title: cultivar?.name_ja ?? "品種詳細"
+    title,
+    description,
+    alternates: { canonical: url },
+    openGraph: {
+      title,
+      description,
+      url,
+      type: "article",
+      images: image ? [{ url: image, alt: cultivar.name_ja }] : undefined
+    },
+    twitter: {
+      card: image ? "summary_large_image" : "summary",
+      title,
+      description,
+      images: image ? [image] : undefined
+    }
   };
 }
 
@@ -35,6 +61,9 @@ export default async function CultivarDetailPage({ params }: Props) {
   const isAdmin = await isAdminUser(user);
   const officialPhotos = (cultivar.photos ?? []).filter((photo) => photo.source_type !== "viewer");
   const mainPhoto = officialPhotos.find((photo) => photo.is_main) ?? officialPhotos[0];
+  const shareTitle = `${cultivar.name_ja}｜${cultivar.fruits.name_ja}の品種`;
+  const shareText = getMetadataDescription(cultivar.description, cultivar.taste, cultivar.kenyu_comment);
+  const shareUrl = getAbsoluteUrl(`/fruits/${cultivar.fruits.slug}/cultivars/${cultivar.slug}`);
   const photos = [...officialPhotos].sort((a, b) => Number(b.is_main) - Number(a.is_main));
   const galleryPhotos = mainPhoto ? photos.filter((photo) => photo.id !== mainPhoto.id) : photos;
   const communityPhotos: CommunityPhotoItem[] = (cultivar.photos ?? [])
@@ -97,6 +126,8 @@ export default async function CultivarDetailPage({ params }: Props) {
             </div>
         }
       />
+
+      <ShareButtons title={shareTitle} text={shareText} url={shareUrl} />
 
       {mainPhoto ? (
         <div className="relative aspect-[4/3] overflow-hidden rounded-lg bg-leaf-100">

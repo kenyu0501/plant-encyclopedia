@@ -9,9 +9,11 @@ import { CultivarComparison } from "@/components/cultivar-comparison";
 import { MangoPedigree } from "@/components/mango-pedigree";
 import { PhotoLightboxGallery } from "@/components/photo-lightbox-gallery";
 import { PageHeader } from "@/components/page-header";
+import { ShareButtons } from "@/components/share-buttons";
 import { getCurrentUser, isAdminUser } from "@/lib/auth";
 import { getPhotoUrl } from "@/lib/photo-url";
 import { getPublicFruitBySlug } from "@/lib/queries";
+import { getAbsoluteUrl, getMetadataDescription } from "@/lib/site-url";
 
 export const dynamic = "force-dynamic";
 
@@ -22,8 +24,32 @@ type Props = {
 export async function generateMetadata({ params }: Props): Promise<Metadata> {
   const { slug } = await params;
   const fruit = await getPublicFruitBySlug(slug);
+  if (!fruit) return { title: "果樹詳細" };
+
+  const title = `${fruit.name_ja}${fruit.name_en ? `（${fruit.name_en}）` : ""}`;
+  const description = getMetadataDescription(fruit.description, fruit.fruit_description, fruit.cultivation_summary);
+  const url = getAbsoluteUrl(`/fruits/${fruit.slug}`);
+  const officialPhotos = (fruit.photos ?? []).filter((photo) => photo.source_type !== "viewer");
+  const mainPhoto = officialPhotos.find((photo) => photo.is_main) ?? officialPhotos[0];
+  const image = mainPhoto ? getPhotoUrl(mainPhoto, "medium") : null;
+
   return {
-    title: fruit?.name_ja ?? "果樹詳細"
+    title,
+    description,
+    alternates: { canonical: url },
+    openGraph: {
+      title,
+      description,
+      url,
+      type: "article",
+      images: image ? [{ url: image, alt: fruit.name_ja }] : undefined
+    },
+    twitter: {
+      card: image ? "summary_large_image" : "summary",
+      title,
+      description,
+      images: image ? [image] : undefined
+    }
   };
 }
 
@@ -36,6 +62,9 @@ export default async function FruitDetailPage({ params }: Props) {
   const isAdmin = await isAdminUser(user);
   const officialPhotos = (fruit.photos ?? []).filter((photo) => photo.source_type !== "viewer");
   const mainPhoto = officialPhotos.find((photo) => photo.is_main) ?? officialPhotos[0];
+  const shareTitle = `${fruit.name_ja}${fruit.name_en ? `（${fruit.name_en}）` : ""}｜けんゆーの熱帯果樹図鑑`;
+  const shareText = getMetadataDescription(fruit.description, fruit.fruit_description, fruit.cultivation_summary);
+  const shareUrl = getAbsoluteUrl(`/fruits/${fruit.slug}`);
   const photos = [...officialPhotos].sort((a, b) => Number(b.is_main) - Number(a.is_main));
   const galleryPhotos = photos
     .filter((photo) => photo.id !== mainPhoto?.id)
@@ -83,6 +112,8 @@ export default async function FruitDetailPage({ params }: Props) {
           </div>
         }
       />
+
+      <ShareButtons title={shareTitle} text={shareText} url={shareUrl} />
 
       {mainPhoto ? (
         <div className="relative aspect-[4/3] overflow-hidden rounded-lg bg-leaf-100">
