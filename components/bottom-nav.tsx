@@ -2,11 +2,12 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Camera, Home, Images, Leaf } from "lucide-react";
+import { Camera, Heart, Home, Images, Leaf } from "lucide-react";
 
 const items = [
   { href: "/", label: "ホーム", icon: Home },
   { href: "/fruits", label: "果樹", icon: Leaf },
+  { href: "/favorites", label: "保存", icon: Heart },
   { href: "/submit-photo", label: "投稿", icon: Camera },
   { href: "/my-submissions", label: "自分の投稿", icon: Images }
 ];
@@ -16,7 +17,7 @@ export function BottomNav() {
 
   return (
     <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-leaf-100 bg-white/95 px-3 pb-[calc(0.45rem+env(safe-area-inset-bottom))] pt-2 shadow-soft backdrop-blur">
-      <div className="mx-auto grid max-w-4xl grid-cols-4 gap-1">
+      <div className="mx-auto grid max-w-4xl grid-cols-5 gap-1">
         {items.map((item) => {
           const active = pathname === item.href || (item.href !== "/" && pathname.startsWith(item.href));
           const Icon = item.icon;

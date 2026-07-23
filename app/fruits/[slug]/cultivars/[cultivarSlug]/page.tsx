@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import type { ReactNode } from "react";
 import { Apple, BarChart3, Coffee, Dna, ExternalLink, Flower2, Globe2, ImagePlus, Leaf, Pencil, PlayCircle, Ruler, Scale, Sprout, Thermometer } from "lucide-react";
 import { CommunityPhotoGallery, type CommunityPhotoItem } from "@/components/community-photo-gallery";
+import { CultivarFavoriteButton } from "@/components/cultivar-favorite-button";
 import { PageHeader } from "@/components/page-header";
 import { PhotoLightboxGallery } from "@/components/photo-lightbox-gallery";
 import { RecentCultivarTracker } from "@/components/recent-cultivar-tracker";
@@ -107,6 +108,12 @@ export default async function CultivarDetailPage({ params }: Props) {
         description={`${cultivar.fruits.name_ja}の品種${cultivar.name_en ? ` / ${cultivar.name_en}` : ""}`}
         action={
             <div className="flex flex-wrap justify-end gap-2">
+              <CultivarFavoriteButton
+                id={cultivar.id}
+                fruitName={cultivar.fruits.name_ja}
+                cultivarName={cultivar.name_ja}
+                href={`/fruits/${fruitSlug}/cultivars/${cultivar.slug}`}
+              />
               <Link
                 href={`/submit-photo?fruit_id=${cultivar.fruit_id}&cultivar_id=${cultivar.id}`}
                 className="inline-flex items-center gap-2 rounded-md border border-leaf-200 bg-white px-3 py-2 text-sm font-semibold text-leaf-800"
