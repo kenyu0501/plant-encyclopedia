@@ -110,6 +110,34 @@ export type Database = {
           }
         ];
       };
+      user_plants: {
+        Row: UserPlant;
+        Insert: UserPlantInsert;
+        Update: Partial<UserPlantInsert>;
+        Relationships: [
+          {
+            foreignKeyName: "user_plants_cultivar_id_fkey";
+            columns: ["cultivar_id"];
+            isOneToOne: false;
+            referencedRelation: "cultivars";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
+      cultivation_logs: {
+        Row: CultivationLog;
+        Insert: CultivationLogInsert;
+        Update: Partial<CultivationLogInsert>;
+        Relationships: [
+          {
+            foreignKeyName: "cultivation_logs_plant_id_fkey";
+            columns: ["plant_id"];
+            isOneToOne: false;
+            referencedRelation: "user_plants";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
     };
     Views: Record<string, never>;
     Functions: {
@@ -280,6 +308,62 @@ export type PageView = {
 };
 
 export type PageViewInsert = Omit<PageView, "id" | "created_at" | "updated_at"> & {
+  id?: string;
+  created_at?: string;
+  updated_at?: string;
+};
+
+export type CultivationMethod = "pot" | "ground" | "other";
+
+export type CultivationEventType =
+  | "planting"
+  | "repotting"
+  | "flowering"
+  | "fruiting"
+  | "fertilizing"
+  | "pruning"
+  | "watering"
+  | "pest"
+  | "harvest"
+  | "observation"
+  | "other";
+
+export type UserPlant = {
+  [key: string]: unknown;
+  id: string;
+  user_id: string;
+  cultivar_id: string | null;
+  nickname: string;
+  planted_at: string | null;
+  cultivation_method: CultivationMethod;
+  pot_size: string | null;
+  region: string | null;
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export type UserPlantInsert = Omit<UserPlant, "id" | "created_at" | "updated_at"> & {
+  id?: string;
+  created_at?: string;
+  updated_at?: string;
+};
+
+export type CultivationLog = {
+  [key: string]: unknown;
+  id: string;
+  user_id: string;
+  plant_id: string;
+  event_type: CultivationEventType;
+  occurred_at: string;
+  title: string | null;
+  notes: string | null;
+  photo_path: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export type CultivationLogInsert = Omit<CultivationLog, "id" | "created_at" | "updated_at"> & {
   id?: string;
   created_at?: string;
   updated_at?: string;

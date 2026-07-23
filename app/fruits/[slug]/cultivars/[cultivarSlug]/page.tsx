@@ -108,6 +108,13 @@ export default async function CultivarDetailPage({ params }: Props) {
         description={`${cultivar.fruits.name_ja}の品種${cultivar.name_en ? ` / ${cultivar.name_en}` : ""}`}
         action={
             <div className="flex flex-wrap justify-end gap-2">
+              <Link
+                href={`/garden?cultivar_id=${cultivar.id}`}
+                className="inline-flex items-center gap-2 rounded-md border border-leaf-200 bg-white px-3 py-2 text-sm font-semibold text-leaf-800"
+              >
+                <Sprout size={16} />
+                栽培記録
+              </Link>
               <CultivarFavoriteButton
                 id={cultivar.id}
                 fruitName={cultivar.fruits.name_ja}

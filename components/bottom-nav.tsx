@@ -2,14 +2,14 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { Camera, Heart, Home, Images, Leaf } from "lucide-react";
+import { Camera, Heart, Home, Leaf, Sprout } from "lucide-react";
 
 const items = [
   { href: "/", label: "ホーム", icon: Home },
   { href: "/fruits", label: "果樹", icon: Leaf },
   { href: "/favorites", label: "保存", icon: Heart },
-  { href: "/submit-photo", label: "投稿", icon: Camera },
-  { href: "/my-submissions", label: "自分の投稿", icon: Images }
+  { href: "/garden", label: "栽培", icon: Sprout },
+  { href: "/submit-photo", label: "投稿", icon: Camera }
 ];
 
 export function BottomNav() {
