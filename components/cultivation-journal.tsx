@@ -58,6 +58,8 @@ const methodLabels: Record<CultivationMethod, string> = {
   other: "その他"
 };
 
+const MAX_USER_PLANTS = 10;
+
 export function CultivationJournal({
   fruits,
   initialUser
@@ -204,6 +206,13 @@ export function CultivationJournal({
   async function addPlant(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
     if (!user || !cultivarId || !nickname.trim()) return;
+    if (plants.length >= MAX_USER_PLANTS) {
+      setMessage({
+        tone: "error",
+        text: `育てている株は最大${MAX_USER_PLANTS}株まで登録できます。`
+      });
+      return;
+    }
     setSaving(true);
     setMessage({ tone: "info", text: "所有株を登録しています。" });
     const supabase = createClient();
@@ -391,8 +400,16 @@ export function CultivationJournal({
         <summary className="flex min-h-12 cursor-pointer list-none items-center gap-2 px-4 py-3 font-bold text-leaf-900 [&::-webkit-details-marker]:hidden">
           <Plus size={18} />
           所有株を登録
+          <span className="ml-auto text-xs font-semibold text-leaf-900/52">
+            {plants.length}/{MAX_USER_PLANTS}株
+          </span>
         </summary>
-        <form onSubmit={addPlant} className="space-y-4 border-t border-leaf-100 p-4">
+        {plants.length >= MAX_USER_PLANTS ? (
+          <div className="border-t border-leaf-100 p-4 text-sm leading-6 text-leaf-900">
+            登録できる株は最大{MAX_USER_PLANTS}株です。別の株を登録する場合は、不要な株を削除してください。
+          </div>
+        ) : (
+          <form onSubmit={addPlant} className="space-y-4 border-t border-leaf-100 p-4">
           <div className="grid gap-4 sm:grid-cols-2">
             <Field label="果樹">
               <select
@@ -486,7 +503,8 @@ export function CultivationJournal({
             <Sprout size={17} />
             所有株を登録
           </button>
-        </form>
+          </form>
+        )}
       </details>
 
       {loading ? (
@@ -499,7 +517,9 @@ export function CultivationJournal({
             <div className="flex items-end justify-between gap-3">
               <div>
                 <h2 className="text-lg font-bold text-leaf-900">育てている株</h2>
-                <p className="mt-1 text-xs text-leaf-900/52">{plants.length}株を登録中</p>
+                <p className="mt-1 text-xs text-leaf-900/52">
+                  {plants.length}/{MAX_USER_PLANTS}株を登録中
+                </p>
               </div>
             </div>
             <div className="flex gap-3 overflow-x-auto pb-1">
@@ -661,31 +681,31 @@ function PlantSummary({
   onDelete: () => void;
 }) {
   return (
-    <section className="rounded-lg bg-leaf-800 p-5 text-white">
+    <section className="rounded-lg bg-white/84 p-5 text-black ring-1 ring-leaf-100">
       <div className="flex items-start justify-between gap-3">
         <div>
-          <p className="text-xs font-bold text-white/64">{cultivar?.fruitName ?? "登録品種"}</p>
+          <p className="text-xs font-bold text-black">{cultivar?.fruitName ?? "登録品種"}</p>
           <h2 className="mt-1 text-xl font-bold">{plant.nickname}</h2>
-          <p className="mt-1 text-sm text-white/72">{cultivar?.cultivarName ?? "品種情報なし"}</p>
+          <p className="mt-1 text-sm font-semibold text-black">{cultivar?.cultivarName ?? "品種情報なし"}</p>
         </div>
         <button
           type="button"
           onClick={onDelete}
           aria-label={`${plant.nickname}を削除`}
-          className="flex h-10 w-10 items-center justify-center rounded-md text-white/64 hover:bg-white/10 hover:text-white"
+          className="flex h-10 w-10 items-center justify-center rounded-md text-black hover:bg-red-50 hover:text-red-700"
         >
           <Trash2 size={17} />
         </button>
       </div>
-      <div className="mt-4 flex flex-wrap gap-2 text-xs font-semibold">
-        <span className="rounded-full bg-white/12 px-3 py-1.5">{methodLabels[plant.cultivation_method]}</span>
-        {plant.pot_size ? <span className="rounded-full bg-white/12 px-3 py-1.5">{plant.pot_size}</span> : null}
+      <div className="mt-4 flex flex-wrap gap-2 text-xs font-semibold text-black">
+        <span className="rounded-full bg-leaf-100 px-3 py-1.5">{methodLabels[plant.cultivation_method]}</span>
+        {plant.pot_size ? <span className="rounded-full bg-leaf-100 px-3 py-1.5">{plant.pot_size}</span> : null}
         {plant.planted_at ? (
-          <span className="rounded-full bg-white/12 px-3 py-1.5">{formatJapaneseDate(plant.planted_at)}から</span>
+          <span className="rounded-full bg-leaf-100 px-3 py-1.5">{formatJapaneseDate(plant.planted_at)}から</span>
         ) : null}
-        {plant.region ? <span className="rounded-full bg-white/12 px-3 py-1.5">{plant.region}</span> : null}
+        {plant.region ? <span className="rounded-full bg-leaf-100 px-3 py-1.5">{plant.region}</span> : null}
       </div>
-      {plant.notes ? <p className="mt-4 text-sm leading-6 text-white/76">{plant.notes}</p> : null}
+      {plant.notes ? <p className="mt-4 whitespace-pre-wrap text-sm leading-6 text-black">{plant.notes}</p> : null}
     </section>
   );
 }
@@ -810,6 +830,9 @@ function formatJapaneseDate(value: string) {
 }
 
 function databaseErrorMessage(message: string) {
+  if (/user_plants_limit_exceeded/i.test(message)) {
+    return `育てている株は最大${MAX_USER_PLANTS}株まで登録できます。`;
+  }
   if (/user_plants|cultivation_logs|schema cache|relation .* does not exist/i.test(message)) {
     return "栽培記録用のSupabase SQLを先に実行してください。";
   }

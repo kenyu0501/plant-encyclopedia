@@ -62,6 +62,37 @@ create index if not exists user_plants_cultivar_id_idx
 create index if not exists cultivation_logs_user_plant_date_idx
   on public.cultivation_logs (user_id, plant_id, occurred_at desc, created_at desc);
 
+create or replace function public.enforce_user_plants_limit()
+returns trigger
+language plpgsql
+security definer
+set search_path = public, pg_temp
+as $$
+begin
+  perform pg_advisory_xact_lock(hashtextextended(new.user_id::text, 0));
+
+  if (
+    select count(*)
+    from public.user_plants
+    where user_id = new.user_id
+  ) >= 10 then
+    raise exception using
+      errcode = 'P0001',
+      message = 'user_plants_limit_exceeded';
+  end if;
+
+  return new;
+end;
+$$;
+
+drop trigger if exists enforce_user_plants_limit_trigger on public.user_plants;
+create trigger enforce_user_plants_limit_trigger
+before insert on public.user_plants
+for each row
+execute function public.enforce_user_plants_limit();
+
+revoke all on function public.enforce_user_plants_limit() from public;
+
 alter table public.user_plants enable row level security;
 alter table public.cultivation_logs enable row level security;
 
