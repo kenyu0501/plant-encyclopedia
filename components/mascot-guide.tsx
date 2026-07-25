@@ -6,8 +6,6 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 
-const MASCOT_HIDDEN_KEY = "kenchan-mascot-hidden";
-
 type MascotPose = "idle" | "wave" | "eat" | "laugh";
 
 const mascotImages: Record<MascotPose, string> = {
@@ -61,15 +59,10 @@ const guideLinks = [
 export function MascotGuide() {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
-  const [isHidden, setIsHidden] = useState(false);
   const [pose, setPose] = useState<MascotPose>("idle");
   const [allowsMotion, setAllowsMotion] = useState(true);
   const [isJumping, setIsJumping] = useState(false);
   const [imagesReady, setImagesReady] = useState(false);
-
-  useEffect(() => {
-    setIsHidden(window.localStorage.getItem(MASCOT_HIDDEN_KEY) === "true");
-  }, []);
 
   useEffect(() => {
     const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -97,7 +90,7 @@ export function MascotGuide() {
   }, []);
 
   useEffect(() => {
-    if (!imagesReady || !allowsMotion || isHidden) {
+    if (!imagesReady || !allowsMotion) {
       setPose("idle");
       setIsJumping(false);
       return;
@@ -133,34 +126,9 @@ export function MascotGuide() {
       stopped = true;
       window.clearTimeout(timeoutId);
     };
-  }, [allowsMotion, imagesReady, isHidden]);
+  }, [allowsMotion, imagesReady]);
 
   if (pathname.startsWith("/admin")) return null;
-
-  function hideMascot() {
-    setIsOpen(false);
-    setIsHidden(true);
-    window.localStorage.setItem(MASCOT_HIDDEN_KEY, "true");
-  }
-
-  function showMascot() {
-    setIsHidden(false);
-    window.localStorage.removeItem(MASCOT_HIDDEN_KEY);
-  }
-
-  if (isHidden) {
-    return (
-      <button
-        type="button"
-        onClick={showMascot}
-        aria-label="図鑑の案内キャラクターを表示"
-        className="fixed right-3 z-30 flex h-11 w-11 items-center justify-center rounded-full bg-white text-leaf-700 shadow-soft ring-1 ring-leaf-100 transition hover:-translate-y-0.5 hover:bg-leaf-50"
-        style={{ bottom: "calc(5.3rem + env(safe-area-inset-bottom))" }}
-      >
-        <Sprout size={21} />
-      </button>
-    );
-  }
 
   return (
     <aside
@@ -211,14 +179,6 @@ export function MascotGuide() {
       ) : null}
 
       <div className="relative">
-        <button
-          type="button"
-          onClick={hideMascot}
-          aria-label="案内キャラクターをしまう"
-          className="absolute right-0 top-1 z-10 flex h-8 w-8 items-center justify-center rounded-full bg-white/95 text-leaf-700 shadow-sm ring-1 ring-leaf-100 hover:bg-leaf-50"
-        >
-          <X size={14} />
-        </button>
         <button
           type="button"
           onClick={() => setIsOpen((current) => !current)}
