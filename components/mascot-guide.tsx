@@ -17,6 +17,13 @@ const mascotImages: Record<MascotPose, string> = {
   laugh: "/mascot/kenchan-mascot-laugh.png"
 };
 
+const mascotPoseTransforms: Record<MascotPose, string> = {
+  idle: "scale(1) rotate(0deg)",
+  wave: "scale(1.012) rotate(-1deg)",
+  eat: "scale(1.01) rotate(0deg)",
+  laugh: "scale(1.018) rotate(0deg)"
+};
+
 const mascotActions: {
   pose: Exclude<MascotPose, "idle">;
   duration: number;
@@ -58,6 +65,7 @@ export function MascotGuide() {
   const [pose, setPose] = useState<MascotPose>("idle");
   const [allowsMotion, setAllowsMotion] = useState(true);
   const [isJumping, setIsJumping] = useState(false);
+  const [imagesReady, setImagesReady] = useState(false);
 
   useEffect(() => {
     setIsHidden(window.localStorage.getItem(MASCOT_HIDDEN_KEY) === "true");
@@ -72,7 +80,24 @@ export function MascotGuide() {
   }, []);
 
   useEffect(() => {
-    if (!allowsMotion || isHidden) {
+    let cancelled = false;
+    const preloadImages = Object.values(mascotImages).map((src) => {
+      const image = new window.Image();
+      image.src = src;
+      return image.decode().catch(() => undefined);
+    });
+
+    void Promise.all(preloadImages).then(() => {
+      if (!cancelled) setImagesReady(true);
+    });
+
+    return () => {
+      cancelled = true;
+    };
+  }, []);
+
+  useEffect(() => {
+    if (!imagesReady || !allowsMotion || isHidden) {
       setPose("idle");
       setIsJumping(false);
       return;
@@ -108,7 +133,7 @@ export function MascotGuide() {
       stopped = true;
       window.clearTimeout(timeoutId);
     };
-  }, [allowsMotion, isHidden]);
+  }, [allowsMotion, imagesReady, isHidden]);
 
   if (pathname.startsWith("/admin")) return null;
 
@@ -206,28 +231,19 @@ export function MascotGuide() {
               isJumping ? "mascot-celebrate" : ""
             }`}
           >
-            {(Object.entries(mascotImages) as [MascotPose, string][]).map(
-              ([imagePose, src]) => (
-                <Image
-                  key={imagePose}
-                  src={src}
-                  alt=""
-                  fill
-                  unoptimized
-                  priority={false}
-                  sizes="(min-width: 640px) 132px, 116px"
-                  aria-hidden={imagePose !== pose}
-                  className={`mascot-pose-layer object-contain ${
-                    imagePose === "idle"
-                      ? "is-base"
-                      : imagePose === pose
-                        ? "is-active"
-                        : ""
-                  }`}
-                  style={{ imageRendering: "pixelated" }}
-                />
-              )
-            )}
+            <Image
+              src={mascotImages[pose]}
+              alt=""
+              fill
+              unoptimized
+              priority={false}
+              sizes="(min-width: 640px) 132px, 116px"
+              className="mascot-pose-image object-contain"
+              style={{
+                imageRendering: "pixelated",
+                transform: mascotPoseTransforms[pose]
+              }}
+            />
           </span>
         </button>
       </div>

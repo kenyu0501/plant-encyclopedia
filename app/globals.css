@@ -49,25 +49,9 @@ textarea {
   transform-origin: center bottom;
 }
 
-.mascot-pose-layer {
-  opacity: 0;
-  transform: scale(0.985);
-  transition:
-    opacity 0.65s cubic-bezier(0.22, 1, 0.36, 1),
-    transform 0.65s cubic-bezier(0.22, 1, 0.36, 1);
-  will-change: opacity, transform;
-}
-
-.mascot-pose-layer.is-base {
-  z-index: 0;
-  opacity: 1;
-  transform: scale(1);
-}
-
-.mascot-pose-layer.is-active {
-  z-index: 1;
-  opacity: 1;
-  transform: scale(1);
+.mascot-pose-image {
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: transform;
 }
 
 .mascot-celebrate {
@@ -138,7 +122,7 @@ textarea {
     animation-iteration-count: 1;
   }
 
-  .mascot-pose-layer {
+  .mascot-pose-image {
     transition-duration: 1ms;
   }
 }
