@@ -1,4 +1,4 @@
-import { Instagram, Youtube } from "lucide-react";
+import { ExternalLink, Instagram, Sprout, Users, Youtube } from "lucide-react";
 import Image from "next/image";
 
 const socialLinks = [
@@ -7,6 +7,7 @@ const socialLinks = [
     label: "YouTube",
     account: "@avocado_japan",
     icon: Youtube,
+    mark: null,
     className: "bg-red-600 text-white hover:bg-red-700"
   },
   {
@@ -14,6 +15,7 @@ const socialLinks = [
     label: "X",
     account: "@kenyu0501_",
     icon: null,
+    mark: "X",
     className: "bg-neutral-950 text-white hover:bg-neutral-800"
   },
   {
@@ -21,8 +23,33 @@ const socialLinks = [
     label: "Instagram",
     account: "@kenyu.uehara",
     icon: Instagram,
+    mark: null,
     className:
       "bg-gradient-to-r from-fuchsia-600 via-rose-500 to-orange-500 text-white hover:opacity-90"
+  },
+  {
+    href: "https://www.facebook.com/people/けんゆー/100064303141109/",
+    label: "Facebook",
+    account: "けんゆー",
+    icon: null,
+    mark: "f",
+    className: "bg-blue-600 text-white hover:bg-blue-700"
+  },
+  {
+    href: "https://okinawan-avocado.com",
+    label: "糸満フルーツ園けんちゃん",
+    account: "公式Webサイト",
+    icon: Sprout,
+    mark: null,
+    className: "bg-leaf-700 text-white hover:bg-leaf-900"
+  },
+  {
+    href: "https://community.camp-fire.jp/projects/view/241505",
+    label: "オンラインサロン",
+    account: "CAMPFIRE Community",
+    icon: Users,
+    mark: null,
+    className: "bg-orange-600 text-white hover:bg-orange-700"
   }
 ];
 
@@ -74,34 +101,42 @@ export function CreatorProfile() {
               もっと熱帯果樹分野は楽しくなると信じてます．よろしくね！
             </p>
           </div>
+        </div>
+      </div>
 
-          <div className="mt-5 flex flex-wrap gap-2.5" aria-label="図鑑製作者のSNS">
-            {socialLinks.map((item) => {
-              const Icon = item.icon;
-              return (
-                <a
-                  key={item.label}
-                  href={item.href}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={`inline-flex min-h-11 items-center gap-2 rounded-lg px-3.5 py-2 text-sm font-bold shadow-sm transition ${item.className}`}
+      <div className="relative mt-6 border-t border-leaf-100 pt-6">
+        <h3 className="text-xl font-bold text-leaf-900">けんゆーのSNSについて</h3>
+        <p className="mt-1 text-sm leading-6 text-leaf-900/60">
+          動画や日々の栽培，活動のお知らせはこちらからご覧いただけます．
+        </p>
+
+        <div className="mt-4 grid gap-3 sm:grid-cols-2" aria-label="けんゆーのSNSと関連サイト">
+          {socialLinks.map((item) => {
+            const Icon = item.icon;
+            return (
+              <a
+                key={item.label}
+                href={item.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`flex min-h-16 items-center gap-3 rounded-xl px-4 py-3 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md ${item.className}`}
+              >
+                <span
+                  aria-hidden="true"
+                  className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/15 text-xl font-black"
                 >
-                  {Icon ? (
-                    <Icon size={18} aria-hidden="true" />
-                  ) : (
-                    <span
-                      aria-hidden="true"
-                      className="flex h-[18px] w-[18px] items-center justify-center text-base font-black"
-                    >
-                      X
-                    </span>
-                  )}
-                  <span>{item.label}</span>
-                  <span className="text-xs font-semibold opacity-75">{item.account}</span>
-                </a>
-              );
-            })}
-          </div>
+                  {Icon ? <Icon size={21} /> : item.mark}
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className="block font-bold leading-5">{item.label}</span>
+                  <span className="mt-0.5 block truncate text-xs font-semibold opacity-75">
+                    {item.account}
+                  </span>
+                </span>
+                <ExternalLink size={15} aria-hidden="true" className="shrink-0 opacity-60" />
+              </a>
+            );
+          })}
         </div>
       </div>
     </section>
