@@ -1,4 +1,14 @@
-import { ExternalLink, Instagram, Sprout, Users, Youtube } from "lucide-react";
+import {
+  BookOpenText,
+  Building2,
+  Coffee,
+  ExternalLink,
+  Instagram,
+  PenLine,
+  Sprout,
+  Users,
+  Youtube
+} from "lucide-react";
 import Image from "next/image";
 
 const socialLinks = [
@@ -50,6 +60,33 @@ const socialLinks = [
     icon: Users,
     mark: null,
     className: "bg-orange-600 text-white hover:bg-orange-700"
+  }
+];
+
+const activityLinks = [
+  {
+    href: "https://www.jtfa.info",
+    label: "日本熱帯果樹協会",
+    role: "理事",
+    icon: Building2
+  },
+  {
+    href: "https://sites.google.com/view/okinawacoffeeschool/",
+    label: "国産コーヒー栽培実践塾",
+    role: "スタッフ",
+    icon: Coffee
+  },
+  {
+    href: "https://agri.mynavi.jp/author/ken-yu/",
+    label: "マイナビ農業",
+    role: "ライター",
+    icon: PenLine
+  },
+  {
+    href: null,
+    label: "現代農業 過去連載",
+    role: "「熱帯果樹のおもしろ生態大百科」",
+    icon: BookOpenText
   }
 ];
 
@@ -135,6 +172,72 @@ export function CreatorProfile() {
                 </span>
                 <ExternalLink size={15} aria-hidden="true" className="shrink-0 opacity-60" />
               </a>
+            );
+          })}
+        </div>
+      </div>
+
+      <div className="relative mt-6 border-t border-leaf-100 pt-6">
+        <h3 className="text-xl font-bold text-leaf-900">苗木屋ねったい</h3>
+        <p className="mt-2 leading-7 text-leaf-900/72">果樹・観葉植物の苗木生産してます．</p>
+        <a
+          href="https://www.youtube.com/@nettai_plants"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="mt-4 inline-flex min-h-12 items-center gap-3 rounded-xl bg-red-600 px-4 py-3 font-bold text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-red-700 hover:shadow-md"
+        >
+          <Youtube size={21} aria-hidden="true" />
+          <span>
+            <span className="block leading-5">苗木屋ねったい YouTube</span>
+            <span className="mt-0.5 block text-xs font-semibold opacity-75">@nettai_plants</span>
+          </span>
+          <ExternalLink size={15} aria-hidden="true" className="ml-1 opacity-60" />
+        </a>
+      </div>
+
+      <div className="relative mt-6 border-t border-leaf-100 pt-6">
+        <h3 className="text-xl font-bold text-leaf-900">活動・執筆</h3>
+        <div className="mt-4 grid gap-3 sm:grid-cols-2">
+          {activityLinks.map((item) => {
+            const Icon = item.icon;
+            const content = (
+              <>
+                <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-leaf-100 text-leaf-700">
+                  <Icon size={20} aria-hidden="true" />
+                </span>
+                <span className="min-w-0 flex-1">
+                  <span className="block font-bold leading-5 text-leaf-900">{item.label}</span>
+                  <span className="mt-1 block text-sm font-semibold leading-5 text-leaf-900/60">
+                    {item.role}
+                  </span>
+                </span>
+                {item.href ? (
+                  <ExternalLink
+                    size={15}
+                    aria-hidden="true"
+                    className="shrink-0 text-leaf-900/35"
+                  />
+                ) : null}
+              </>
+            );
+
+            return item.href ? (
+              <a
+                key={item.label}
+                href={item.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="flex min-h-20 items-center gap-3 rounded-xl bg-white/90 px-4 py-3 ring-1 ring-leaf-100 transition hover:-translate-y-0.5 hover:bg-leaf-50 hover:shadow-sm"
+              >
+                {content}
+              </a>
+            ) : (
+              <div
+                key={item.label}
+                className="flex min-h-20 items-center gap-3 rounded-xl bg-white/65 px-4 py-3 ring-1 ring-leaf-100"
+              >
+                {content}
+              </div>
             );
           })}
         </div>
