@@ -34,6 +34,19 @@ const mascotActions: {
 const MASCOT_INITIAL_IDLE_MS = 3000;
 const MASCOT_BETWEEN_ACTIONS_MS = 5000;
 const MASCOT_BETWEEN_CYCLES_MS = 9000;
+const MASCOT_INITIAL_SPEECH_DELAY_MS = 8000;
+const MASCOT_SPEECH_VISIBLE_MS = 5200;
+const MASCOT_SPEECH_INTERVAL_MIN_MS = 20000;
+const MASCOT_SPEECH_INTERVAL_RANGE_MS = 15000;
+
+const mascotMessages = [
+  "気になる品種を探してみよう！",
+  "お気に入りに保存できるよ",
+  "栽培記録もつけてみてね",
+  "今日も元気に育ってるかな？",
+  "マンゴー、おいしいね！",
+  "たまにはシェアもしてね！"
+];
 
 const guideLinks = [
   {
@@ -63,6 +76,7 @@ export function MascotGuide() {
   const [allowsMotion, setAllowsMotion] = useState(true);
   const [isJumping, setIsJumping] = useState(false);
   const [imagesReady, setImagesReady] = useState(false);
+  const [speechMessage, setSpeechMessage] = useState<string | null>(null);
 
   useEffect(() => {
     const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -128,6 +142,45 @@ export function MascotGuide() {
     };
   }, [allowsMotion, imagesReady]);
 
+  useEffect(() => {
+    if (isOpen) {
+      setSpeechMessage(null);
+      return;
+    }
+
+    let messageIndex = 0;
+    let showTimeoutId: number;
+    let hideTimeoutId: number;
+    let stopped = false;
+
+    const scheduleMessage = (delay: number) => {
+      showTimeoutId = window.setTimeout(() => {
+        if (stopped) return;
+
+        setSpeechMessage(mascotMessages[messageIndex % mascotMessages.length]);
+        messageIndex += 1;
+
+        hideTimeoutId = window.setTimeout(() => {
+          if (stopped) return;
+
+          setSpeechMessage(null);
+          const nextDelay =
+            MASCOT_SPEECH_INTERVAL_MIN_MS +
+            Math.random() * MASCOT_SPEECH_INTERVAL_RANGE_MS;
+          scheduleMessage(nextDelay);
+        }, MASCOT_SPEECH_VISIBLE_MS);
+      }, delay);
+    };
+
+    scheduleMessage(allowsMotion ? MASCOT_INITIAL_SPEECH_DELAY_MS : 12000);
+
+    return () => {
+      stopped = true;
+      window.clearTimeout(showTimeoutId);
+      window.clearTimeout(hideTimeoutId);
+    };
+  }, [allowsMotion, isOpen]);
+
   if (pathname.startsWith("/admin")) return null;
 
   return (
@@ -179,6 +232,17 @@ export function MascotGuide() {
       ) : null}
 
       <div className="relative">
+        {speechMessage ? (
+          <div
+            className="mascot-speech-bubble absolute bottom-[calc(100%-0.45rem)] right-1 z-10 w-max max-w-[min(15rem,calc(100vw-1rem))] rounded-2xl bg-white px-4 py-2.5 text-sm font-bold leading-5 text-leaf-900 shadow-soft ring-1 ring-leaf-100"
+          >
+            <p>{speechMessage}</p>
+            <span
+              aria-hidden="true"
+              className="absolute -bottom-2 right-8 h-4 w-4 rotate-45 border-b border-r border-leaf-100 bg-white"
+            />
+          </div>
+        ) : null}
         <button
           type="button"
           onClick={() => setIsOpen((current) => !current)}
