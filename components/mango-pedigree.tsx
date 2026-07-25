@@ -86,10 +86,10 @@ export function MangoPedigree() {
 
       <div className="rounded-md bg-fruit-100 p-3 text-sm leading-6 text-leaf-900/74">
         <p className="font-bold text-leaf-900">JIRCAS登録外・未公開ページの関係</p>
-        <p className="mt-1">{hiddenRows.join(" / ")}</p>
+        <p className="mt-1 [overflow-wrap:anywhere]">{hiddenRows.join(" / ")}</p>
       </div>
 
-      <p className="text-xs leading-5 text-leaf-900/54">
+      <p className="max-w-full text-xs leading-5 text-leaf-900/54 [overflow-wrap:anywhere]">
         出典: Yamamoto et al. Genetic diversity and relatedness of mango cultivars assessed by SSR markers, Breeding Science, 2019.
       </p>
     </section>

@@ -238,9 +238,11 @@ export default async function CultivarDetailPage({ params }: Props) {
           </div>
         ) : null}
         {cultivar.public_notes ? (
-          <div className="mt-4 rounded-lg bg-leaf-50 p-4 text-sm leading-6 text-leaf-900/72">
+          <div className="mt-4 min-w-0 max-w-full rounded-lg bg-leaf-50 p-4 text-sm leading-6 text-leaf-900/72">
             <p className="font-bold text-leaf-900">出典・補足</p>
-            <p className="mt-1 whitespace-pre-line">{cultivar.public_notes}</p>
+            <p className="mt-1 max-w-full whitespace-pre-line [overflow-wrap:anywhere]">
+              {cultivar.public_notes}
+            </p>
           </div>
         ) : null}
       </section>

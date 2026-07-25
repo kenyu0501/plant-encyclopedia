@@ -148,7 +148,11 @@ export default async function FruitDetailPage({ params }: Props) {
           <Info label="沖縄適性" value={fruit.okinawa_suitability} />
         </div>
         {fruit.description ? <p className="mt-5 leading-7 text-leaf-900/80">{fruit.description}</p> : null}
-        {fruit.public_notes ? <p className="mt-4 rounded-md bg-leaf-50 p-3 text-sm leading-6 text-leaf-900/76">{fruit.public_notes}</p> : null}
+        {fruit.public_notes ? (
+          <p className="mt-4 max-w-full whitespace-pre-line rounded-md bg-leaf-50 p-3 text-sm leading-6 text-leaf-900/76 [overflow-wrap:anywhere]">
+            {fruit.public_notes}
+          </p>
+        ) : null}
       </section>
 
       <section id="cultivars" className="scroll-mt-5 space-y-3">
