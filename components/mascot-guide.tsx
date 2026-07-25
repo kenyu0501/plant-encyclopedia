@@ -6,21 +6,37 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
 
-type MascotPose = "idle" | "wave" | "eat" | "laugh";
+type MascotPose =
+  | "idle"
+  | "wave"
+  | "eat"
+  | "laugh"
+  | "coffee"
+  | "read"
+  | "water"
+  | "avocado";
 type MascotWalkPhase = "idle" | "out" | "pause" | "back";
 
 const mascotImages: Record<MascotPose, string> = {
   idle: "/mascot/kenchan-mascot-pixel-v3.png",
   wave: "/mascot/kenchan-mascot-wave.png",
   eat: "/mascot/kenchan-mascot-eat-mango.png",
-  laugh: "/mascot/kenchan-mascot-laugh.png"
+  laugh: "/mascot/kenchan-mascot-laugh.png",
+  coffee: "/mascot/kenchan-mascot-drink-coffee.png",
+  read: "/mascot/kenchan-mascot-read-book.png",
+  water: "/mascot/kenchan-mascot-water-seedling.png",
+  avocado: "/mascot/kenchan-mascot-avocado-celebrate.png"
 };
 
 const mascotPoseTransforms: Record<MascotPose, string> = {
   idle: "scale(1) rotate(0deg)",
   wave: "scale(1.012) rotate(-1deg)",
   eat: "scale(1.01) rotate(0deg)",
-  laugh: "scale(1.018) rotate(0deg)"
+  laugh: "scale(1.018) rotate(0deg)",
+  coffee: "scale(1.012) rotate(0deg)",
+  read: "scale(1.012) rotate(0deg)",
+  water: "scale(1.018) rotate(0deg)",
+  avocado: "scale(1.022) rotate(0deg)"
 };
 
 const mascotRunningImages = [
@@ -35,7 +51,11 @@ const mascotActions: {
 }[] = [
   { pose: "wave", duration: 1800 },
   { pose: "eat", duration: 2400 },
-  { pose: "laugh", duration: 1900 }
+  { pose: "laugh", duration: 1900 },
+  { pose: "coffee", duration: 2600 },
+  { pose: "read", duration: 3200 },
+  { pose: "water", duration: 3000 },
+  { pose: "avocado", duration: 2200 }
 ];
 
 const MASCOT_INITIAL_IDLE_MS = 3000;
@@ -147,7 +167,10 @@ export function MascotGuide() {
         if (stopped) return;
         const action = mascotActions[actionIndex % mascotActions.length];
         const cycleIndex = Math.floor(actionIndex / mascotActions.length);
-        setIsJumping(action.pose === "laugh" && cycleIndex % 2 === 0);
+        setIsJumping(
+          action.pose === "avocado" ||
+            (action.pose === "laugh" && cycleIndex % 2 === 0)
+        );
         setPose(action.pose);
         timeoutId = window.setTimeout(() => {
           if (stopped) return;
@@ -344,7 +367,9 @@ export function MascotGuide() {
           <span
             className={`relative block h-[7.25rem] w-[7.25rem] sm:h-[8.25rem] sm:w-[8.25rem] ${
               isJumping && !isStrolling ? "mascot-celebrate" : ""
-            } ${walkPhase === "pause" ? "mascot-stroll-look" : ""}`}
+            } ${walkPhase === "pause" ? "mascot-stroll-look" : ""} ${
+              !isStrolling && pose !== "idle" ? `mascot-action-${pose}` : ""
+            }`}
           >
             {walkPhase === "out" || walkPhase === "back" ? (
               <span

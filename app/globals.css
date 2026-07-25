@@ -99,6 +99,21 @@ textarea {
   transform-origin: center bottom;
 }
 
+.mascot-action-coffee {
+  animation: mascot-action-coffee 2.6s ease-in-out both;
+  transform-origin: center bottom;
+}
+
+.mascot-action-read {
+  animation: mascot-action-read 3.2s ease-in-out both;
+  transform-origin: center bottom;
+}
+
+.mascot-action-water {
+  animation: mascot-action-water 3s ease-in-out both;
+  transform-origin: center bottom;
+}
+
 @keyframes mascot-loading-run {
   0%,
   100% {
@@ -215,6 +230,44 @@ textarea {
   }
 }
 
+@keyframes mascot-action-coffee {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0);
+  }
+
+  42%,
+  68% {
+    transform: translateY(-0.1rem) rotate(-1deg);
+  }
+}
+
+@keyframes mascot-action-read {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0);
+  }
+
+  50% {
+    transform: translateY(-0.08rem) rotate(0.7deg);
+  }
+}
+
+@keyframes mascot-action-water {
+  0%,
+  100% {
+    transform: translateY(0) rotate(0);
+  }
+
+  38% {
+    transform: translateY(-0.08rem) rotate(-1.2deg);
+  }
+
+  72% {
+    transform: translateY(0) rotate(0.7deg);
+  }
+}
+
 @media (min-width: 640px) {
   .mascot-stroll-shell {
     --mascot-stroll-distance: -10rem;
@@ -254,7 +307,10 @@ textarea {
   }
 
   .mascot-stroll-frame,
-  .mascot-stroll-look {
+  .mascot-stroll-look,
+  .mascot-action-coffee,
+  .mascot-action-read,
+  .mascot-action-water {
     animation: none;
   }
 }
