@@ -209,7 +209,11 @@ export function MascotGuide() {
                   sizes="(min-width: 640px) 132px, 116px"
                   aria-hidden={imagePose !== pose}
                   className={`mascot-pose-layer object-contain ${
-                    imagePose === pose ? "is-active" : ""
+                    imagePose === "idle"
+                      ? "is-base"
+                      : imagePose === pose
+                        ? "is-active"
+                        : ""
                   }`}
                   style={{ imageRendering: "pixelated" }}
                 />

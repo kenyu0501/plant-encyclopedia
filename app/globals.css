@@ -58,6 +58,12 @@ textarea {
   will-change: opacity, transform;
 }
 
+.mascot-pose-layer.is-base {
+  z-index: 0;
+  opacity: 1;
+  transform: scale(1);
+}
+
 .mascot-pose-layer.is-active {
   z-index: 1;
   opacity: 1;
