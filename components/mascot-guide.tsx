@@ -26,9 +26,9 @@ const mascotActions: {
   { pose: "laugh", duration: 1900 }
 ];
 
-const MASCOT_INITIAL_IDLE_MS = 2000;
-const MASCOT_BETWEEN_ACTIONS_MS = 2000;
-const MASCOT_BETWEEN_CYCLES_MS = 6000;
+const MASCOT_INITIAL_IDLE_MS = 3000;
+const MASCOT_BETWEEN_ACTIONS_MS = 5000;
+const MASCOT_BETWEEN_CYCLES_MS = 9000;
 
 const guideLinks = [
   {
@@ -68,15 +68,6 @@ export function MascotGuide() {
     updateMotionPreference();
     mediaQuery.addEventListener("change", updateMotionPreference);
     return () => mediaQuery.removeEventListener("change", updateMotionPreference);
-  }, []);
-
-  useEffect(() => {
-    Object.values(mascotImages)
-      .filter((src) => src !== mascotImages.idle)
-      .forEach((src) => {
-        const image = new window.Image();
-        image.src = src;
-      });
   }, []);
 
   useEffect(() => {
@@ -205,17 +196,26 @@ export function MascotGuide() {
           aria-label={isOpen ? "図鑑の案内を閉じる" : "図鑑の案内を開く"}
           className="mascot-float block rounded-full outline-none focus-visible:ring-2 focus-visible:ring-leaf-600 focus-visible:ring-offset-2"
         >
-          <Image
-            key={pose}
-            src={mascotImages[pose]}
-            alt=""
-            width={132}
-            height={132}
-            unoptimized
-            priority={false}
-            className="mascot-frame-change h-[7.25rem] w-[7.25rem] object-contain sm:h-[8.25rem] sm:w-[8.25rem]"
-            style={{ imageRendering: "pixelated" }}
-          />
+          <span className="relative block h-[7.25rem] w-[7.25rem] sm:h-[8.25rem] sm:w-[8.25rem]">
+            {(Object.entries(mascotImages) as [MascotPose, string][]).map(
+              ([imagePose, src]) => (
+                <Image
+                  key={imagePose}
+                  src={src}
+                  alt=""
+                  fill
+                  unoptimized
+                  priority={false}
+                  sizes="(min-width: 640px) 132px, 116px"
+                  aria-hidden={imagePose !== pose}
+                  className={`mascot-pose-layer object-contain ${
+                    imagePose === pose ? "is-active" : ""
+                  }`}
+                  style={{ imageRendering: "pixelated" }}
+                />
+              )
+            )}
+          </span>
         </button>
       </div>
     </aside>

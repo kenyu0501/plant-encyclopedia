@@ -49,8 +49,19 @@ textarea {
   transform-origin: center bottom;
 }
 
-.mascot-frame-change {
-  animation: mascot-frame-change 0.24s ease-out;
+.mascot-pose-layer {
+  opacity: 0;
+  transform: scale(0.985);
+  transition:
+    opacity 0.65s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.65s cubic-bezier(0.22, 1, 0.36, 1);
+  will-change: opacity, transform;
+}
+
+.mascot-pose-layer.is-active {
+  z-index: 1;
+  opacity: 1;
+  transform: scale(1);
 }
 
 @keyframes fruit-bounce {
@@ -92,24 +103,15 @@ textarea {
   }
 }
 
-@keyframes mascot-frame-change {
-  from {
-    opacity: 0.78;
-    transform: scale(0.97);
-  }
-
-  to {
-    opacity: 1;
-    transform: scale(1);
-  }
-}
-
 @media (prefers-reduced-motion: reduce) {
   .fruit-bounce,
   .loading-dot,
-  .mascot-float,
-  .mascot-frame-change {
+  .mascot-float {
     animation-duration: 1ms;
     animation-iteration-count: 1;
+  }
+
+  .mascot-pose-layer {
+    transition-duration: 1ms;
   }
 }
