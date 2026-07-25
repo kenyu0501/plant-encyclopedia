@@ -57,13 +57,23 @@ export function CreatorProfile() {
         <div className="min-w-0 flex-1">
           <p className="text-sm font-bold text-leaf-700">図鑑製作者の自己紹介</p>
           <h2 id="creator-profile-title" className="mt-1 text-2xl font-bold text-leaf-900">
-            こんにちは，けんゆーです！
+            はじめまして！けんゆーと申します．
           </h2>
-          <p className="mt-3 leading-7 text-leaf-900/72">
-            沖縄県糸満市で，アボカド，マンゴー，バナナなどの熱帯果樹を育てています．
-            実際の栽培経験と文献を行き来しながら，品種選びや栽培の現場で役立つ情報を，
-            少しずつこの図鑑にまとめています．
-          </p>
+          <div className="mt-3 space-y-3 leading-7 text-leaf-900/72">
+            <p>
+              2児の父です．お酒はやめました．果物を食べて，コーヒーを飲みながら植物を育てたりしています．
+              小説やお笑いを見るのが好きです．
+            </p>
+            <p>
+              さて，この図鑑は熱帯果樹の品種に特化した図鑑です．果樹には魅力的な品種が数えきれないほど多く，
+              色々食べたり育てたりしているので，作りました．
+            </p>
+            <p>
+              現状一人で作っていますが，もちろん限界があるので，皆さんのお力をお貸しください．
+              閲覧者の方でも画像を投稿できるようになっています．皆さんの情報が集まれば，
+              もっと熱帯果樹分野は楽しくなると信じてます．よろしくね！
+            </p>
+          </div>
 
           <div className="mt-5 flex flex-wrap gap-2.5" aria-label="図鑑製作者のSNS">
             {socialLinks.map((item) => {
