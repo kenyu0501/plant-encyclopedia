@@ -1,19 +1,18 @@
 import Link from "next/link";
 import { ArrowRight } from "lucide-react";
 import { AnalyticsSummary } from "@/components/analytics-summary";
-import { FruitCard } from "@/components/fruit-card";
+import { CreatorProfile } from "@/components/creator-profile";
 import { HomeSearch } from "@/components/home-search";
 import { PendingSubmissionsNotice } from "@/components/pending-submissions-notice";
 import { RecentlyViewedCultivars } from "@/components/recently-viewed-cultivars";
 import { RecentlyUpdatedCultivars } from "@/components/recently-updated-cultivars";
 import { getCurrentUser, isAdminUser } from "@/lib/auth";
-import { getPendingViewerPhotoCount, getPublicFruits, getPublicSearchEntries, getRecentlyUpdatedCultivars, getSiteAnalytics, getSiteSettings } from "@/lib/queries";
+import { getPendingViewerPhotoCount, getPublicSearchEntries, getRecentlyUpdatedCultivars, getSiteAnalytics, getSiteSettings } from "@/lib/queries";
 
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
-  const [fruits, settings, searchEntries, analytics, recentlyUpdatedCultivars, user] = await Promise.all([
-    getPublicFruits(6),
+  const [settings, searchEntries, analytics, recentlyUpdatedCultivars, user] = await Promise.all([
     getSiteSettings(),
     getPublicSearchEntries(),
     getSiteAnalytics(),
@@ -57,27 +56,9 @@ export default async function HomePage() {
 
       <RecentlyUpdatedCultivars items={recentlyUpdatedCultivars} />
 
-      <PendingSubmissionsNotice count={pendingViewerPhotoCount} />
+      <CreatorProfile />
 
-      <section className="space-y-4">
-        <div className="flex items-center justify-between gap-4">
-          <h2 className="text-xl font-bold text-leaf-900">公開中の果樹</h2>
-          <Link href="/fruits" className="text-sm font-semibold text-leaf-700">
-            すべて見る
-          </Link>
-        </div>
-        {fruits.length > 0 ? (
-          <div className="grid gap-4 sm:grid-cols-2">
-            {fruits.map((fruit) => (
-              <FruitCard key={fruit.id} fruit={fruit} />
-            ))}
-          </div>
-        ) : (
-          <p className="rounded-lg bg-white/80 p-5 text-sm text-leaf-900/70 ring-1 ring-leaf-100">
-            まだ公開中の果樹がありません．管理画面から登録してください．
-          </p>
-        )}
-      </section>
+      <PendingSubmissionsNotice count={pendingViewerPhotoCount} />
     </div>
   );
 }
