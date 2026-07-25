@@ -57,6 +57,7 @@ export function MascotGuide() {
   const [isHidden, setIsHidden] = useState(false);
   const [pose, setPose] = useState<MascotPose>("idle");
   const [allowsMotion, setAllowsMotion] = useState(true);
+  const [isJumping, setIsJumping] = useState(false);
 
   useEffect(() => {
     setIsHidden(window.localStorage.getItem(MASCOT_HIDDEN_KEY) === "true");
@@ -73,6 +74,7 @@ export function MascotGuide() {
   useEffect(() => {
     if (!allowsMotion || isHidden) {
       setPose("idle");
+      setIsJumping(false);
       return;
     }
 
@@ -84,10 +86,13 @@ export function MascotGuide() {
       timeoutId = window.setTimeout(() => {
         if (stopped) return;
         const action = mascotActions[actionIndex % mascotActions.length];
+        const cycleIndex = Math.floor(actionIndex / mascotActions.length);
+        setIsJumping(action.pose === "laugh" && cycleIndex % 2 === 0);
         setPose(action.pose);
         timeoutId = window.setTimeout(() => {
           if (stopped) return;
           setPose("idle");
+          setIsJumping(false);
           actionIndex += 1;
           const completedCycle = actionIndex % mascotActions.length === 0;
           scheduleNextAction(
@@ -196,7 +201,11 @@ export function MascotGuide() {
           aria-label={isOpen ? "図鑑の案内を閉じる" : "図鑑の案内を開く"}
           className="mascot-float block rounded-full outline-none focus-visible:ring-2 focus-visible:ring-leaf-600 focus-visible:ring-offset-2"
         >
-          <span className="relative block h-[7.25rem] w-[7.25rem] sm:h-[8.25rem] sm:w-[8.25rem]">
+          <span
+            className={`relative block h-[7.25rem] w-[7.25rem] sm:h-[8.25rem] sm:w-[8.25rem] ${
+              isJumping ? "mascot-celebrate" : ""
+            }`}
+          >
             {(Object.entries(mascotImages) as [MascotPose, string][]).map(
               ([imagePose, src]) => (
                 <Image
