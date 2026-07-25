@@ -49,6 +49,10 @@ textarea {
   transform-origin: center bottom;
 }
 
+.mascot-frame-change {
+  animation: mascot-frame-change 0.24s ease-out;
+}
+
 @keyframes fruit-bounce {
   0%,
   100% {
@@ -88,10 +92,23 @@ textarea {
   }
 }
 
+@keyframes mascot-frame-change {
+  from {
+    opacity: 0.78;
+    transform: scale(0.97);
+  }
+
+  to {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .fruit-bounce,
   .loading-dot,
-  .mascot-float {
+  .mascot-float,
+  .mascot-frame-change {
     animation-duration: 1ms;
     animation-iteration-count: 1;
   }

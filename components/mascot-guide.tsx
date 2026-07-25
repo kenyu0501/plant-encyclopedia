@@ -8,6 +8,28 @@ import { useEffect, useState } from "react";
 
 const MASCOT_HIDDEN_KEY = "kenchan-mascot-hidden";
 
+type MascotPose = "idle" | "wave" | "eat" | "laugh";
+
+const mascotImages: Record<MascotPose, string> = {
+  idle: "/mascot/kenchan-mascot-pixel-v3.png",
+  wave: "/mascot/kenchan-mascot-wave.png",
+  eat: "/mascot/kenchan-mascot-eat-mango.png",
+  laugh: "/mascot/kenchan-mascot-laugh.png"
+};
+
+const mascotActions: {
+  pose: Exclude<MascotPose, "idle">;
+  duration: number;
+}[] = [
+  { pose: "wave", duration: 1800 },
+  { pose: "eat", duration: 2400 },
+  { pose: "laugh", duration: 1900 }
+];
+
+const MASCOT_INITIAL_IDLE_MS = 2000;
+const MASCOT_BETWEEN_ACTIONS_MS = 2000;
+const MASCOT_BETWEEN_CYCLES_MS = 6000;
+
 const guideLinks = [
   {
     href: "/fruits",
@@ -33,10 +55,64 @@ export function MascotGuide() {
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
   const [isHidden, setIsHidden] = useState(false);
+  const [pose, setPose] = useState<MascotPose>("idle");
+  const [allowsMotion, setAllowsMotion] = useState(true);
 
   useEffect(() => {
     setIsHidden(window.localStorage.getItem(MASCOT_HIDDEN_KEY) === "true");
   }, []);
+
+  useEffect(() => {
+    const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
+    const updateMotionPreference = () => setAllowsMotion(!mediaQuery.matches);
+    updateMotionPreference();
+    mediaQuery.addEventListener("change", updateMotionPreference);
+    return () => mediaQuery.removeEventListener("change", updateMotionPreference);
+  }, []);
+
+  useEffect(() => {
+    Object.values(mascotImages)
+      .filter((src) => src !== mascotImages.idle)
+      .forEach((src) => {
+        const image = new window.Image();
+        image.src = src;
+      });
+  }, []);
+
+  useEffect(() => {
+    if (!allowsMotion || isHidden) {
+      setPose("idle");
+      return;
+    }
+
+    let actionIndex = 0;
+    let timeoutId: number;
+    let stopped = false;
+
+    const scheduleNextAction = (idleDuration: number) => {
+      timeoutId = window.setTimeout(() => {
+        if (stopped) return;
+        const action = mascotActions[actionIndex % mascotActions.length];
+        setPose(action.pose);
+        timeoutId = window.setTimeout(() => {
+          if (stopped) return;
+          setPose("idle");
+          actionIndex += 1;
+          const completedCycle = actionIndex % mascotActions.length === 0;
+          scheduleNextAction(
+            completedCycle ? MASCOT_BETWEEN_CYCLES_MS : MASCOT_BETWEEN_ACTIONS_MS
+          );
+        }, action.duration);
+      }, idleDuration);
+    };
+
+    scheduleNextAction(MASCOT_INITIAL_IDLE_MS);
+
+    return () => {
+      stopped = true;
+      window.clearTimeout(timeoutId);
+    };
+  }, [allowsMotion, isHidden]);
 
   if (pathname.startsWith("/admin")) return null;
 
@@ -130,13 +206,14 @@ export function MascotGuide() {
           className="mascot-float block rounded-full outline-none focus-visible:ring-2 focus-visible:ring-leaf-600 focus-visible:ring-offset-2"
         >
           <Image
-            src="/mascot/kenchan-mascot-pixel-v3.png"
+            key={pose}
+            src={mascotImages[pose]}
             alt=""
             width={132}
             height={132}
             unoptimized
             priority={false}
-            className="h-[7.25rem] w-[7.25rem] object-contain sm:h-[8.25rem] sm:w-[8.25rem]"
+            className="mascot-frame-change h-[7.25rem] w-[7.25rem] object-contain sm:h-[8.25rem] sm:w-[8.25rem]"
             style={{ imageRendering: "pixelated" }}
           />
         </button>
