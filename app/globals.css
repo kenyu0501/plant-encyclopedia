@@ -43,7 +43,8 @@ textarea {
   transform-origin: center bottom;
 }
 
-.mascot-run-frame {
+.mascot-run-frame,
+.mascot-stroll-frame {
   opacity: 0;
   animation: mascot-run-frame 0.54s linear infinite;
 }
@@ -70,6 +71,32 @@ textarea {
 .mascot-speech-bubble {
   animation: mascot-speech-bubble 5.2s ease-in-out both;
   transform-origin: right bottom;
+}
+
+.mascot-stroll-shell {
+  --mascot-stroll-distance: -5rem;
+  transform: translateX(0);
+  will-change: transform;
+}
+
+.mascot-stroll-out,
+.mascot-stroll-pause {
+  transform: translateX(var(--mascot-stroll-distance));
+}
+
+.mascot-stroll-out,
+.mascot-stroll-back {
+  transition: transform 3s linear;
+}
+
+.mascot-stroll-pause,
+.mascot-stroll-idle {
+  transition: none;
+}
+
+.mascot-stroll-look {
+  animation: mascot-stroll-look 1.6s ease-in-out both;
+  transform-origin: center bottom;
 }
 
 @keyframes mascot-loading-run {
@@ -173,6 +200,27 @@ textarea {
   }
 }
 
+@keyframes mascot-stroll-look {
+  0%,
+  100% {
+    transform: rotate(0deg) translateY(0);
+  }
+
+  30% {
+    transform: rotate(-2deg) translateY(-0.08rem);
+  }
+
+  70% {
+    transform: rotate(2deg) translateY(-0.08rem);
+  }
+}
+
+@media (min-width: 640px) {
+  .mascot-stroll-shell {
+    --mascot-stroll-distance: -10rem;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .loading-fruit-dot,
   .mascot-loading-run,
@@ -187,7 +235,8 @@ textarea {
     opacity: 0;
   }
 
-  .mascot-run-frame:first-child {
+  .mascot-run-frame:first-child,
+  .mascot-stroll-frame:first-child {
     opacity: 1;
   }
 
@@ -196,6 +245,16 @@ textarea {
   }
 
   .mascot-speech-bubble {
+    animation: none;
+  }
+
+  .mascot-stroll-shell {
+    transform: translateX(0);
+    transition: none;
+  }
+
+  .mascot-stroll-frame,
+  .mascot-stroll-look {
     animation: none;
   }
 }

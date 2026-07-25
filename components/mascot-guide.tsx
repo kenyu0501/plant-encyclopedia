@@ -4,9 +4,10 @@ import { BookOpenText, Heart, Sprout, X } from "lucide-react";
 import Image from "next/image";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 type MascotPose = "idle" | "wave" | "eat" | "laugh";
+type MascotWalkPhase = "idle" | "out" | "pause" | "back";
 
 const mascotImages: Record<MascotPose, string> = {
   idle: "/mascot/kenchan-mascot-pixel-v3.png",
@@ -21,6 +22,12 @@ const mascotPoseTransforms: Record<MascotPose, string> = {
   eat: "scale(1.01) rotate(0deg)",
   laugh: "scale(1.018) rotate(0deg)"
 };
+
+const mascotRunningImages = [
+  "/mascot/kenchan-mascot-run-1.png",
+  "/mascot/kenchan-mascot-run-2.png",
+  "/mascot/kenchan-mascot-run-3.png"
+];
 
 const mascotActions: {
   pose: Exclude<MascotPose, "idle">;
@@ -38,6 +45,12 @@ const MASCOT_INITIAL_SPEECH_DELAY_MS = 8000;
 const MASCOT_SPEECH_VISIBLE_MS = 5200;
 const MASCOT_SPEECH_INTERVAL_MIN_MS = 20000;
 const MASCOT_SPEECH_INTERVAL_RANGE_MS = 15000;
+const MASCOT_STROLL_INTERVAL_MIN_MS = 45000;
+const MASCOT_STROLL_INTERVAL_RANGE_MS = 45000;
+const MASCOT_STROLL_WALK_MS = 3000;
+const MASCOT_STROLL_PAUSE_MS = 1600;
+const MASCOT_STROLL_RETRY_MS = 8000;
+const MASCOT_RECENT_INTERACTION_MS = 10000;
 
 const mascotMessages = [
   "気になる品種を探してみよう！",
@@ -77,6 +90,13 @@ export function MascotGuide() {
   const [isJumping, setIsJumping] = useState(false);
   const [imagesReady, setImagesReady] = useState(false);
   const [speechMessage, setSpeechMessage] = useState<string | null>(null);
+  const [walkPhase, setWalkPhase] = useState<MascotWalkPhase>("idle");
+  const interactionStateRef = useRef({
+    isOpen: false,
+    hasSpeech: false,
+    lastInteractionAt: 0
+  });
+  const isStrolling = walkPhase !== "idle";
 
   useEffect(() => {
     const mediaQuery = window.matchMedia("(prefers-reduced-motion: reduce)");
@@ -88,7 +108,10 @@ export function MascotGuide() {
 
   useEffect(() => {
     let cancelled = false;
-    const preloadImages = Object.values(mascotImages).map((src) => {
+    const preloadImages = [
+      ...Object.values(mascotImages),
+      ...mascotRunningImages
+    ].map((src) => {
       const image = new window.Image();
       image.src = src;
       return image.decode().catch(() => undefined);
@@ -104,7 +127,12 @@ export function MascotGuide() {
   }, []);
 
   useEffect(() => {
-    if (!imagesReady || !allowsMotion) {
+    interactionStateRef.current.isOpen = isOpen;
+    interactionStateRef.current.hasSpeech = Boolean(speechMessage);
+  }, [isOpen, speechMessage]);
+
+  useEffect(() => {
+    if (!imagesReady || !allowsMotion || isStrolling) {
       setPose("idle");
       setIsJumping(false);
       return;
@@ -140,10 +168,10 @@ export function MascotGuide() {
       stopped = true;
       window.clearTimeout(timeoutId);
     };
-  }, [allowsMotion, imagesReady]);
+  }, [allowsMotion, imagesReady, isStrolling]);
 
   useEffect(() => {
-    if (isOpen) {
+    if (isOpen || isStrolling) {
       setSpeechMessage(null);
       return;
     }
@@ -179,7 +207,64 @@ export function MascotGuide() {
       window.clearTimeout(showTimeoutId);
       window.clearTimeout(hideTimeoutId);
     };
-  }, [allowsMotion, isOpen]);
+  }, [allowsMotion, isOpen, isStrolling]);
+
+  useEffect(() => {
+    if (!allowsMotion || !imagesReady) {
+      setWalkPhase("idle");
+      return;
+    }
+
+    let timeoutId: number;
+    let stopped = false;
+
+    const randomStrollDelay = () =>
+      MASCOT_STROLL_INTERVAL_MIN_MS +
+      Math.random() * MASCOT_STROLL_INTERVAL_RANGE_MS;
+
+    const scheduleStroll = (delay: number) => {
+      timeoutId = window.setTimeout(() => {
+        if (stopped) return;
+
+        const interaction = interactionStateRef.current;
+        const recentlyInteracted =
+          Date.now() - interaction.lastInteractionAt < MASCOT_RECENT_INTERACTION_MS;
+
+        if (interaction.isOpen || interaction.hasSpeech || recentlyInteracted) {
+          scheduleStroll(MASCOT_STROLL_RETRY_MS);
+          return;
+        }
+
+        setPose("idle");
+        setIsJumping(false);
+        setSpeechMessage(null);
+        setWalkPhase("out");
+
+        timeoutId = window.setTimeout(() => {
+          if (stopped) return;
+          setWalkPhase("pause");
+
+          timeoutId = window.setTimeout(() => {
+            if (stopped) return;
+            setWalkPhase("back");
+
+            timeoutId = window.setTimeout(() => {
+              if (stopped) return;
+              setWalkPhase("idle");
+              scheduleStroll(randomStrollDelay());
+            }, MASCOT_STROLL_WALK_MS);
+          }, MASCOT_STROLL_PAUSE_MS);
+        }, MASCOT_STROLL_WALK_MS);
+      }, delay);
+    };
+
+    scheduleStroll(randomStrollDelay());
+
+    return () => {
+      stopped = true;
+      window.clearTimeout(timeoutId);
+    };
+  }, [allowsMotion, imagesReady]);
 
   if (pathname.startsWith("/admin")) return null;
 
@@ -231,8 +316,8 @@ export function MascotGuide() {
         </div>
       ) : null}
 
-      <div className="relative">
-        {speechMessage ? (
+      <div className={`relative mascot-stroll-shell mascot-stroll-${walkPhase}`}>
+        {speechMessage && !isStrolling ? (
           <div
             className="mascot-speech-bubble absolute bottom-[calc(100%-0.45rem)] right-1 z-10 w-max max-w-[min(15rem,calc(100vw-1rem))] rounded-2xl bg-white px-4 py-2.5 text-sm font-bold leading-5 text-leaf-900 shadow-soft ring-1 ring-leaf-100"
           >
@@ -245,29 +330,64 @@ export function MascotGuide() {
         ) : null}
         <button
           type="button"
-          onClick={() => setIsOpen((current) => !current)}
+          onClick={() => {
+            interactionStateRef.current.lastInteractionAt = Date.now();
+            setIsOpen((current) => !current);
+          }}
+          disabled={isStrolling}
           aria-expanded={isOpen}
           aria-label={isOpen ? "図鑑の案内を閉じる" : "図鑑の案内を開く"}
-          className="mascot-float block rounded-full outline-none focus-visible:ring-2 focus-visible:ring-leaf-600 focus-visible:ring-offset-2"
+          className={`block rounded-full outline-none focus-visible:ring-2 focus-visible:ring-leaf-600 focus-visible:ring-offset-2 ${
+            isStrolling ? "cursor-default" : "mascot-float"
+          }`}
         >
           <span
             className={`relative block h-[7.25rem] w-[7.25rem] sm:h-[8.25rem] sm:w-[8.25rem] ${
-              isJumping ? "mascot-celebrate" : ""
-            }`}
+              isJumping && !isStrolling ? "mascot-celebrate" : ""
+            } ${walkPhase === "pause" ? "mascot-stroll-look" : ""}`}
           >
-            <Image
-              src={mascotImages[pose]}
-              alt=""
-              fill
-              unoptimized
-              priority={false}
-              sizes="(min-width: 640px) 132px, 116px"
-              className="mascot-pose-image object-contain"
-              style={{
-                imageRendering: "pixelated",
-                transform: mascotPoseTransforms[pose]
-              }}
-            />
+            {walkPhase === "out" || walkPhase === "back" ? (
+              <span
+                className="absolute inset-0 block"
+                style={{
+                  transform: walkPhase === "back" ? "scaleX(-1)" : "scaleX(1)"
+                }}
+              >
+                {mascotRunningImages.map((src, index) => (
+                  <Image
+                    key={src}
+                    src={src}
+                    alt=""
+                    fill
+                    unoptimized
+                    priority={false}
+                    sizes="(min-width: 640px) 132px, 116px"
+                    className="mascot-stroll-frame object-contain"
+                    style={{
+                      animationDelay: `${index * 0.18}s`,
+                      imageRendering: "pixelated"
+                    }}
+                  />
+                ))}
+              </span>
+            ) : (
+              <Image
+                src={walkPhase === "pause" ? mascotImages.idle : mascotImages[pose]}
+                alt=""
+                fill
+                unoptimized
+                priority={false}
+                sizes="(min-width: 640px) 132px, 116px"
+                className="mascot-pose-image object-contain"
+                style={{
+                  imageRendering: "pixelated",
+                  transform:
+                    walkPhase === "pause"
+                      ? mascotPoseTransforms.idle
+                      : mascotPoseTransforms[pose]
+                }}
+              />
+            )}
           </span>
         </button>
       </div>
