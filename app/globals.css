@@ -44,6 +44,11 @@ textarea {
   animation: loading-dot 0.96s ease-in-out infinite;
 }
 
+.mascot-float {
+  animation: mascot-float 3.2s ease-in-out infinite;
+  transform-origin: center bottom;
+}
+
 @keyframes fruit-bounce {
   0%,
   100% {
@@ -72,9 +77,21 @@ textarea {
   }
 }
 
+@keyframes mascot-float {
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+
+  50% {
+    transform: translateY(-0.4rem);
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .fruit-bounce,
-  .loading-dot {
+  .loading-dot,
+  .mascot-float {
     animation-duration: 1ms;
     animation-iteration-count: 1;
   }

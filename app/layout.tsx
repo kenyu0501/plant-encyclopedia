@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Suspense } from "react";
 import "./globals.css";
 import { BottomNav } from "@/components/bottom-nav";
+import { MascotGuide } from "@/components/mascot-guide";
 import { NavigationLoading } from "@/components/navigation-loading";
 import { PageViewTracker } from "@/components/page-view-tracker";
 import { PwaRegister } from "@/components/pwa-register";
@@ -52,6 +53,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <main className="safe-bottom mx-auto min-h-screen w-full max-w-4xl px-4 pb-24 pt-5 sm:px-6">
           {children}
         </main>
+        <MascotGuide />
         <BottomNav />
       </body>
     </html>
