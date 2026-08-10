@@ -20,6 +20,10 @@ type Field = keyof Pick<
   | "origin"
   | "description"
   | "fruit_size"
+  | "sugar_content"
+  | "sweetness"
+  | "acidity"
+  | "overall_rating"
   | "taste"
   | "texture"
   | "aroma"
@@ -46,6 +50,10 @@ const fields: { name: Field; label: string; textarea?: boolean; required?: boole
   { name: "origin", label: "原産地" },
   { name: "description", label: "説明", textarea: true },
   { name: "fruit_size", label: "果実サイズ" },
+  { name: "sugar_content", label: "糖度" },
+  { name: "sweetness", label: "甘味" },
+  { name: "acidity", label: "酸味" },
+  { name: "overall_rating", label: "総合評価" },
   { name: "taste", label: "味", textarea: true },
   { name: "texture", label: "食感" },
   { name: "aroma", label: "香り" },

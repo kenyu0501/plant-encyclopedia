@@ -60,6 +60,10 @@ insert into public.cultivars (
   origin,
   description,
   fruit_size,
+  sugar_content,
+  sweetness,
+  acidity,
+  overall_rating,
   taste,
   aroma,
   kenyu_comment,
@@ -76,13 +80,11 @@ select
   source.origin,
   format('%sはドラゴンフルーツの品種．果肉色は%s．', source.name_ja, source.flesh_color),
   source.fruit_size,
-  format(
-    '糖度%s°Brix（数個体のみ計測）．甘味%s，酸味%s，総合評価%s．',
-    source.brix,
-    source.sweetness_rating,
-    source.acidity_rating,
-    source.overall_rating
-  ),
+  format('%s°Brix（数個体のみ計測）', source.brix),
+  source.sweetness_rating,
+  source.acidity_rating,
+  source.overall_rating,
+  null,
   format('香り%s．', source.aroma_rating),
   source.tasting_comment,
   '出典: けんゆー「ドラゴンフルーツ記録」（2026年8月）．糖度は数個体のみ計測．甘味・酸味・香り・総合評価は筆者による5段階評価．',
@@ -119,18 +121,18 @@ target as (
 )
 update public.cultivars as cultivars
 set
+  sugar_content = format('%s°Brix（数個体のみ計測）', target.brix),
+  sweetness = target.sweetness_rating,
+  acidity = target.acidity_rating,
+  overall_rating = target.overall_rating,
   taste = case
-    when coalesce(cultivars.taste, '') like '%【けんゆー実食記録 2026年8月】%'
+    when coalesce(cultivars.taste, '') like '%（出典: けんゆー「ドラゴンフルーツ記録」）%'
       then cultivars.taste
     else concat_ws(
       E'\n\n',
       nullif(cultivars.taste, ''),
       format(
-        '【けんゆー実食記録 2026年8月】糖度%s°Brix（数個体のみ計測）．甘味%s，酸味%s，総合評価%s．%s（出典: けんゆー「ドラゴンフルーツ記録」）',
-        target.brix,
-        target.sweetness_rating,
-        target.acidity_rating,
-        target.overall_rating,
+        '【けんゆー実食記録 2026年8月】%s（出典: けんゆー「ドラゴンフルーツ記録」）',
         target.tasting_comment
       )
     )
@@ -154,6 +156,10 @@ select
   cultivars.name_ja,
   cultivars.slug,
   cultivars.fruit_size,
+  cultivars.sugar_content,
+  cultivars.sweetness,
+  cultivars.acidity,
+  cultivars.overall_rating,
   cultivars.taste,
   cultivars.aroma,
   cultivars.is_public

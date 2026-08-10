@@ -79,10 +79,14 @@ export default async function CultivarDetailPage({ params }: Props) {
   const isAvocado = fruitSlug === "avocado";
   const showsFloweringType = fruitSlug === "avocado" || fruitSlug === "white-sapote";
   const displayOrigin = isBanana ? getPublicBananaOrigin(cultivar.origin) : cultivar.origin;
+  const displaySugarContent = cultivar.sugar_content ?? getSugarContent(cultivar.taste, cultivar.description);
+  const displayAcidity = cultivar.acidity ?? (fruitSlug === "mango" ? getMangoAcidity(cultivar.taste, cultivar.description) : null);
   const primaryStats = getPrimaryStats({
     fruitSlug,
     origin: displayOrigin,
     fruitSize: cultivar.fruit_size,
+    sugarContent: displaySugarContent,
+    acidity: displayAcidity,
     taste: cultivar.taste,
     description: cultivar.description,
     harvestSeason: cultivar.harvest_season,
@@ -210,6 +214,10 @@ export default async function CultivarDetailPage({ params }: Props) {
           <InfoGroup title="果実と食味">
             <Info label="原産地" value={displayOrigin} />
             <Info label="果実サイズ" value={cultivar.fruit_size} />
+            <Info label="糖度" value={displaySugarContent} />
+            <Info label="甘味" value={cultivar.sweetness} />
+            <Info label="酸味" value={displayAcidity} />
+            <Info label="総合評価" value={cultivar.overall_rating} />
             <Info label="味" value={cultivar.taste} />
             <Info label="食感" value={cultivar.texture} />
             <Info label="香り" value={cultivar.aroma} />
@@ -267,6 +275,8 @@ function getPrimaryStats({
   fruitSlug,
   origin,
   fruitSize,
+  sugarContent,
+  acidity,
   taste,
   description,
   harvestSeason,
@@ -281,6 +291,8 @@ function getPrimaryStats({
   fruitSlug: string;
   origin: string | null;
   fruitSize: string | null;
+  sugarContent: string | null;
+  acidity: string | null;
   taste: string | null;
   description: string | null;
   harvestSeason: string | null;
@@ -311,8 +323,8 @@ function getPrimaryStats({
   if (fruitSlug === "mango") {
     return [
       { label: "産地", value: origin, icon: <Globe2 size={18} /> },
-      { label: "糖度", value: getMangoSugar(taste, description), icon: <BarChart3 size={18} /> },
-      { label: "酸度", value: getMangoAcidity(taste, description), icon: <Leaf size={18} /> },
+      { label: "糖度", value: sugarContent ?? getMangoSugar(taste, description), icon: <BarChart3 size={18} /> },
+      { label: "酸度", value: acidity ?? getMangoAcidity(taste, description), icon: <Leaf size={18} /> },
       { label: "収穫期", value: harvestSeason ?? getMaturityDays(taste, description), icon: <Apple size={18} /> },
       { label: "果実重", value: getFruitWeightSummary(fruitSize, description), icon: <Scale size={18} /> }
     ];
@@ -353,6 +365,14 @@ function getMangoSugar(taste: string | null, description: string | null) {
   const text = [taste, description].filter(Boolean).join(" ");
   const match = text.match(/糖度[^0-9]*(\d+(?:\.\d+)?)\s*度?/);
   return match ? `${match[1]}度` : null;
+}
+
+function getSugarContent(taste: string | null, description: string | null) {
+  const text = [taste, description].filter(Boolean).join(" ");
+  const range = text.match(/糖度[^0-9]*(\d+(?:\.\d+)?\s*(?:[〜～~-]\s*\d+(?:\.\d+)?)?)\s*(°?Brix|度|%)/i);
+  if (range) return `${range[1].replace(/\s+/g, "")}${/^°?brix$/i.test(range[2]) ? "°Brix" : range[2]}`;
+  const brix = text.match(/(\d+(?:\.\d+)?\s*(?:[〜～~-]\s*\d+(?:\.\d+)?)?)\s*°?Brix/i);
+  return brix ? `${brix[1].replace(/\s+/g, "")}°Brix` : null;
 }
 
 function getMangoAcidity(taste: string | null, description: string | null) {

@@ -399,6 +399,10 @@ function matchesFilters(cultivar: CultivarWithMedia, filters: CultivarFilters) {
         cultivar.origin,
         cultivar.description,
         cultivar.fruit_size,
+        cultivar.sugar_content,
+        cultivar.sweetness,
+        cultivar.acidity,
+        cultivar.overall_rating,
         cultivar.taste,
         cultivar.harvest_season,
         cultivar.cold_hardiness,
@@ -492,7 +496,11 @@ function weightMatchToGrams(match: RegExpMatchArray) {
 }
 
 function getBrix(cultivar: CultivarWithMedia) {
-  const text = normalizeNumericText([cultivar.taste, cultivar.description].filter(Boolean).join(" "));
+  const directMatch = normalizeNumericText(cultivar.sugar_content ?? "").match(/\d+(?:\.\d+)?/);
+  if (directMatch) return Number(directMatch[0]);
+  const text = normalizeNumericText(
+    [cultivar.taste, cultivar.description].filter(Boolean).join(" ")
+  );
   const match = text.match(/(?:糖度|Brix)[^0-9]*(\d+(?:\.\d+)?)/i);
   return match ? Number(match[1]) : null;
 }

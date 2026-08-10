@@ -205,6 +205,10 @@ export type Cultivar = {
   origin: string | null;
   description: string | null;
   fruit_size: string | null;
+  sugar_content: string | null;
+  sweetness: string | null;
+  acidity: string | null;
+  overall_rating: string | null;
   taste: string | null;
   texture: string | null;
   aroma: string | null;
