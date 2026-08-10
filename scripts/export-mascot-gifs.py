@@ -4,6 +4,7 @@
 from __future__ import annotations
 
 import math
+import zipfile
 from pathlib import Path
 from typing import Callable
 
@@ -255,6 +256,29 @@ def main() -> None:
         y = 0 if source is images["idle"] else -3 * abs(math.sin(index * math.pi / 3))
         stroll_frames.append(transform(source, x=x, y=y))
     save_gif("kenchan-stroll-and-return.gif", stroll_frames)
+
+    all_actions = (
+        idle
+        + wave
+        + eat
+        + laugh
+        + coffee
+        + reading
+        + watering
+        + avocado
+        + hold(images["idle"], 0.6)
+        + run_frames
+        + hold(images["idle"], 0.8)
+        + stroll_frames
+        + hold(images["idle"], 1)
+    )
+    save_gif("kenchan-all-actions.gif", all_actions)
+
+    bundle = OUTPUT_DIR / "kenchan-mascot-gifs.zip"
+    with zipfile.ZipFile(bundle, "w", compression=zipfile.ZIP_DEFLATED) as archive:
+        for gif_path in sorted(OUTPUT_DIR.glob("*.gif")):
+            archive.write(gif_path, arcname=gif_path.name)
+    print(bundle.relative_to(ROOT))
 
 
 if __name__ == "__main__":
