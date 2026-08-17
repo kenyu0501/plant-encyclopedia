@@ -12,7 +12,7 @@ export function FruitCard({ fruit }: { fruit: FruitWithChildren }) {
       <div className="relative aspect-[4/3] bg-leaf-100">
         {mainPhoto ? (
           <>
-            <Image src={getPhotoUrl(mainPhoto, "thumb")} alt={mainPhoto.caption ?? fruit.name_ja} fill className="object-cover" sizes="(min-width: 640px) 33vw, 100vw" />
+            <Image src={getPhotoUrl(mainPhoto, "thumb")} alt={mainPhoto.caption ?? fruit.name_ja} fill className="object-cover" sizes="(min-width: 640px) 33vw, 100vw" unoptimized />
           </>
         ) : (
           <div className="flex h-full items-center justify-center text-sm font-semibold text-leaf-700">No photo</div>

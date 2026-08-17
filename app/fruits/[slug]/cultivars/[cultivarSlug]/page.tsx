@@ -149,7 +149,7 @@ export default async function CultivarDetailPage({ params }: Props) {
 
       {mainPhoto ? (
         <div className="relative aspect-[4/3] overflow-hidden rounded-lg bg-leaf-100">
-          <Image src={getPhotoUrl(mainPhoto, "medium")} alt={mainPhoto.caption ?? cultivar.name_ja} fill className="object-cover" priority sizes="100vw" />
+          <Image src={getPhotoUrl(mainPhoto, "medium")} alt={mainPhoto.caption ?? cultivar.name_ja} fill className="object-cover" priority sizes="100vw" unoptimized />
         </div>
       ) : null}
 

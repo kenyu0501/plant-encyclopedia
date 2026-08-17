@@ -29,7 +29,8 @@ export async function uploadPhotoVariants(
 
   for (const variantName of ["thumb", "medium", "original"] as const) {
     const { error } = await supabase.storage.from("fruit-photos").upload(paths[variantName], variants[variantName].file, {
-      cacheControl: variantName === "thumb" ? "604800" : "86400",
+      // Each upload uses a new UUID path, so these variants are immutable and safe to cache for a year.
+      cacheControl: "31536000",
       upsert: false
     });
 

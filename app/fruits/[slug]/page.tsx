@@ -117,7 +117,7 @@ export default async function FruitDetailPage({ params }: Props) {
 
       {mainPhoto ? (
         <div className="relative aspect-[4/3] overflow-hidden rounded-lg bg-leaf-100">
-          <Image src={getPhotoUrl(mainPhoto, "medium")} alt={mainPhoto.caption ?? fruit.name_ja} fill className="object-cover" priority sizes="100vw" />
+          <Image src={getPhotoUrl(mainPhoto, "medium")} alt={mainPhoto.caption ?? fruit.name_ja} fill className="object-cover" priority sizes="100vw" unoptimized />
         </div>
       ) : null}
 

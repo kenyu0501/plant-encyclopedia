@@ -48,7 +48,7 @@ export function PhotoLightboxGallery({
               className={`relative block w-full ${aspectClassName} bg-leaf-100`}
               aria-label={`${photo.caption ?? altFallback}を拡大表示`}
             >
-              <Image src={getPhotoUrl(photo, "thumb")} alt={photo.caption ?? altFallback} fill className="object-cover" sizes={sizes} />
+              <Image src={getPhotoUrl(photo, "thumb")} alt={photo.caption ?? altFallback} fill className="object-cover" sizes={sizes} unoptimized />
             </button>
             {photo.caption || photo.photo_type ? (
               <figcaption className="space-y-1 p-2 text-xs leading-5 text-leaf-900/68">
@@ -131,6 +131,7 @@ export function PhotoLightboxGallery({
                 className="object-contain"
                 sizes="100vw"
                 priority
+                unoptimized
               />
             </div>
             {activePhoto.caption || activePhoto.photo_type ? (

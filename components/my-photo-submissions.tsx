@@ -95,7 +95,7 @@ function SubmissionCard({ submission }: { submission: ViewerPhotoSubmission }) {
   return (
     <article className="overflow-hidden rounded-lg bg-white/86 shadow-soft ring-1 ring-leaf-100">
       <div className="relative aspect-[4/3] bg-leaf-100">
-        <Image src={getPhotoUrl(submission, "thumb")} alt={submission.caption ?? submission.photo_type ?? "投稿写真"} fill className="object-cover" sizes="100vw" />
+        <Image src={getPhotoUrl(submission, "thumb")} alt={submission.caption ?? submission.photo_type ?? "投稿写真"} fill className="object-cover" sizes="100vw" unoptimized />
       </div>
       <div className="space-y-4 p-4">
         <div className="flex flex-wrap items-center justify-between gap-2">

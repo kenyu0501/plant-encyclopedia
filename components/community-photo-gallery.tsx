@@ -55,6 +55,7 @@ export function CommunityPhotoGallery({ items }: { items: CommunityPhotoItem[] }
                 fill
                 className="object-cover"
                 sizes="(min-width: 640px) 50vw, 100vw"
+                unoptimized
               />
             </button>
             <CommunityPhotoMeta item={item} />
@@ -126,6 +127,7 @@ export function CommunityPhotoGallery({ items }: { items: CommunityPhotoItem[] }
                 className="object-contain"
                 sizes="100vw"
                 priority
+                unoptimized
               />
             </div>
             <div className="pointer-events-auto max-w-3xl rounded-lg bg-black/38 p-3 text-sm leading-6 text-white/86" data-community-lightbox-interactive>
