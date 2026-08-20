@@ -287,14 +287,32 @@ export async function getSiteAnalytics(): Promise<SiteAnalytics | null> {
   const currentHour = new Date();
   currentHour.setMinutes(0, 0, 0);
   const oldestIncludedHour = new Date(currentHour.getTime() - (30 * 24 * 2 - 1) * 60 * 60 * 1000).toISOString();
-  const dailyAnalyticsSelect =
-    "views, cultivar_id, cultivars(name_ja, slug, is_public, fruits(name_ja, slug, is_public))";
   const hourlyAnalyticsSelect =
     "id, views, view_hour, cultivar_id, cultivars(name_ja, slug, is_public, fruits(name_ja, slug, is_public))";
-  const dailyResultPromise = supabase.from("page_views").select(dailyAnalyticsSelect);
   const recentData: unknown[] = [];
+  let totalViews = 0;
+  let totalError: { message?: string } | null = null;
   let recentError: { message?: string } | null = null;
   const pageSize = 1000;
+
+  // Supabase returns at most 1,000 rows per request. Paginate the lifetime
+  // records so the total keeps increasing after page_views exceeds that limit.
+  for (let from = 0; ; from += pageSize) {
+    const totalResult = await supabase
+      .from("page_views")
+      .select("id, views")
+      .order("id", { ascending: true })
+      .range(from, from + pageSize - 1);
+
+    if (totalResult.error) {
+      totalError = totalResult.error;
+      break;
+    }
+
+    const page = totalResult.data ?? [];
+    totalViews += page.reduce((sum, row) => sum + (row.views ?? 0), 0);
+    if (page.length < pageSize) break;
+  }
 
   for (let from = 0; ; from += pageSize) {
     const hourlyResult = await supabase
@@ -315,16 +333,12 @@ export async function getSiteAnalytics(): Promise<SiteAnalytics | null> {
     if (page.length < pageSize) break;
   }
 
-  const { data, error } = await dailyResultPromise;
-
-  if (error || recentError) {
-    console.error(error ?? recentError);
+  if (totalError || recentError) {
+    console.error(totalError ?? recentError);
     return null;
   }
 
-  const rows = (data ?? []) as unknown as AnalyticsRow[];
   const recentRows = recentData as AnalyticsRow[];
-  const totalViews = rows.reduce((sum, row) => sum + (row.views ?? 0), 0);
 
   return {
     totalViews,
