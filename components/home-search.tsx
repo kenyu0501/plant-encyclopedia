@@ -50,6 +50,7 @@ export function HomeSearch({ entries }: { entries: PublicSearchEntry[] }) {
                 <Link
                   key={`${entry.type}-${entry.id}`}
                   href={entry.href}
+                  prefetch={false}
                   onClick={() => setQuery("")}
                   className="flex items-center gap-3 rounded-md px-3 py-3 hover:bg-leaf-50"
                 >

@@ -23,7 +23,7 @@ export default async function AdminPage() {
         <h2 className="text-lg font-bold text-leaf-900">果樹</h2>
         <div className="grid gap-3">
           {fruits.map((fruit) => (
-            <Link key={fruit.id} href={`/admin/fruits/${fruit.id}`} className="flex items-center justify-between gap-3 rounded-lg bg-white/84 p-4 ring-1 ring-leaf-100">
+            <Link key={fruit.id} href={`/admin/fruits/${fruit.id}`} prefetch={false} className="flex items-center justify-between gap-3 rounded-lg bg-white/84 p-4 ring-1 ring-leaf-100">
               <span>
                 <span className="font-semibold text-leaf-900">{fruit.name_ja}</span>
                 <span className="ml-2 text-xs font-semibold text-leaf-900/48">

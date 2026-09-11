@@ -52,7 +52,7 @@ export function AnalyticsSummary({ analytics }: { analytics: SiteAnalytics | nul
         <ol className="divide-y divide-leaf-100 overflow-hidden rounded-lg bg-leaf-50 ring-1 ring-leaf-100">
           {activeAnalytics.topCultivars.map((item, index) => (
             <li key={item.href}>
-              <Link href={item.href} className="flex items-center gap-3 p-3">
+              <Link href={item.href} prefetch={false} className="flex items-center gap-3 p-3">
                 <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-white text-sm font-black text-leaf-800 ring-1 ring-leaf-100">
                   {index + 1}
                 </span>

@@ -18,6 +18,7 @@ export function PendingSubmissionsNotice({ count }: { count: number }) {
         </div>
         <Link
           href="/admin/photo-submissions"
+          prefetch={false}
           className="inline-flex items-center justify-center rounded-md bg-leaf-700 px-4 py-3 text-sm font-semibold text-white"
         >
           投稿を確認

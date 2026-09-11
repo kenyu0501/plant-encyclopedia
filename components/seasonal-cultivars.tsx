@@ -22,7 +22,7 @@ export function SeasonalCultivars({ items, month }: { items: SeasonalCultivar[];
 
       <div className="grid gap-3 sm:grid-cols-2">
         {items.map((item) => (
-          <Link key={item.id} href={item.href} className="group rounded-lg bg-leaf-50 p-4 ring-1 ring-leaf-100 transition hover:bg-fruit-50">
+          <Link key={item.id} href={item.href} prefetch={false} className="group rounded-lg bg-leaf-50 p-4 ring-1 ring-leaf-100 transition hover:bg-fruit-50">
             <div className="flex items-start gap-3">
               <span className="mt-0.5 grid h-9 w-9 shrink-0 place-items-center rounded-full bg-white text-fruit-700 ring-1 ring-fruit-100">
                 <Sparkles size={18} />

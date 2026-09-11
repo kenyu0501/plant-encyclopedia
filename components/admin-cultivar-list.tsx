@@ -189,6 +189,7 @@ export function AdminCultivarList({ cultivars, fruits }: { cultivars: AdminCulti
               </button>
               <Link
                 href={`/admin/cultivars/${cultivar.id}`}
+                prefetch={false}
                 aria-label={`${cultivar.name_ja}を編集`}
                 className="inline-flex h-10 w-10 items-center justify-center rounded-md border border-leaf-100 bg-white text-leaf-800"
               >

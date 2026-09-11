@@ -182,7 +182,13 @@ function PhotoCard({ photo }: { photo: AdminPhoto }) {
     <article className="overflow-hidden rounded-lg bg-white/86 shadow-soft ring-1 ring-leaf-100">
       <div className="relative aspect-[4/3] bg-leaf-100">
         {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img src={getPhotoUrl(photo, "thumb")} alt={photo.caption ?? targetName} className="h-full w-full object-cover" />
+        <img
+          src={getPhotoUrl(photo, "thumb")}
+          alt={photo.caption ?? targetName}
+          loading="lazy"
+          decoding="async"
+          className="h-full w-full object-cover"
+        />
       </div>
       <div className="space-y-4 p-4">
         <div className="flex items-start justify-between gap-3">

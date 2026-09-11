@@ -51,6 +51,7 @@ export function RecentlyViewedCultivars() {
           <Link
             key={item.id}
             href={item.href}
+            prefetch={false}
             className="w-44 shrink-0 rounded-lg bg-white/84 p-4 ring-1 ring-leaf-100"
           >
             <p className="truncate font-bold text-leaf-900">{item.cultivarName}</p>

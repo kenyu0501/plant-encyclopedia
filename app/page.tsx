@@ -36,6 +36,7 @@ export default async function HomePage() {
         <div className="mt-5 flex flex-wrap gap-3">
           <Link
             href="/fruits"
+            prefetch={false}
             className="inline-flex items-center gap-2 rounded-md bg-leaf-700 px-4 py-3 text-sm font-semibold text-white"
           >
             果樹一覧へ
@@ -43,6 +44,7 @@ export default async function HomePage() {
           </Link>
           <Link
             href="/admin/login"
+            prefetch={false}
             className="inline-flex items-center gap-2 rounded-md border border-leaf-200 bg-white px-4 py-3 text-sm font-semibold text-leaf-800"
           >
             管理者ログイン

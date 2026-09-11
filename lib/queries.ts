@@ -593,17 +593,28 @@ export async function getAdminCultivars() {
   return data as AdminCultivar[];
 }
 
-export async function getAdminPhotos() {
+export async function getAdminPhotos(page = 1, pageSize = 20) {
   const supabase = await createClient();
-  const { data, error } = await supabase
+  const safePage = Number.isFinite(page) ? Math.max(1, Math.floor(page)) : 1;
+  const safePageSize = Math.min(50, Math.max(1, Math.floor(pageSize)));
+  const from = (safePage - 1) * safePageSize;
+  const { data, error, count } = await supabase
     .from("photos")
-    .select("*, fruits(name_ja, slug), cultivars(name_ja, slug)")
-    .order("created_at", { ascending: false });
+    .select("*, fruits(name_ja, slug), cultivars(name_ja, slug)", { count: "exact" })
+    .order("created_at", { ascending: false })
+    .range(from, from + safePageSize - 1);
   if (error) {
     console.error(error);
-    return [];
+    return { items: [] as AdminPhoto[], total: 0, page: safePage, pageSize: safePageSize, totalPages: 1 };
   }
-  return data as AdminPhoto[];
+  const total = count ?? 0;
+  return {
+    items: data as AdminPhoto[],
+    total,
+    page: safePage,
+    pageSize: safePageSize,
+    totalPages: Math.max(1, Math.ceil(total / safePageSize))
+  };
 }
 
 export async function getPendingViewerPhotos() {

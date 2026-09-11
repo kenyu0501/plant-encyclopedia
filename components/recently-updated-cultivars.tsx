@@ -16,7 +16,7 @@ export function RecentlyUpdatedCultivars({ items }: { items: RecentlyUpdatedCult
       </div>
       <div className="grid gap-3 sm:grid-cols-2 lg:grid-cols-3">
         {items.map((item) => (
-          <Link key={item.id} href={item.href} className="rounded-lg bg-white/84 p-4 ring-1 ring-leaf-100">
+          <Link key={item.id} href={item.href} prefetch={false} className="rounded-lg bg-white/84 p-4 ring-1 ring-leaf-100">
             <p className="font-bold text-leaf-900">{item.cultivarName}</p>
             {item.nameEn ? <p className="mt-1 truncate text-xs text-leaf-900/50">{item.nameEn}</p> : null}
             <div className="mt-3 flex items-center justify-between gap-2 text-xs font-semibold text-leaf-900/54">

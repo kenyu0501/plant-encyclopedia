@@ -45,6 +45,22 @@ const mascotRunningImages = [
   "/mascot/kenchan-mascot-run-3.png"
 ];
 
+const mascotImageLoads = new Map<string, Promise<boolean>>();
+
+function loadMascotImage(src: string) {
+  const existing = mascotImageLoads.get(src);
+  if (existing) return existing;
+
+  const pending = new Promise<boolean>((resolve) => {
+    const image = new window.Image();
+    image.onload = () => resolve(true);
+    image.onerror = () => resolve(false);
+    image.src = src;
+  });
+  mascotImageLoads.set(src, pending);
+  return pending;
+}
+
 const mascotActions: {
   pose: Exclude<MascotPose, "idle">;
   duration: number;
@@ -104,11 +120,11 @@ const guideLinks = [
 
 export function MascotGuide() {
   const pathname = usePathname();
+  const isAdminRoute = pathname.startsWith("/admin");
   const [isOpen, setIsOpen] = useState(false);
   const [pose, setPose] = useState<MascotPose>("idle");
   const [allowsMotion, setAllowsMotion] = useState(true);
   const [isJumping, setIsJumping] = useState(false);
-  const [imagesReady, setImagesReady] = useState(false);
   const [speechMessage, setSpeechMessage] = useState<string | null>(null);
   const [walkPhase, setWalkPhase] = useState<MascotWalkPhase>("idle");
   const interactionStateRef = useRef({
@@ -127,32 +143,12 @@ export function MascotGuide() {
   }, []);
 
   useEffect(() => {
-    let cancelled = false;
-    const preloadImages = [
-      ...Object.values(mascotImages),
-      ...mascotRunningImages
-    ].map((src) => {
-      const image = new window.Image();
-      image.src = src;
-      return image.decode().catch(() => undefined);
-    });
-
-    void Promise.all(preloadImages).then(() => {
-      if (!cancelled) setImagesReady(true);
-    });
-
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  useEffect(() => {
     interactionStateRef.current.isOpen = isOpen;
     interactionStateRef.current.hasSpeech = Boolean(speechMessage);
   }, [isOpen, speechMessage]);
 
   useEffect(() => {
-    if (!imagesReady || !allowsMotion || isStrolling) {
+    if (isAdminRoute || !allowsMotion || isStrolling) {
       setPose("idle");
       setIsJumping(false);
       return;
@@ -166,22 +162,31 @@ export function MascotGuide() {
       timeoutId = window.setTimeout(() => {
         if (stopped) return;
         const action = mascotActions[actionIndex % mascotActions.length];
-        const cycleIndex = Math.floor(actionIndex / mascotActions.length);
-        setIsJumping(
-          action.pose === "avocado" ||
-            (action.pose === "laugh" && cycleIndex % 2 === 0)
-        );
-        setPose(action.pose);
-        timeoutId = window.setTimeout(() => {
+        void loadMascotImage(mascotImages[action.pose]).then((loaded) => {
           if (stopped) return;
-          setPose("idle");
-          setIsJumping(false);
-          actionIndex += 1;
-          const completedCycle = actionIndex % mascotActions.length === 0;
-          scheduleNextAction(
-            completedCycle ? MASCOT_BETWEEN_CYCLES_MS : MASCOT_BETWEEN_ACTIONS_MS
+          if (!loaded) {
+            actionIndex += 1;
+            scheduleNextAction(MASCOT_BETWEEN_ACTIONS_MS);
+            return;
+          }
+
+          const cycleIndex = Math.floor(actionIndex / mascotActions.length);
+          setIsJumping(
+            action.pose === "avocado" ||
+              (action.pose === "laugh" && cycleIndex % 2 === 0)
           );
-        }, action.duration);
+          setPose(action.pose);
+          timeoutId = window.setTimeout(() => {
+            if (stopped) return;
+            setPose("idle");
+            setIsJumping(false);
+            actionIndex += 1;
+            const completedCycle = actionIndex % mascotActions.length === 0;
+            scheduleNextAction(
+              completedCycle ? MASCOT_BETWEEN_CYCLES_MS : MASCOT_BETWEEN_ACTIONS_MS
+            );
+          }, action.duration);
+        });
       }, idleDuration);
     };
 
@@ -191,10 +196,10 @@ export function MascotGuide() {
       stopped = true;
       window.clearTimeout(timeoutId);
     };
-  }, [allowsMotion, imagesReady, isStrolling]);
+  }, [allowsMotion, isAdminRoute, isStrolling]);
 
   useEffect(() => {
-    if (isOpen || isStrolling) {
+    if (isAdminRoute || isOpen || isStrolling) {
       setSpeechMessage(null);
       return;
     }
@@ -230,10 +235,10 @@ export function MascotGuide() {
       window.clearTimeout(showTimeoutId);
       window.clearTimeout(hideTimeoutId);
     };
-  }, [allowsMotion, isOpen, isStrolling]);
+  }, [allowsMotion, isAdminRoute, isOpen, isStrolling]);
 
   useEffect(() => {
-    if (!allowsMotion || !imagesReady) {
+    if (isAdminRoute || !allowsMotion) {
       setWalkPhase("idle");
       return;
     }
@@ -258,26 +263,34 @@ export function MascotGuide() {
           return;
         }
 
-        setPose("idle");
-        setIsJumping(false);
-        setSpeechMessage(null);
-        setWalkPhase("out");
-
-        timeoutId = window.setTimeout(() => {
+        void Promise.all(mascotRunningImages.map(loadMascotImage)).then((loaded) => {
           if (stopped) return;
-          setWalkPhase("pause");
+          if (loaded.some((didLoad) => !didLoad)) {
+            scheduleStroll(MASCOT_STROLL_RETRY_MS);
+            return;
+          }
+
+          setPose("idle");
+          setIsJumping(false);
+          setSpeechMessage(null);
+          setWalkPhase("out");
 
           timeoutId = window.setTimeout(() => {
             if (stopped) return;
-            setWalkPhase("back");
+            setWalkPhase("pause");
 
             timeoutId = window.setTimeout(() => {
               if (stopped) return;
-              setWalkPhase("idle");
-              scheduleStroll(randomStrollDelay());
-            }, MASCOT_STROLL_WALK_MS);
-          }, MASCOT_STROLL_PAUSE_MS);
-        }, MASCOT_STROLL_WALK_MS);
+              setWalkPhase("back");
+
+              timeoutId = window.setTimeout(() => {
+                if (stopped) return;
+                setWalkPhase("idle");
+                scheduleStroll(randomStrollDelay());
+              }, MASCOT_STROLL_WALK_MS);
+            }, MASCOT_STROLL_PAUSE_MS);
+          }, MASCOT_STROLL_WALK_MS);
+        });
       }, delay);
     };
 
@@ -287,9 +300,9 @@ export function MascotGuide() {
       stopped = true;
       window.clearTimeout(timeoutId);
     };
-  }, [allowsMotion, imagesReady]);
+  }, [allowsMotion, isAdminRoute]);
 
-  if (pathname.startsWith("/admin")) return null;
+  if (isAdminRoute) return null;
 
   return (
     <aside
@@ -320,6 +333,7 @@ export function MascotGuide() {
                 <Link
                   key={item.href}
                   href={item.href}
+                  prefetch={false}
                   onClick={() => setIsOpen(false)}
                   className="flex items-center gap-3 rounded-lg px-3 py-2.5 transition hover:bg-leaf-50"
                 >

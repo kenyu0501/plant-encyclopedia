@@ -25,6 +25,7 @@ export function BottomNav() {
             <Link
               key={item.href}
               href={item.href}
+              prefetch={false}
               className={`flex min-h-14 flex-col items-center justify-center rounded-md text-xs font-semibold ${
                 active ? "bg-leaf-50 text-leaf-800" : "text-leaf-900/60"
               }`}
