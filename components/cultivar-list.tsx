@@ -129,8 +129,8 @@ export function CultivarList({
 
   return (
     <div className="space-y-4">
-      <section className="overflow-hidden rounded-lg bg-white/86 ring-1 ring-leaf-100">
-        <div className="p-4">
+      <section className="overflow-hidden rounded-xl border border-leaf-100 bg-white shadow-soft">
+        <div className="p-5">
           <label htmlFor="cultivar-search" className="mb-2 block text-sm font-bold text-leaf-900">
             品種名・特徴から検索
           </label>
@@ -160,7 +160,7 @@ export function CultivarList({
             <span className="hidden text-xs font-semibold text-leaf-900/52 group-open:inline">閉じる</span>
           </summary>
 
-          <div className="border-t border-leaf-100 bg-leaf-50/55 p-4">
+          <div className="border-t border-leaf-100 bg-leaf-50/55 p-5">
             <div className="grid gap-4 sm:grid-cols-2">
               {hasWeightData ? (
                 <fieldset>
@@ -261,7 +261,7 @@ export function CultivarList({
           </div>
         </details>
 
-        <div className="flex min-h-12 items-center justify-between gap-3 border-t border-leaf-100 px-4 py-2">
+        <div className="flex min-h-12 items-center justify-between gap-3 border-t border-leaf-100 px-5 py-2">
           <p aria-live="polite" className="text-sm font-bold text-leaf-900">
             {filteredCultivars.length}
             <span className="font-semibold text-leaf-900/54"> / {cultivars.length}品種</span>
@@ -280,7 +280,7 @@ export function CultivarList({
       </section>
 
       {availableModes.length > 1 ? (
-        <div className="flex gap-1 overflow-x-auto rounded-lg bg-white/86 p-1 ring-1 ring-leaf-100">
+        <div className="flex gap-1 overflow-x-auto rounded-xl border border-leaf-100 bg-white p-1 shadow-soft">
           <ModeButton active={activeMode === "name"} icon={<ListFilter size={16} />} label="あいうえお順" onClick={() => setViewMode("name")} />
           {hasColdView ? <ModeButton active={activeMode === "cold"} icon={<Thermometer size={16} />} label="耐寒性順" onClick={() => setViewMode("cold")} /> : null}
           {hasFloweringView ? <ModeButton active={activeMode === "flowering"} icon={<Flower2 size={16} />} label="開花型別" onClick={() => setViewMode("flowering")} /> : null}

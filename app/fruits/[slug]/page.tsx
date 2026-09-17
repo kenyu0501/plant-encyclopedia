@@ -86,7 +86,7 @@ export default async function FruitDetailPage({ params }: Props) {
   ];
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-7">
       <PageHeader
         title={fruit.name_ja}
         description={fruit.name_en ?? undefined}
@@ -116,7 +116,7 @@ export default async function FruitDetailPage({ params }: Props) {
       <ShareButtons title={shareTitle} text={shareText} url={shareUrl} />
 
       {mainPhoto ? (
-        <div className="relative aspect-[4/3] overflow-hidden rounded-lg bg-leaf-100">
+        <div className="relative aspect-[4/3] overflow-hidden rounded-[1.5rem] bg-leaf-100 shadow-soft sm:aspect-[16/10]">
           <Image src={getPhotoUrl(mainPhoto, "medium")} alt={mainPhoto.caption ?? fruit.name_ja} fill className="object-cover" priority sizes="100vw" unoptimized />
         </div>
       ) : null}
@@ -135,9 +135,10 @@ export default async function FruitDetailPage({ params }: Props) {
 
       <CommunityPhotoGallery items={communityPhotos} />
 
-      <section className="rounded-lg bg-white/84 p-5 ring-1 ring-leaf-100">
-        <h2 className="font-bold text-leaf-900">果樹情報</h2>
-        <div className="mt-4 grid gap-4 text-sm leading-6 text-leaf-900/76">
+      <section className="editorial-card p-5 sm:p-7">
+        <p className="section-kicker">FRUIT PROFILE</p>
+        <h2 className="display-serif mt-2 text-2xl font-bold text-leaf-900">果樹情報</h2>
+        <div className="mt-5 grid gap-4 text-sm leading-7 text-leaf-900/76 sm:grid-cols-2">
           <Info label="学名" value={fruit.scientific_name} italic />
           <Info label="科名" value={fruit.family_name} />
           <Info label="原産地" value={fruit.origin} />
@@ -155,9 +156,9 @@ export default async function FruitDetailPage({ params }: Props) {
         ) : null}
       </section>
 
-      <section id="cultivars" className="scroll-mt-5 space-y-3">
+      <section id="cultivars" className="scroll-mt-5 space-y-4">
         <div className="flex items-center justify-between gap-3">
-          <h2 className="text-lg font-bold text-leaf-900">品種</h2>
+          <div><p className="section-kicker">CULTIVAR COLLECTION</p><h2 className="display-serif mt-2 text-2xl font-bold text-leaf-900">品種</h2></div>
           {isAdmin ? (
             <Link href={`/admin/cultivars/new?fruit_id=${fruit.id}`} className="text-sm font-semibold text-leaf-700">
               品種追加
@@ -187,7 +188,7 @@ export default async function FruitDetailPage({ params }: Props) {
                 href={video.youtube_url}
                 target="_blank"
                 rel="noreferrer"
-                className="flex items-center gap-3 rounded-lg bg-white/84 p-4 ring-1 ring-leaf-100"
+                className="interactive-card flex items-center gap-3 rounded-xl border border-leaf-100 bg-white p-4 shadow-soft"
               >
                 <PlayCircle className="shrink-0 text-fruit-600" size={24} />
                 <span className="min-w-0 flex-1 font-semibold text-leaf-900">{video.title || video.youtube_url}</span>
@@ -230,9 +231,9 @@ function isFruitPagePhoto(photoType: string | null) {
 function Info({ label, value, italic = false }: { label: string; value: string | null; italic?: boolean }) {
   if (!value) return null;
   return (
-    <div>
-      <dt className="font-semibold text-leaf-900">{label}</dt>
-      <dd className={`mt-1 ${italic ? "italic" : ""}`}>{value}</dd>
+    <div className="border-b border-leaf-100 pb-3">
+      <dt className="text-xs font-bold tracking-wide text-leaf-700">{label}</dt>
+      <dd className={`mt-1 text-leaf-900 ${italic ? "italic" : ""}`}>{value}</dd>
     </div>
   );
 }

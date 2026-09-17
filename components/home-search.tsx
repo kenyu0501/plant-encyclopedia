@@ -21,13 +21,13 @@ export function HomeSearch({ entries }: { entries: PublicSearchEntry[] }) {
   }, [entries, normalizedQuery]);
 
   return (
-    <div className="relative mt-5">
-      <div className="flex min-h-12 items-center gap-2 rounded-md border border-leaf-100 bg-white px-3 shadow-sm focus-within:border-leaf-600">
+    <div className="relative">
+      <div className="flex min-h-12 items-center gap-2 rounded-lg bg-white px-3 focus-within:ring-2 focus-within:ring-fruit-400">
         <Search size={19} className="shrink-0 text-leaf-700" />
         <input
           value={query}
           onChange={(event) => setQuery(event.target.value)}
-          placeholder="果樹・品種を検索"
+          placeholder="果樹や品種の名前で探す"
           className="min-w-0 flex-1 bg-transparent py-3 text-base text-leaf-900 outline-none placeholder:text-leaf-900/40"
         />
         {query ? (
@@ -43,7 +43,7 @@ export function HomeSearch({ entries }: { entries: PublicSearchEntry[] }) {
       </div>
 
       {normalizedQuery ? (
-        <div className="absolute inset-x-0 top-full z-30 mt-2 max-h-[62vh] overflow-y-auto rounded-lg bg-white p-2 shadow-soft ring-1 ring-leaf-100">
+        <div className="absolute inset-x-0 top-full z-30 mt-4 max-h-[62vh] overflow-y-auto rounded-xl bg-white p-2 shadow-lift ring-1 ring-leaf-100">
           {results.length > 0 ? (
             <div className="grid gap-1">
               {results.map((entry) => (

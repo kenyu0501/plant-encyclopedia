@@ -38,7 +38,7 @@ export function RecentlyViewedCultivars() {
   return (
     <section className="space-y-3">
       <div className="flex items-center justify-between gap-3">
-        <h2 className="flex items-center gap-2 text-xl font-bold text-leaf-900">
+        <h2 className="display-serif flex items-center gap-2 text-xl font-bold text-leaf-900">
           <Clock3 size={20} />
           最近見た品種
         </h2>
@@ -52,7 +52,7 @@ export function RecentlyViewedCultivars() {
             key={item.id}
             href={item.href}
             prefetch={false}
-            className="w-44 shrink-0 rounded-lg bg-white/84 p-4 ring-1 ring-leaf-100"
+            className="interactive-card w-44 shrink-0 rounded-xl border border-leaf-100 bg-white p-4 shadow-soft"
           >
             <p className="truncate font-bold text-leaf-900">{item.cultivarName}</p>
             <p className="mt-1 truncate text-xs font-semibold text-leaf-900/54">{item.fruitName}</p>

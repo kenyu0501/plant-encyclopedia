@@ -42,7 +42,7 @@ export function ShareButtons({ title, text, url }: ShareButtonsProps) {
   }
 
   return (
-    <section aria-label="このページを共有" className="rounded-lg bg-white/76 p-3 ring-1 ring-leaf-100">
+    <section aria-label="このページを共有" className="rounded-xl border border-leaf-100 bg-white/85 p-3 shadow-soft">
       <div className="flex flex-wrap items-center gap-2">
         <p className="mr-1 text-xs font-bold text-leaf-900/70">このページを共有</p>
         <ShareLink href={xUrl} label="Xで共有" icon={<span className="text-base font-black leading-none">X</span>} />

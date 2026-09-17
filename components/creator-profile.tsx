@@ -17,49 +17,42 @@ const socialLinks = [
     label: "YouTube",
     account: "@avocado_japan",
     icon: Youtube,
-    mark: null,
-    className: "bg-red-600 text-white hover:bg-red-700"
+    mark: null
   },
   {
     href: "https://x.com/kenyu0501_",
     label: "X",
     account: "@kenyu0501_",
     icon: null,
-    mark: "X",
-    className: "bg-neutral-950 text-white hover:bg-neutral-800"
+    mark: "X"
   },
   {
     href: "https://www.instagram.com/kenyu.uehara/",
     label: "Instagram",
     account: "@kenyu.uehara",
     icon: Instagram,
-    mark: null,
-    className:
-      "bg-gradient-to-r from-fuchsia-600 via-rose-500 to-orange-500 text-white hover:opacity-90"
+    mark: null
   },
   {
     href: "https://www.facebook.com/people/けんゆー/100064303141109/",
     label: "Facebook",
     account: "けんゆー",
     icon: null,
-    mark: "f",
-    className: "bg-blue-600 text-white hover:bg-blue-700"
+    mark: "f"
   },
   {
     href: "https://okinawan-avocado.com",
     label: "糸満フルーツ園けんちゃん",
     account: "公式Webサイト",
     icon: Sprout,
-    mark: null,
-    className: "bg-leaf-700 text-white hover:bg-leaf-900"
+    mark: null
   },
   {
     href: "https://community.camp-fire.jp/projects/view/241505",
     label: "オンラインサロン",
     account: "CAMPFIRE Community",
     icon: Users,
-    mark: null,
-    className: "bg-orange-600 text-white hover:bg-orange-700"
+    mark: null
   }
 ];
 
@@ -94,7 +87,7 @@ export function CreatorProfile() {
   return (
     <section
       aria-labelledby="creator-profile-title"
-      className="relative overflow-hidden rounded-xl bg-white/88 p-5 shadow-soft ring-1 ring-leaf-100 sm:p-6"
+      className="editorial-card relative overflow-hidden p-6 sm:p-8"
     >
       <div
         aria-hidden="true"
@@ -119,8 +112,8 @@ export function CreatorProfile() {
         </div>
 
         <div className="min-w-0 flex-1">
-          <p className="text-sm font-bold text-leaf-700">図鑑製作者の自己紹介</p>
-          <h2 id="creator-profile-title" className="mt-1 text-2xl font-bold text-leaf-900">
+          <p className="section-kicker">ABOUT THE EDITOR · 図鑑製作者の自己紹介</p>
+          <h2 id="creator-profile-title" className="display-serif mt-3 text-2xl font-bold text-leaf-900">
             はじめまして！けんゆーと申します．
           </h2>
           <div className="mt-3 space-y-3 leading-7 text-leaf-900/72">
@@ -156,11 +149,11 @@ export function CreatorProfile() {
                 href={item.href}
                 target="_blank"
                 rel="noopener noreferrer"
-                className={`flex min-h-16 items-center gap-3 rounded-xl px-4 py-3 shadow-sm transition hover:-translate-y-0.5 hover:shadow-md ${item.className}`}
+                className="interactive-card flex min-h-16 items-center gap-3 rounded-lg border border-leaf-100 bg-white px-4 py-3 text-leaf-900 shadow-sm"
               >
                 <span
                   aria-hidden="true"
-                  className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-white/15 text-xl font-black"
+                  className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-leaf-50 text-xl font-black text-leaf-700"
                 >
                   {Icon ? <Icon size={21} /> : item.mark}
                 </span>
@@ -184,7 +177,7 @@ export function CreatorProfile() {
           href="https://www.youtube.com/@nettai_plants"
           target="_blank"
           rel="noopener noreferrer"
-          className="mt-4 inline-flex min-h-12 items-center gap-3 rounded-xl bg-red-600 px-4 py-3 font-bold text-white shadow-sm transition hover:-translate-y-0.5 hover:bg-red-700 hover:shadow-md"
+          className="interactive-card mt-4 inline-flex min-h-12 items-center gap-3 rounded-lg border border-leaf-100 bg-white px-4 py-3 font-bold text-leaf-900 shadow-sm"
         >
           <Youtube size={21} aria-hidden="true" />
           <span>

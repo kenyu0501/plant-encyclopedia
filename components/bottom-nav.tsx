@@ -16,8 +16,8 @@ export function BottomNav() {
   const pathname = usePathname();
 
   return (
-    <nav className="fixed inset-x-0 bottom-0 z-40 border-t border-leaf-100 bg-white/95 px-3 pb-[calc(0.45rem+env(safe-area-inset-bottom))] pt-2 shadow-soft backdrop-blur">
-      <div className="mx-auto grid max-w-4xl grid-cols-5 gap-1">
+    <nav aria-label="メインナビゲーション" className="fixed inset-x-0 bottom-0 z-40 border-t border-leaf-100/80 bg-white/95 px-3 pb-[calc(0.45rem+env(safe-area-inset-bottom))] pt-2 shadow-[0_-8px_28px_rgba(20,47,39,0.06)] backdrop-blur-xl">
+      <div className="mx-auto grid max-w-5xl grid-cols-5 gap-1">
         {items.map((item) => {
           const active = pathname === item.href || (item.href !== "/" && pathname.startsWith(item.href));
           const Icon = item.icon;
@@ -26,8 +26,9 @@ export function BottomNav() {
               key={item.href}
               href={item.href}
               prefetch={false}
-              className={`flex min-h-14 flex-col items-center justify-center rounded-md text-xs font-semibold ${
-                active ? "bg-leaf-50 text-leaf-800" : "text-leaf-900/60"
+              aria-current={active ? "page" : undefined}
+              className={`flex min-h-14 flex-col items-center justify-center rounded-lg text-xs font-semibold transition-colors ${
+                active ? "bg-leaf-900 text-white" : "text-leaf-900/58 hover:bg-leaf-50 hover:text-leaf-900"
               }`}
             >
               <Icon size={20} />

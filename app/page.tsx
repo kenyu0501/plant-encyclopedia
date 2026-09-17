@@ -23,30 +23,26 @@ export default async function HomePage() {
   const pendingViewerPhotoCount = isAdmin ? await getPendingViewerPhotoCount() : 0;
 
   return (
-    <div className="space-y-8">
-      <section className="rounded-lg bg-white/84 p-5 shadow-soft ring-1 ring-leaf-100">
-        <p className="text-sm font-semibold text-leaf-700">{settings.home_eyebrow}</p>
-        <h1 className="mt-3 text-3xl font-bold leading-tight text-leaf-900">
-          {settings.home_title}
-        </h1>
-        <p className="mt-3 leading-7 text-leaf-900/75">
-          {settings.home_description}
-        </p>
-        <HomeSearch entries={searchEntries} />
-        <div className="mt-5 flex flex-wrap gap-3">
-          <Link
-            href="/fruits"
-            prefetch={false}
-            className="inline-flex items-center gap-2 rounded-md bg-leaf-700 px-4 py-3 text-sm font-semibold text-white"
-          >
-            果樹一覧へ
-            <ArrowRight size={18} />
+    <div className="space-y-10 sm:space-y-12">
+      <section className="relative rounded-[2rem] bg-[radial-gradient(circle_at_95%_0%,#2a6547_0%,#142f27_58%)] px-6 py-9 text-white shadow-lift sm:px-10 sm:py-12">
+        <div className="max-w-2xl">
+          <p className="text-[11px] font-bold tracking-[0.22em] text-fruit-200">{settings.home_eyebrow}</p>
+          <h1 className="display-serif mt-5 text-[2.25rem] font-bold leading-[1.3] text-white sm:text-5xl">
+            {settings.home_title}
+          </h1>
+          <div className="mt-5 h-px w-14 bg-fruit-300" />
+          <p className="mt-5 max-w-xl text-sm leading-8 text-white/78 sm:text-base">
+            {settings.home_description}
+          </p>
+        </div>
+        <div className="mt-7 max-w-xl rounded-xl bg-white p-2 text-leaf-900 shadow-lift sm:mt-9">
+          <HomeSearch entries={searchEntries} />
+        </div>
+        <div className="mt-7 flex flex-wrap items-center gap-x-6 gap-y-3">
+          <Link href="/fruits" prefetch={false} className="inline-flex items-center gap-2 rounded-full bg-fruit-300 px-5 py-3 text-sm font-bold text-leaf-950 transition-colors hover:bg-fruit-200">
+            果樹一覧を見る <ArrowRight size={17} />
           </Link>
-          <Link
-            href="/admin/login"
-            prefetch={false}
-            className="inline-flex items-center gap-2 rounded-md border border-leaf-200 bg-white px-4 py-3 text-sm font-semibold text-leaf-800"
-          >
+          <Link href="/admin/login" prefetch={false} className="border-b border-white/40 pb-1 text-xs font-semibold text-white/70 hover:text-white">
             管理者ログイン
           </Link>
         </div>

@@ -19,16 +19,19 @@ export function AnalyticsSummary({ analytics }: { analytics: SiteAnalytics | nul
   const activeAnalytics = analytics.periods[activePeriod];
 
   return (
-    <section className="space-y-3 rounded-lg bg-white/84 p-5 ring-1 ring-leaf-100">
+    <section className="editorial-card space-y-5 p-5 sm:p-7">
       <div className="flex flex-wrap items-center justify-between gap-3">
-        <h2 className="text-xl font-bold text-leaf-900">閲覧データ</h2>
-        <div className="flex rounded-lg bg-leaf-50 p-1 ring-1 ring-leaf-100" aria-label="ランキング期間">
+        <div>
+          <p className="section-kicker">READERS&apos; INTEREST</p>
+          <h2 className="display-serif mt-2 text-2xl font-bold text-leaf-900">閲覧データ</h2>
+        </div>
+        <div className="flex rounded-full bg-leaf-50 p-1 ring-1 ring-leaf-100" aria-label="ランキング期間">
           {periods.map((item) => (
             <button
               key={item.key}
               type="button"
               onClick={() => setActivePeriod(item.key)}
-              className={`min-h-9 rounded-md px-3 text-xs font-bold transition ${
+              className={`min-h-9 rounded-full px-3 text-xs font-bold transition ${
                 activePeriod === item.key ? "bg-leaf-700 text-white shadow-sm" : "text-leaf-900/64"
               }`}
               aria-pressed={activePeriod === item.key}
@@ -49,11 +52,11 @@ export function AnalyticsSummary({ analytics }: { analytics: SiteAnalytics | nul
       </div>
 
       {activeAnalytics.topCultivars.length > 0 ? (
-        <ol className="divide-y divide-leaf-100 overflow-hidden rounded-lg bg-leaf-50 ring-1 ring-leaf-100">
+        <ol className="divide-y divide-leaf-100 overflow-hidden rounded-xl border border-leaf-100 bg-white">
           {activeAnalytics.topCultivars.map((item, index) => (
             <li key={item.href}>
-              <Link href={item.href} prefetch={false} className="flex items-center gap-3 p-3">
-                <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-white text-sm font-black text-leaf-800 ring-1 ring-leaf-100">
+              <Link href={item.href} prefetch={false} className="flex items-center gap-3 p-3.5 transition-colors hover:bg-leaf-50">
+                <span className="grid h-8 w-8 shrink-0 place-items-center rounded-full bg-leaf-50 text-sm font-black text-leaf-800 ring-1 ring-leaf-100">
                   {index + 1}
                 </span>
                 <span className="min-w-0 flex-1">
@@ -107,9 +110,9 @@ function getViewComparison(current: number, previous: number) {
 
 function StatCard({ label, value, comparison }: { label: string; value: string; comparison?: string }) {
   return (
-    <div className="rounded-lg bg-leaf-50 p-4 ring-1 ring-leaf-100">
-      <p className="text-xs font-bold text-leaf-700">{label}</p>
-      <p className="mt-1 text-2xl font-black text-leaf-900">{value}</p>
+    <div className="rounded-xl border border-leaf-100 bg-leaf-50/75 p-5">
+      <p className="text-xs font-bold tracking-wide text-leaf-700">{label}</p>
+      <p className="display-serif mt-2 text-3xl font-bold text-leaf-900">{value}</p>
       {comparison ? <p className="mt-1 text-xs font-semibold text-leaf-900/52">{comparison}</p> : null}
     </div>
   );

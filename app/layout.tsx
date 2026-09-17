@@ -6,6 +6,7 @@ import { MascotGuide } from "@/components/mascot-guide";
 import { NavigationLoading } from "@/components/navigation-loading";
 import { PageViewTracker } from "@/components/page-view-tracker";
 import { PwaRegister } from "@/components/pwa-register";
+import { SiteHeader } from "@/components/site-header";
 import { getSiteUrl } from "@/lib/site-url";
 
 export const metadata: Metadata = {
@@ -36,7 +37,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#2f855a",
+  themeColor: "#142f27",
   width: "device-width",
   initialScale: 1
 };
@@ -50,7 +51,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <Suspense fallback={null}>
           <NavigationLoading />
         </Suspense>
-        <main className="safe-bottom mx-auto min-h-screen w-full max-w-4xl px-4 pb-24 pt-5 sm:px-6">
+        <SiteHeader />
+        <main className="safe-bottom mx-auto min-h-screen w-full max-w-5xl px-4 pb-24 sm:px-6">
           {children}
         </main>
         <MascotGuide />

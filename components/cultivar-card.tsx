@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { PlayCircle } from "lucide-react";
+import { ArrowUpRight, PlayCircle } from "lucide-react";
 import { getPhotoUrl } from "@/lib/photo-url";
 import type { CultivarWithMedia } from "@/types/database";
 
@@ -22,32 +22,33 @@ export function CultivarCard({ fruitSlug, cultivar }: { fruitSlug: string; culti
   return (
     <Link
       href={`/fruits/${fruitSlug}/cultivars/${cultivar.slug}`}
-      className="grid grid-cols-[88px_1fr] gap-3 rounded-lg bg-white/84 p-3 ring-1 ring-leaf-100"
+      className="interactive-card group grid grid-cols-[92px_1fr] gap-4 rounded-xl border border-leaf-100 bg-white p-3.5 shadow-soft sm:grid-cols-[112px_1fr]"
     >
-      <div className="relative h-24 overflow-hidden rounded-md bg-leaf-100">
+      <div className="relative h-full min-h-28 overflow-hidden rounded-lg bg-leaf-100">
         {mainPhoto ? (
           <>
             {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img src={getPhotoUrl(mainPhoto, "thumb")} alt={mainPhoto.caption ?? cultivar.name_ja} className="h-full w-full object-cover" loading="lazy" />
+            <img src={getPhotoUrl(mainPhoto, "thumb")} alt={mainPhoto.caption ?? cultivar.name_ja} className="absolute inset-0 h-full w-full object-cover transition-transform duration-500 group-hover:scale-[1.04]" loading="lazy" />
           </>
         ) : (
           <div className="flex h-full items-center justify-center px-2 text-center text-xs font-semibold text-leaf-900/38">
-            No photo
+            写真準備中
           </div>
         )}
       </div>
       <div className="min-w-0">
         <div className="flex items-start justify-between gap-3">
           <div className="min-w-0">
-            <h3 className="font-bold text-leaf-900">{cultivar.name_ja}</h3>
+            <h3 className="display-serif text-[1.06rem] font-bold leading-snug text-leaf-900 sm:text-lg">{cultivar.name_ja}</h3>
             {cultivar.name_en ? <p className="mt-1 text-sm text-leaf-900/58">{cultivar.name_en}</p> : null}
           </div>
-          {cultivar.is_for_sale ? (
-            <span className="rounded-md bg-fruit-100 px-2 py-1 text-xs font-bold text-leaf-900">販売</span>
-          ) : null}
+          <span className="flex shrink-0 items-center gap-1 text-leaf-700">
+            {cultivar.is_for_sale ? <span className="rounded-full bg-fruit-100 px-2 py-1 text-[10px] font-bold text-fruit-800">販売</span> : null}
+            <ArrowUpRight size={16} />
+          </span>
         </div>
         {coldHardiness || floweringType || plantHeightType || genomeGroup || yieldLevel || originGroup || sugarContent || mangoAcidity || mangoFruitWeight || harvestSummary || useGroup || coffeeSpecies ? (
-          <div className="mt-3 flex flex-wrap gap-2 text-xs font-semibold text-leaf-900/64">
+          <div className="mt-3 flex flex-wrap gap-1.5 text-[11px] font-semibold text-leaf-900/70">
             {coffeeSpecies ? <span className="rounded-md bg-fruit-100 px-2 py-1">{coffeeSpecies}</span> : null}
             {originGroup ? <span className="rounded-md bg-leaf-50 px-2 py-1">{originGroup}</span> : null}
             {useGroup ? <span className="rounded-md bg-leaf-50 px-2 py-1">{useGroup}</span> : null}
@@ -68,7 +69,7 @@ export function CultivarCard({ fruitSlug, cultivar }: { fruitSlug: string; culti
             <span className="truncate">{mainVideo.title || "YouTubeあり"}</span>
           </div>
         ) : null}
-        {cultivar.taste ? <p className="mt-3 line-clamp-2 text-sm leading-6 text-leaf-900/70">{cultivar.taste}</p> : null}
+        {cultivar.taste ? <p className="mt-3 line-clamp-2 border-t border-leaf-100 pt-3 text-xs leading-6 text-leaf-900/68 sm:text-sm">{cultivar.taste}</p> : null}
       </div>
     </Link>
   );

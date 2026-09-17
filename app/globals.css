@@ -4,7 +4,7 @@
 
 :root {
   color-scheme: light;
-  background: #f7fbf7;
+  background: #f8f8f3;
 }
 
 html {
@@ -14,9 +14,57 @@ html {
 body {
   min-height: 100vh;
   background:
-    radial-gradient(circle at top left, rgba(245, 182, 66, 0.18), transparent 34rem),
-    linear-gradient(180deg, #f7fbf7 0%, #eff7ef 100%);
-  color: #173c2a;
+    radial-gradient(circle at 88% 0, rgba(225, 211, 170, 0.24), transparent 35rem),
+    linear-gradient(180deg, #fafaf6 0%, #f4f6f0 100%);
+  color: #142f27;
+  font-family: -apple-system, BlinkMacSystemFont, "Hiragino Kaku Gothic ProN", "Yu Gothic", Meiryo, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+::selection {
+  background: #d8e8d9;
+  color: #142f27;
+}
+
+:focus-visible {
+  outline: 3px solid #d8a64e;
+  outline-offset: 3px;
+}
+
+.display-serif {
+  font-family: Georgia, "Hiragino Mincho ProN", "Yu Mincho", serif;
+  letter-spacing: -0.035em;
+}
+
+.section-kicker {
+  color: #386849;
+  font-size: 0.68rem;
+  font-weight: 800;
+  letter-spacing: 0.2em;
+  text-transform: uppercase;
+}
+
+.editorial-card {
+  border: 1px solid rgba(37, 84, 60, 0.12);
+  border-radius: 1.5rem;
+  background: rgba(255, 255, 255, 0.91);
+  box-shadow: 0 12px 34px rgba(20, 47, 39, 0.06);
+}
+
+.interactive-card {
+  transition: transform 220ms ease, box-shadow 220ms ease, border-color 220ms ease;
+}
+
+.interactive-card:hover {
+  transform: translateY(-3px);
+  border-color: rgba(37, 84, 60, 0.3);
+  box-shadow: 0 20px 42px rgba(20, 47, 39, 0.12);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .interactive-card { transition: none; }
+  .interactive-card:hover { transform: none; }
 }
 
 button,

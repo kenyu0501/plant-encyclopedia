@@ -100,7 +100,7 @@ export default async function CultivarDetailPage({ params }: Props) {
   });
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-7">
       <RecentCultivarTracker
         id={cultivar.id}
         fruitName={cultivar.fruits.name_ja}
@@ -148,7 +148,7 @@ export default async function CultivarDetailPage({ params }: Props) {
       <ShareButtons title={shareTitle} text={shareText} url={shareUrl} />
 
       {mainPhoto ? (
-        <div className="relative aspect-[4/3] overflow-hidden rounded-lg bg-leaf-100">
+        <div className="relative aspect-[4/3] overflow-hidden rounded-[1.5rem] bg-leaf-100 shadow-soft sm:aspect-[16/10]">
           <Image src={getPhotoUrl(mainPhoto, "medium")} alt={mainPhoto.caption ?? cultivar.name_ja} fill className="object-cover" priority sizes="100vw" unoptimized />
         </div>
       ) : null}
@@ -186,7 +186,7 @@ export default async function CultivarDetailPage({ params }: Props) {
                 href={video.youtube_url}
                 target="_blank"
                 rel="noreferrer"
-                className="flex items-center gap-3 rounded-lg bg-white/84 p-4 ring-1 ring-leaf-100"
+                className="interactive-card flex items-center gap-3 rounded-xl border border-leaf-100 bg-white p-4 shadow-soft"
               >
                 <PlayCircle className="text-fruit-600" size={24} />
                 <span className="min-w-0 flex-1 font-semibold text-leaf-900">{video.title || video.youtube_url}</span>
@@ -197,8 +197,9 @@ export default async function CultivarDetailPage({ params }: Props) {
         </section>
       ) : null}
 
-      <section className="rounded-lg bg-white/84 p-5 ring-1 ring-leaf-100">
-        <h2 className="font-bold text-leaf-900">品種情報</h2>
+      <section className="editorial-card p-5 sm:p-7">
+        <p className="section-kicker">CULTIVAR PROFILE</p>
+        <h2 className="display-serif mt-2 text-2xl font-bold text-leaf-900">品種情報</h2>
 
         {cultivar.description ? <p className="mt-4 leading-7 text-leaf-900/82">{cultivar.description}</p> : null}
 
@@ -261,12 +262,12 @@ export default async function CultivarDetailPage({ params }: Props) {
 function MetricCard({ label, value, icon }: { label: string; value: string | null; icon: ReactNode }) {
   if (!value) return null;
   return (
-    <div className="rounded-lg bg-leaf-50 p-4 ring-1 ring-leaf-100">
+    <div className="rounded-xl border border-leaf-100 bg-leaf-50/75 p-4">
       <div className="flex items-center gap-2 text-leaf-700">
         {icon}
         <dt className="text-xs font-bold">{label}</dt>
       </div>
-      <dd className="mt-2 text-lg font-bold leading-tight text-leaf-900">{value}</dd>
+      <dd className="display-serif mt-2 text-lg font-bold leading-tight text-leaf-900">{value}</dd>
     </div>
   );
 }
@@ -399,8 +400,8 @@ function getFruitWeightSummary(fruitSize: string | null, description: string | n
 
 function InfoGroup({ title, children }: { title: string; children: ReactNode }) {
   return (
-    <section className="rounded-lg bg-white/72 p-4 ring-1 ring-leaf-100">
-      <h3 className="text-sm font-bold text-leaf-900">{title}</h3>
+    <section className="rounded-xl border border-leaf-100 bg-white p-5">
+      <h3 className="display-serif text-lg font-bold text-leaf-900">{title}</h3>
       <dl className="mt-3 grid gap-3 text-sm leading-6 text-leaf-900/76">{children}</dl>
     </section>
   );
