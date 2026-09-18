@@ -116,7 +116,7 @@ export async function getPublicFruits(limit?: number) {
   const supabase = await createClient();
   let query = supabase
     .from("fruits")
-    .select("*, photos(*), cultivars(id), videos(*)")
+    .select("*, photos(*), cultivars(id, is_public), videos(*)")
     .eq("is_public", true)
     .order("display_order", { ascending: true, nullsFirst: false })
     .order("name_ja", { ascending: true });
@@ -132,7 +132,7 @@ export async function getPublicFruits(limit?: number) {
     ...fruit,
     photos: (fruit.photos ?? []).filter((photo) => photo.approval_status === "approved" && !photo.cultivar_id),
     videos: uniqueYoutubeLinks((fruit.videos ?? []).filter((video) => video.is_public && !video.cultivar_id)),
-    cultivars: (fruit.cultivars ?? []).filter((cultivar) => cultivar.is_public !== false)
+    cultivars: (fruit.cultivars ?? []).filter((cultivar) => cultivar.is_public)
   }));
 }
 

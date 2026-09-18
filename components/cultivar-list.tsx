@@ -8,6 +8,7 @@ import {
   Dna,
   Flower2,
   Globe2,
+  Grid2X2,
   ListFilter,
   RotateCcw,
   Ruler,
@@ -17,9 +18,13 @@ import {
   Thermometer
 } from "lucide-react";
 import { CultivarCard } from "@/components/cultivar-card";
+import { CultivarPhotoCard } from "@/components/cultivar-photo-card";
+import { CatalogPagination } from "@/components/catalog-pagination";
 import type { CultivarWithMedia } from "@/types/database";
 
 type ViewMode = "name" | "cold" | "flowering" | "origin" | "use" | "height" | "genome" | "yield" | "coffeeSpecies";
+type CardMode = "photo" | "detail";
+const PHOTO_PAGE_SIZE = 24;
 type CultivarGroup = {
   label: string;
   rank: number;
@@ -69,6 +74,8 @@ export function CultivarList({
   const hasContainerData = cultivars.some((cultivar) => hasSuitableText(cultivar.container_suitability, "container"));
   const hasBeginnerData = cultivars.some((cultivar) => hasSuitableText(cultivar.beginner_suitability, "beginner"));
   const [viewMode, setViewMode] = useState<ViewMode>("name");
+  const [cardMode, setCardMode] = useState<CardMode>("photo");
+  const [photoPage, setPhotoPage] = useState(1);
   const [filters, setFilters] = useState<CultivarFilters>(initialFilters);
 
   const filteredCultivars = useMemo(
@@ -114,9 +121,17 @@ export function CultivarList({
   const activeMode = availableModes.includes(viewMode) ? viewMode : "name";
   const detailedFilterCount = countDetailedFilters(filters);
   const hasActiveFilters = Boolean(filters.query.trim()) || detailedFilterCount > 0;
+  const photoPageCount = Math.ceil(sortedCultivars.length / PHOTO_PAGE_SIZE);
+  const currentPhotoPage = Math.min(photoPage, Math.max(photoPageCount, 1));
 
   function updateFilter<Key extends keyof CultivarFilters>(key: Key, value: CultivarFilters[Key]) {
     setFilters((current) => ({ ...current, [key]: value }));
+    setPhotoPage(1);
+  }
+
+  function changePhotoPage(nextPage: number) {
+    setPhotoPage(nextPage);
+    document.getElementById("cultivar-photo-results")?.scrollIntoView({ block: "start" });
   }
 
   if (cultivars.length === 0) {
@@ -269,7 +284,7 @@ export function CultivarList({
           {hasActiveFilters ? (
             <button
               type="button"
-              onClick={() => setFilters(initialFilters)}
+              onClick={() => { setFilters(initialFilters); setPhotoPage(1); }}
               className="inline-flex min-h-10 items-center gap-2 rounded-md px-3 text-sm font-bold text-leaf-700 transition hover:bg-leaf-50"
             >
               <RotateCcw size={15} />
@@ -293,13 +308,23 @@ export function CultivarList({
         </div>
       ) : null}
 
+      {activeMode === "name" && filteredCultivars.length > 0 ? (
+        <div className="flex flex-wrap items-center justify-between gap-3">
+          <p className="text-xs leading-5 text-leaf-900/60">写真から探せます。特徴を比べたいときは詳細表示に切り替えてください。</p>
+          <div role="group" aria-label="品種一覧の表示方法" className="inline-flex rounded-full border border-leaf-200 bg-white p-1 shadow-sm">
+            <button type="button" onClick={() => setCardMode("photo")} aria-pressed={cardMode === "photo"} className={`inline-flex min-h-9 items-center gap-1.5 rounded-full px-3 text-xs font-bold ${cardMode === "photo" ? "bg-leaf-900 text-white" : "text-leaf-800"}`}><Grid2X2 size={15} />写真一覧</button>
+            <button type="button" onClick={() => setCardMode("detail")} aria-pressed={cardMode === "detail"} className={`inline-flex min-h-9 items-center gap-1.5 rounded-full px-3 text-xs font-bold ${cardMode === "detail" ? "bg-leaf-900 text-white" : "text-leaf-800"}`}><ListFilter size={15} />詳細一覧</button>
+          </div>
+        </div>
+      ) : null}
+
       {filteredCultivars.length === 0 ? (
         <div className="rounded-lg border border-dashed border-leaf-200 bg-white/72 p-6 text-center">
           <p className="font-bold text-leaf-900">条件に合う品種が見つかりませんでした</p>
           <p className="mt-2 text-sm text-leaf-900/58">条件を減らすか、検索語を変えてお試しください。</p>
           <button
             type="button"
-            onClick={() => setFilters(initialFilters)}
+            onClick={() => { setFilters(initialFilters); setPhotoPage(1); }}
             className="mt-4 inline-flex min-h-11 items-center gap-2 rounded-md bg-leaf-700 px-4 py-2 text-sm font-bold text-white"
           >
             <RotateCcw size={16} />
@@ -322,6 +347,15 @@ export function CultivarList({
         <GroupedCultivars fruitSlug={fruitSlug} groups={yieldGroups} />
       ) : activeMode === "coffeeSpecies" ? (
         <GroupedCultivars fruitSlug={fruitSlug} groups={coffeeSpeciesGroups} />
+      ) : cardMode === "photo" ? (
+        <div id="cultivar-photo-results" className="scroll-mt-6 space-y-5">
+          <div className="grid grid-cols-2 gap-3 sm:grid-cols-3 sm:gap-4 lg:grid-cols-4">
+            {sortedCultivars.slice((currentPhotoPage - 1) * PHOTO_PAGE_SIZE, currentPhotoPage * PHOTO_PAGE_SIZE).map((cultivar) => (
+              <CultivarPhotoCard key={cultivar.id} fruitSlug={fruitSlug} cultivar={cultivar} />
+            ))}
+          </div>
+          <CatalogPagination page={currentPhotoPage} pageCount={photoPageCount} onPageChange={changePhotoPage} />
+        </div>
       ) : (
         <div className="grid gap-3 sm:grid-cols-2">
           {sortedCultivars.map((cultivar) => (
