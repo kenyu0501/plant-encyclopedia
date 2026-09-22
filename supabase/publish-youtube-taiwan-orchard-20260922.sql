@@ -115,3 +115,91 @@ on conflict (slug) do update set
   approved_at = excluded.approved_at,
   published_at = excluded.published_at,
   updated_at = excluded.updated_at;
+
+-- この動画で紹介した追加品種の詳細ページにも、同じYouTube動画を表示します。
+-- URL・果樹・品種の組み合わせを確認してから追加するため、何度実行しても重複しません。
+with target_cultivars(fruit_slug, cultivar_slug) as (
+  values
+    ('jackfruit', 'zhen-zhu-bai'),
+    ('jackfruit', 'sun-shan'),
+    ('chempedak', 'mong-chen'),
+    ('chempedak', 'qing-long-jin'),
+    ('chempedak', 'pan-long'),
+    ('chempedak', 'taitung-red'),
+    ('chempedak', 'xiao-zi-mi'),
+    ('chempedak', 'nangang-jiao'),
+    ('avocado', 'hei-bao'),
+    ('avocado', 'hei-jin-gang'),
+    ('avocado', 'hei-jin-huan'),
+    ('avocado', 'madou-no-2'),
+    ('abiu', 'bai-jin'),
+    ('black-sapote', 'zheng-tan-xiang-line'),
+    ('mango', 'maha-chanok')
+), resolved as (
+  select
+    f.id as fruit_id,
+    c.id as cultivar_id,
+    c.name_ja as cultivar_name
+  from target_cultivars target
+  join public.fruits f on f.slug = target.fruit_slug
+  join public.cultivars c
+    on c.fruit_id = f.id
+   and c.slug = target.cultivar_slug
+)
+insert into public.videos (
+  fruit_id,
+  cultivar_id,
+  youtube_url,
+  title,
+  description,
+  thumbnail_url,
+  video_type,
+  is_public
+)
+select
+  resolved.fruit_id,
+  resolved.cultivar_id,
+  'https://www.youtube.com/watch?v=DTmz_5rnTyk',
+  '【後半 本日限定】台湾のすごい園地に来た【#台湾17】',
+  resolved.cultivar_name || 'が登場する台湾の熱帯果樹園の取材動画です。樹姿、果実、接ぎ木や園主による品種説明を確認できます。',
+  'https://img.youtube.com/vi/DTmz_5rnTyk/hqdefault.jpg',
+  '園地・品種紹介',
+  true
+from resolved
+where not exists (
+  select 1
+  from public.videos existing
+  where existing.fruit_id = resolved.fruit_id
+    and existing.cultivar_id = resolved.cultivar_id
+    and existing.youtube_url = 'https://www.youtube.com/watch?v=DTmz_5rnTyk'
+);
+
+-- 実行確認：15品種すべてに動画が1件ずつ表示されれば成功です。
+select
+  f.name_ja as fruit_name,
+  c.name_ja as cultivar_name,
+  count(v.id) as linked_video_count
+from public.cultivars c
+join public.fruits f on f.id = c.fruit_id
+left join public.videos v
+  on v.cultivar_id = c.id
+ and v.youtube_url = 'https://www.youtube.com/watch?v=DTmz_5rnTyk'
+where c.slug in (
+  'zhen-zhu-bai',
+  'sun-shan',
+  'mong-chen',
+  'qing-long-jin',
+  'pan-long',
+  'taitung-red',
+  'xiao-zi-mi',
+  'nangang-jiao',
+  'hei-bao',
+  'hei-jin-gang',
+  'hei-jin-huan',
+  'madou-no-2',
+  'bai-jin',
+  'zheng-tan-xiang-line',
+  'maha-chanok'
+)
+group by f.name_ja, c.name_ja
+order by f.name_ja, c.name_ja;
