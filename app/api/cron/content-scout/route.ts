@@ -13,6 +13,25 @@ type DraftCandidate = {
   youtubeUrl?: string | null;
 };
 
+type CrossrefItem = {
+  DOI?: string;
+  title?: string[];
+  published?: { "date-parts"?: number[][] };
+  URL?: string;
+  publisher?: string;
+  abstract?: string;
+};
+
+type NewsCandidate = DraftCandidate & { score: number; locale: "ja" | "en" };
+
+const fruitTerms = [
+  "mango", "mangifera", "avocado", "persea americana", "banana", "musa ", "dragon fruit", "pitaya", "hylocereus", "selenicereus",
+  "papaya", "carica papaya", "pineapple", "ananas", "guava", "psidium", "passion fruit", "passiflora", "lychee", "litchi",
+  "rambutan", "durian", "jackfruit", "artocarpus", "cherimoya", "atemoya", "annona", "white sapote", "casimiroa", "tropical fruit"
+];
+const japaneseFruitTerms = ["マンゴー", "アボカド", "バナナ", "ドラゴンフルーツ", "ピタヤ", "パパイヤ", "パインアップル", "パイナップル", "グアバ", "パッションフルーツ", "ライチ", "レイシ", "ランブータン", "ドリアン", "ジャックフルーツ", "パラミツ", "アテモヤ", "チェリモヤ", "ホワイトサポテ", "熱帯果樹"];
+const topicTerms = ["cultivar", "variety", "fruit", "quality", "yield", "flower", "disease", "pest", "postharvest", "harvest", "ripening", "orchard", "resistance", "phenology", "propagation", "cultivation", "graft", "pollination", "storage", "genotype", "qtl", "breeding", "栽培", "品種", "果実", "収穫", "開花", "病害", "害虫", "育種", "研究"];
+
 export const maxDuration = 60;
 
 export async function GET(request: Request) {
@@ -81,28 +100,81 @@ async function resolveYoutubeChannelId() {
 }
 
 async function collectResearch(): Promise<DraftCandidate[]> {
-  const from = new Date(Date.now() - 14 * 86400000).toISOString().slice(0, 10);
-  const url = `https://api.crossref.org/works?query=${encodeURIComponent("tropical fruit cultivation mango avocado banana dragon fruit")}&filter=from-pub-date:${from},type:journal-article&sort=published&order=desc&rows=2&select=DOI,title,published,URL,publisher,abstract`;
-  const response = await fetch(url, { headers: { "user-agent": "TropicalFruitMedia/1.0 (mailto:kenyu.uehara@gmail.com)" }, next: { revalidate: 0 } });
-  if (!response.ok) throw new Error(`Crossref ${response.status}`);
-  const json = await response.json() as { message?: { items?: Array<Record<string, unknown>> } };
-  return (json.message?.items ?? []).map((item) => {
+  const now = new Date();
+  const from = new Date(now.getTime() - 60 * 86400000).toISOString().slice(0, 10);
+  const until = now.toISOString().slice(0, 10);
+  const queries = ["mango Mangifera", "banana Musa", "avocado Persea", "dragon fruit pitaya", "papaya pineapple", "tropical fruit horticulture"];
+  const responses = await Promise.allSettled(queries.map(async (query) => {
+    const params = new URLSearchParams({
+      "query.bibliographic": query,
+      filter: `from-pub-date:${from},until-pub-date:${until},type:journal-article`,
+      sort: "published",
+      order: "desc",
+      rows: "6",
+      select: "DOI,title,published,URL,publisher,abstract"
+    });
+    const response = await fetchWithTimeout(`https://api.crossref.org/works?${params}`, { headers: { "user-agent": "TropicalFruitMedia/1.0 (mailto:kenyu.uehara@gmail.com)" } });
+    if (!response.ok) throw new Error(`Crossref ${response.status}`);
+    const json = await response.json() as { message?: { items?: CrossrefItem[] } };
+    return json.message?.items ?? [];
+  }));
+  const unique = new Map<string, CrossrefItem>();
+  for (const result of responses) {
+    if (result.status !== "fulfilled") continue;
+    for (const item of result.value) {
+      const key = item.DOI || item.URL;
+      if (key) unique.set(key.toLowerCase(), item);
+    }
+  }
+  return Array.from(unique.values()).map((item) => {
     const title = Array.isArray(item.title) ? String(item.title[0] ?? "") : String(item.title ?? "");
     const doi = String(item.DOI ?? "");
     const sourceUrl = doi ? `https://doi.org/${doi}` : String(item.URL ?? "");
     const publisher = String(item.publisher ?? "学術論文");
     const publishedAt = crossrefDate(item.published);
-    return { title: `【論文候補】${title}`, category: "research" as const, excerpt: "新しく公開された熱帯果樹関連論文の候補です。研究の背景、方法、結果、日本の栽培者にとっての意味を確認して解説します。", content: `原題：${title}\n\nこの論文の本文または抄録を一次資料で確認し、研究目的、試験条件、主な結果、限界を日本語で整理してください。単なる翻訳ではなく、沖縄・日本の熱帯果樹栽培でどう役立つかを追記してください。`, sourceName: publisher, sourceUrl, sourcePublishedAt: publishedAt };
-  }).filter((item) => item.sourceUrl && item.title !== "【論文候補】");
+    const searchable = `${title} ${stripTags(item.abstract ?? "")}`.toLowerCase();
+    return { candidate: { title: `【論文候補】${title}`, category: "research" as const, excerpt: "新しく公開された熱帯果樹関連論文の候補です。研究の背景、方法、結果、日本の栽培者にとっての意味を確認して解説します。", content: `原題：${title}\n\nこの論文の本文または抄録を一次資料で確認し、研究目的、試験条件、主な結果、限界を日本語で整理してください。単なる翻訳ではなく、沖縄・日本の熱帯果樹栽培でどう役立つかを追記してください。`, sourceName: publisher, sourceUrl, sourcePublishedAt: publishedAt }, score: relevanceScore(searchable), stamp: publishedAt ? new Date(publishedAt).getTime() : 0 };
+  }).filter((item) => item.candidate.sourceUrl && item.candidate.sourcePublishedAt && isSaneRecentDate(item.candidate.sourcePublishedAt, 60) && item.score >= 5)
+    .sort((a, b) => b.score - a.score || b.stamp - a.stamp)
+    .slice(0, 2)
+    .map((item) => item.candidate);
 }
 
 async function collectNews(): Promise<DraftCandidate[]> {
   const query = '("tropical fruit" OR mango OR avocado OR banana OR "dragon fruit") (cultivation OR disease OR variety OR research)';
   const url = `https://api.gdeltproject.org/api/v2/doc/doc?query=${encodeURIComponent(query)}&mode=artlist&maxrecords=2&format=json&sort=datedesc`;
-  const response = await fetch(url, { next: { revalidate: 0 } });
-  if (!response.ok) throw new Error(`GDELT ${response.status}`);
-  const json = await response.json() as { articles?: Array<{ title?: string; url?: string; domain?: string; seendate?: string; socialimage?: string }> };
-  return (json.articles ?? []).map((item) => ({ title: `【海外ニュース候補】${item.title ?? "熱帯果樹ニュース"}`, category: "news" as const, excerpt: "海外で報じられた熱帯果樹関連ニュースの候補です。一次情報と国内への影響を確認してから記事化します。", content: `元記事を確認し、何が起きたか、なぜ重要か、情報源の信頼性、日本の生産者・愛好家への影響を整理してください。\n\n転載や単純翻訳ではなく、公的資料や研究機関の発表があれば追加で確認してください。`, sourceName: item.domain || "海外ニュース", sourceUrl: item.url || "", sourcePublishedAt: parseGdeltDate(item.seendate), heroImageUrl: item.socialimage || null })).filter((item) => item.sourceUrl);
+  const collected: NewsCandidate[] = [];
+  try {
+    const response = await fetchWithTimeout(url, { headers: { "user-agent": "TropicalFruitMedia/1.0 (mailto:kenyu.uehara@gmail.com)" } });
+    if (response.ok) {
+      const json = await response.json() as { articles?: Array<{ title?: string; url?: string; domain?: string; seendate?: string; socialimage?: string }> };
+      for (const item of json.articles ?? []) {
+        const title = item.title?.trim() ?? "";
+        const publishedAt = parseGdeltDate(item.seendate);
+        const score = relevanceScore(title.toLowerCase()) + sourceScore(item.domain ?? "");
+        if (!item.url || !title || !publishedAt || !isSaneRecentDate(publishedAt, 21) || score < 5) continue;
+        collected.push({ ...makeNewsCandidate(title, item.domain || "海外ニュース", item.url, publishedAt, item.socialimage || null, "en"), score, locale: "en" });
+      }
+    }
+  } catch { /* RSS fallback below */ }
+
+  if (collected.length < 2) {
+    const feeds = await Promise.allSettled([
+      collectGoogleNews('("tropical fruit" OR mango OR avocado OR banana OR "dragon fruit" OR papaya OR pineapple) (cultivation OR disease OR cultivar OR harvest OR research) when:14d', "en"),
+      collectGoogleNews('(マンゴー OR アボカド OR バナナ OR ドラゴンフルーツ OR パパイヤ OR パイナップル) (栽培 OR 病害 OR 品種 OR 収穫 OR 研究) when:14d', "ja")
+    ]);
+    for (const feed of feeds) if (feed.status === "fulfilled") collected.push(...feed.value);
+  }
+
+  const unique = new Map<string, NewsCandidate>();
+  for (const item of collected.sort((a, b) => b.score - a.score || new Date(b.sourcePublishedAt ?? 0).getTime() - new Date(a.sourcePublishedAt ?? 0).getTime())) {
+    const key = item.sourceUrl.replace(/[?#].*$/, "");
+    if (!unique.has(key)) unique.set(key, item);
+  }
+  const ranked = Array.from(unique.values());
+  const japanese = ranked.find((item) => item.locale === "ja");
+  const selected = japanese ? [japanese, ...ranked.filter((item) => item !== japanese)] : ranked;
+  return selected.slice(0, 2).map(({ score: _score, locale: _locale, ...candidate }) => candidate);
 }
 
 async function sendDigest(created: { id: string; title: string }[]) {
@@ -117,3 +189,49 @@ function decodeXml(value: string) { return value.replace(/&amp;/g, "&").replace(
 function slugPart(value: string) { return value.normalize("NFKC").toLowerCase().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "").slice(0, 35) || "candidate"; }
 function crossrefDate(value: unknown) { const parts = (value as { "date-parts"?: number[][] } | undefined)?.["date-parts"]?.[0]; if (!parts?.[0]) return null; return new Date(Date.UTC(parts[0], (parts[1] ?? 1) - 1, parts[2] ?? 1)).toISOString(); }
 function parseGdeltDate(value?: string) { if (!value || !/^\d{14}$/.test(value)) return null; return new Date(`${value.slice(0,4)}-${value.slice(4,6)}-${value.slice(6,8)}T${value.slice(8,10)}:${value.slice(10,12)}:${value.slice(12,14)}Z`).toISOString(); }
+
+function relevanceScore(value: string) {
+  const normalized = value.normalize("NFKC").toLowerCase();
+  const fruitHits = [...fruitTerms, ...japaneseFruitTerms].filter((term) => normalized.includes(term)).length;
+  const topicHits = topicTerms.filter((term) => normalized.includes(term)).length;
+  return Math.min(fruitHits, 3) * 4 + Math.min(topicHits, 4);
+}
+
+function sourceScore(source: string) {
+  return /(university|institute|research|ministry|department|government|gov\b|fao|cabi|cgiar|reuters|associated press|abc news|大学|研究所|研究機構|農林水産|都道府県)/i.test(source) ? 3 : 0;
+}
+
+function isSaneRecentDate(value: string, days: number) {
+  const stamp = new Date(value).getTime();
+  const now = Date.now();
+  return Number.isFinite(stamp) && stamp <= now + 86400000 && stamp >= now - days * 86400000;
+}
+
+function stripTags(value: string) { return decodeXml(value.replace(/<[^>]+>/g, " ").replace(/\s+/g, " ")).trim(); }
+
+function makeNewsCandidate(title: string, sourceName: string, sourceUrl: string, sourcePublishedAt: string, heroImageUrl: string | null, locale: "ja" | "en"): DraftCandidate {
+  const label = locale === "ja" ? "国内ニュース候補" : "海外ニュース候補";
+  return { title: `【${label}】${title}`, category: "news", excerpt: "熱帯果樹に関する新着ニュースの候補です。一次情報と国内への影響を確認してから記事化します。", content: `元記事を確認し、何が起きたか、なぜ重要か、情報源の信頼性、日本の生産者・愛好家への影響を整理してください。\n\n転載や単純翻訳ではなく、公的資料や研究機関の発表があれば追加で確認してください。`, sourceName, sourceUrl, sourcePublishedAt, heroImageUrl };
+}
+
+async function collectGoogleNews(query: string, locale: "ja" | "en"): Promise<NewsCandidate[]> {
+  const params = locale === "ja" ? "hl=ja&gl=JP&ceid=JP:ja" : "hl=en-US&gl=US&ceid=US:en";
+  const response = await fetchWithTimeout(`https://news.google.com/rss/search?q=${encodeURIComponent(query)}&${params}`, { headers: { "user-agent": "TropicalFruitMedia/1.0 (mailto:kenyu.uehara@gmail.com)" } });
+  if (!response.ok) throw new Error(`Google News RSS ${response.status}`);
+  const xml = await response.text();
+  return Array.from(xml.matchAll(/<item>([\s\S]*?)<\/item>/g)).slice(0, 20).flatMap((match) => {
+    const item = match[1];
+    const title = decodeXml(textTag(item, "title")).trim();
+    const sourceName = decodeXml(textTag(item, "source")).trim() || (locale === "ja" ? "国内ニュース" : "海外ニュース");
+    const sourceUrl = decodeXml(textTag(item, "link")).trim();
+    const rawDate = textTag(item, "pubDate");
+    const sourcePublishedAt = rawDate ? new Date(rawDate).toISOString() : "";
+    const score = relevanceScore(title) + sourceScore(sourceName);
+    if (!title || !sourceUrl || !sourcePublishedAt || !isSaneRecentDate(sourcePublishedAt, 21) || score < 5) return [];
+    return [{ ...makeNewsCandidate(title, sourceName, sourceUrl, sourcePublishedAt, null, locale), score, locale }];
+  });
+}
+
+async function fetchWithTimeout(url: string, init: RequestInit = {}) {
+  return fetch(url, { ...init, cache: "no-store", signal: AbortSignal.timeout(15000) });
+}
