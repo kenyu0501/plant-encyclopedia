@@ -1,11 +1,11 @@
 import Link from "next/link";
 
 export function ArticleContent({ content }: { content: string }) {
-  return content.split(/\n{2,}/).filter(Boolean).map((paragraph, paragraphIndex) => (
-    <p key={paragraphIndex} className="whitespace-pre-line">
-      <InlineLinks text={paragraph} />
-    </p>
-  ));
+  return content.split(/\n{2,}/).filter(Boolean).map((paragraph, paragraphIndex) => {
+    if (paragraph.startsWith("## ")) return <h2 key={paragraphIndex} className="display-serif pt-4 text-2xl font-bold leading-10 text-leaf-900"><InlineLinks text={paragraph.slice(3)} /></h2>;
+    if (paragraph.startsWith("### ")) return <h3 key={paragraphIndex} className="pt-2 text-lg font-bold leading-8 text-leaf-900"><InlineLinks text={paragraph.slice(4)} /></h3>;
+    return <p key={paragraphIndex} className="whitespace-pre-line"><InlineLinks text={paragraph} /></p>;
+  });
 }
 
 function InlineLinks({ text }: { text: string }) {

@@ -1,0 +1,403 @@
+-- YouTube「【後半 本日限定】台湾のすごい園地に来た【#台湾17】」
+-- https://www.youtube.com/watch?v=DTmz_5rnTyk
+-- 提供された中国語・日本語の正式字幕を一次資料として、未登録品種を追加します。
+-- 写真は後から管理画面で追加するため、このSQLでは photos テーブルを変更しません。
+--
+-- 「麻豆2号」は字幕だけでは果樹との対応が曖昧ですが、台湾農業部の資料で
+-- アボカド「嘉選2号（麻豆2号）」と確認できたため、公式資料を併記して登録します。
+-- 「紅蓮」は果樹との対応を確定できなかったため登録対象外です。
+-- 品種名の日本語読みが未確定のものは、字幕にある漢字表記を優先しています。
+
+begin;
+
+insert into public.cultivars (
+  fruit_id,
+  name_ja,
+  name_en,
+  slug,
+  origin,
+  description,
+  fruit_size,
+  sugar_content,
+  taste,
+  texture,
+  aroma,
+  harvest_season,
+  cold_hardiness,
+  kenyu_comment,
+  public_notes,
+  private_notes,
+  is_public,
+  is_for_sale
+)
+select
+  f.id,
+  v.name_ja,
+  v.name_en,
+  v.cultivar_slug,
+  v.origin,
+  v.description,
+  v.fruit_size,
+  v.sugar_content,
+  v.taste,
+  v.texture,
+  v.aroma,
+  v.harvest_season,
+  v.cold_hardiness,
+  v.kenyu_comment,
+  v.public_notes,
+  v.private_notes,
+  true,
+  false
+from (
+  values
+    (
+      'jackfruit',
+      '珍珠白',
+      'Zhen Zhu Bai',
+      'zhen-zhu-bai',
+      '台湾',
+      '白い果肉を持つパラミツ品種。動画では、甘みはあるものの、粉を帯びたように白く見える外観が消費者に好まれにくく、園主が一部を赤肉品種へ高接ぎ更新したと説明されています。',
+      null,
+      null,
+      '甘みがある一方、動画では特別おいしいわけではないとも評価されています。',
+      null,
+      null,
+      null,
+      null,
+      '白肉という見た目の個性が大きい品種です。食味と市場評価は別々に記録していきたいです。',
+      '正式字幕 00:01:01〜00:01:14、00:07:21〜00:07:39。品種名、白肉、甘み、外観への評価と高接ぎ更新の説明を反映。',
+      '一次資料: https://www.youtube.com/watch?v=DTmz_5rnTyk（提供された正式日中字幕）',
+      true
+    ),
+    (
+      'jackfruit',
+      '筍山',
+      'Sun Shan',
+      'sun-shan',
+      '台湾',
+      '台湾の園地で栽培されていたパラミツ品種。動画では、おいしく、油分や脂質が多い品種として紹介されています。',
+      null,
+      null,
+      '動画内の園主による評価は「おいしい」。油分・脂質が多いと説明されています。',
+      null,
+      null,
+      null,
+      null,
+      '一般的なパラミツとの食感やコクの違いを、今後実果で確かめたい品種です。',
+      '正式字幕 00:20:49〜00:21:25。パラミツであること、品種名、おいしさ、油分・脂質が多いという説明を反映。',
+      '一次資料: https://www.youtube.com/watch?v=DTmz_5rnTyk（提供された正式日中字幕）',
+      true
+    ),
+    (
+      'chempedak',
+      'モンチェン',
+      'Meng Jiang / Mong Chen',
+      'mong-chen',
+      '台湾',
+      '動画でパラミツとコパラミツの交雑種として紹介された系統。枝葉にはコパラミツの特徴である細かな毛があり、過去の結実では中身のない果実が多かったと説明されています。',
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      'パラミツとコパラミツの中間的な特徴を、樹姿と果実の両方から観察したい系統です。',
+      '正式字幕 00:04:40〜00:05:26。中国語字幕は「孟江」、日本語字幕は「モンチェン」。交雑種のため便宜上コパラミツに収録。',
+      '一次資料: https://www.youtube.com/watch?v=DTmz_5rnTyk（提供された正式日中字幕）。分類とローマ字表記は今後追加資料で再確認する。',
+      true
+    ),
+    (
+      'chempedak',
+      '青龍金',
+      'Qing Long Jin',
+      'qing-long-jin',
+      '台湾',
+      '台湾の園地で紹介されたコパラミツ系の品種。動画では同じ場面で「青龍」がおいしいと語られていますが、「青龍金」と同一の略称かは字幕だけでは確定できません。',
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      '品種名と食味評価の対応は、ラベルや追加資料を得てから更新したいです。',
+      '正式字幕 00:12:55〜00:13:13。「青龍金」「盤龍」の品種名を確認。直後の「青龍がおいしい」という発言は同一品種と断定せず保留。',
+      '一次資料: https://www.youtube.com/watch?v=DTmz_5rnTyk（提供された正式日中字幕）',
+      true
+    ),
+    (
+      'chempedak',
+      '盤龍',
+      'Pan Long',
+      'pan-long',
+      '台湾',
+      '台湾の園地で、青龍金とともに紹介されたコパラミツ系の品種です。',
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      'まずは品種名を図鑑に残し、果肉色や食味、収穫期は追加資料や実果で補いたいです。',
+      '正式字幕 00:12:55〜00:13:07。字幕で確認できる情報が限られるため、未確認の特性は記載していません。',
+      '一次資料: https://www.youtube.com/watch?v=DTmz_5rnTyk（提供された正式日中字幕）',
+      true
+    ),
+    (
+      'chempedak',
+      '台東紅',
+      'Taitung Red',
+      'taitung-red',
+      '台湾・台東',
+      '台湾で以前から栽培されている赤肉のコパラミツ品種として、動画内で紹介されています。',
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      '赤肉という明確な特徴を持つ台湾のコパラミツとして、写真と食味情報を追加していきたいです。',
+      '正式字幕 00:13:13〜00:13:25。昔からある赤肉品種で、名称は「台東紅」と説明。',
+      '一次資料: https://www.youtube.com/watch?v=DTmz_5rnTyk（提供された正式日中字幕）',
+      true
+    ),
+    (
+      'chempedak',
+      '小紫蜜',
+      'Xiao Zi Mi',
+      'xiao-zi-mi',
+      '台湾東部',
+      '台湾東部のコパラミツ系統。動画では、ほかの品種と異なる餅のような食感を持ち、果肉がねっとりして保存しにくいと説明されています。',
+      null,
+      null,
+      null,
+      '餅のような食感で、果肉はねっとりしていると説明されています。',
+      null,
+      null,
+      '弱い',
+      '独特の粘りを持つ品種です。完熟度ごとの食感と日持ちを比較したいです。',
+      '正式字幕 00:13:32〜00:14:40。台湾東部の品種、コパラミツ系統、餅のような食感、保存性、寒さに弱いという説明を反映。',
+      '一次資料: https://www.youtube.com/watch?v=DTmz_5rnTyk（提供された正式日中字幕）',
+      true
+    ),
+    (
+      'chempedak',
+      '南港蕉',
+      'Nangang Jiao',
+      'nangang-jiao',
+      '台湾',
+      '果実が小さく、ほとんど種がないコパラミツ品種。動画で割った果実には果肉が7房ほどしかなく、寒さに弱いため台中より北では栽培が難しいと説明されています。',
+      '小ぶり。動画で割った1果は果肉が7房ほど。',
+      null,
+      null,
+      null,
+      null,
+      null,
+      '弱い。動画では台中より北での栽培は難しいと説明。',
+      '種の少なさは魅力的です。収量、可食部率、低温期の生育を継続して見たい品種です。',
+      '正式字幕 00:16:36〜00:17:36。小果、ほぼ種なし、約7房、寒さに弱いという説明を反映。',
+      '一次資料: https://www.youtube.com/watch?v=DTmz_5rnTyk（提供された正式日中字幕）',
+      true
+    ),
+    (
+      'avocado',
+      '黒宝',
+      'Hei Bao',
+      'hei-bao',
+      '台湾',
+      '台湾の園地で栽培されていたアボカド品種。動画では熟すとおいしく、園主と訪問者の双方が特に高く評価しています。収穫の目安として9〜10月、10月頃という説明があります。',
+      null,
+      null,
+      '熟すとおいしく、動画内で特に高く評価されています。',
+      '同じ場面で栗のような食感への言及がありますが、黒宝を指すかは字幕だけでは確定できません。',
+      null,
+      '9〜10月頃（動画内の園地での説明）',
+      null,
+      '現地で繰り返し「おいしい」と評価されていたのが印象的です。収穫適期と食感を実果で確かめたいです。',
+      '正式字幕 00:03:34〜00:04:20、00:05:59〜00:06:11。品種群はアボカドとして紹介。',
+      '一次資料: https://www.youtube.com/watch?v=DTmz_5rnTyk（提供された正式日中字幕）。栗のような食感の対象品種は未確定。',
+      true
+    ),
+    (
+      'avocado',
+      '黒金剛',
+      'Hei Jin Gang',
+      'hei-jin-gang',
+      '台湾',
+      '台湾の園地で黒宝、黒金環とともに紹介されたアボカド品種です。',
+      null,
+      null,
+      null,
+      null,
+      null,
+      '9〜10月頃（同じ品種群についての動画内説明）',
+      null,
+      '現時点では品種名を中心に収録し、果実特性は写真や実食記録を得てから補います。',
+      '正式字幕 00:03:34〜00:04:20。品種群はアボカドとして紹介されています。',
+      '一次資料: https://www.youtube.com/watch?v=DTmz_5rnTyk（提供された正式日中字幕）',
+      true
+    ),
+    (
+      'avocado',
+      '黒金環',
+      'Hei Jin Huan',
+      'hei-jin-huan',
+      '台湾',
+      '台湾の園地で黒宝、黒金剛とともに紹介されたアボカド品種。動画では「黒金環もいい」と評価されています。',
+      null,
+      null,
+      '動画内の評価は「いい」。詳細な食味は未確認です。',
+      null,
+      null,
+      '9〜10月頃（同じ品種群についての動画内説明）',
+      null,
+      '現地で評価されていた品種として、果実写真と詳しい食味を今後補いたいです。',
+      '正式字幕 00:03:34〜00:04:20。品種群はアボカドとして紹介されています。',
+      '一次資料: https://www.youtube.com/watch?v=DTmz_5rnTyk（提供された正式日中字幕）',
+      true
+    ),
+    (
+      'avocado',
+      '麻豆2号（嘉選2号）',
+      'Madou No. 2 / Chiashuan No. 2',
+      'madou-no-2',
+      '台湾',
+      '台湾のアボカド品種で、嘉選2号とも呼ばれます。中生で、果実は長楕円形。厚く光沢のある緑色の果皮は、軟熟すると紫黒色になります。果肉は淡黄色です。',
+      '長楕円形。台湾農業部資料の展示果は長さ15.4cm、径8.7cm、重さ512.3g。',
+      null,
+      '油分4〜6%。早採りでは渋味や異味が出ることがあります。',
+      '果実の切り口に褐色の繊維が出やすいとされています。',
+      null,
+      '8月中旬〜9月中旬（台湾の資料）',
+      null,
+      '動画の字幕に登場した名称を台湾農業部の資料で照合できました。早採りを避け、適熟果で評価したい品種です。',
+      '正式字幕 00:09:12〜00:09:18で「麻豆2号」を確認。台湾農業部農糧署の公文書では「嘉選二號(麻豆二號)」をアボカド品種として掲載。農業部資料「創造幸福的幸福果」では嘉選2号の収穫期、果形、油分などを解説。',
+      '一次資料: https://www.youtube.com/watch?v=DTmz_5rnTyk（提供された正式日中字幕） / 台湾農業部: https://www.afa.gov.tw/cht/index.php?a_id=572&code=list&ids=353&mod_code=view / https://kmweb.moa.gov.tw/subject/subject.php?id=25923',
+      true
+    ),
+    (
+      'abiu',
+      '白金',
+      'Bai Jin',
+      'bai-jin',
+      '台湾',
+      '動画内で冬蜜とともに紹介されたアビウ品種です。園内の一本の木には、白金、冬蜜など4〜5品種が接がれていました。',
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      '多品種接ぎの一本として確認できた品種です。果実特性は写真や収穫記録から補いたいです。',
+      '正式字幕 00:05:47〜00:07:21。アビウの木に白金、冬蜜など4〜5品種があるという説明を反映。',
+      '一次資料: https://www.youtube.com/watch?v=DTmz_5rnTyk（提供された正式日中字幕）',
+      true
+    ),
+    (
+      'black-sapote',
+      '正檀香系',
+      'Zheng Tan Xiang line',
+      'zheng-tan-xiang-line',
+      '台湾',
+      '動画内で「正檀香系」と呼ばれた種なしのブラックサポテ。雄木と雌木を一本に接いでいると説明されています。',
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      '種なし性と、雄・雌を同じ木に接ぐ仕立てが興味深い系統です。結実性も記録したいです。',
+      '正式字幕 00:08:27〜00:08:52。字幕が「正檀香系」とするため、単一品種と断定せず系統名で収録。',
+      '一次資料: https://www.youtube.com/watch?v=DTmz_5rnTyk（提供された正式日中字幕）',
+      true
+    ),
+    (
+      'mango',
+      'マハチャノック',
+      'Maha Chanok',
+      'maha-chanok',
+      'タイ',
+      'タイのマンゴー品種。動画内の台湾の熱帯果樹園で、新芽がよく伸びる木として紹介されています。',
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      null,
+      '台湾の園地で実際に育つ樹姿が確認できました。果実写真と現地での収穫期、食味を追記したいです。',
+      '正式字幕 00:16:18〜00:16:27。名称「Mahachanok」とタイの品種であることを確認。',
+      '一次資料: https://www.youtube.com/watch?v=DTmz_5rnTyk（提供された正式日中字幕）',
+      true
+    )
+) as v (
+  fruit_slug,
+  name_ja,
+  name_en,
+  cultivar_slug,
+  origin,
+  description,
+  fruit_size,
+  sugar_content,
+  taste,
+  texture,
+  aroma,
+  harvest_season,
+  cold_hardiness,
+  kenyu_comment,
+  public_notes,
+  private_notes,
+  is_public
+)
+join public.fruits f on f.slug = v.fruit_slug
+on conflict (fruit_id, slug) do nothing;
+
+-- 「冬蜜」は登録済みなので重複を作らず、今回の動画で確認できた情報だけを追記します。
+update public.cultivars c
+set
+  public_notes = concat_ws(
+    E'\n',
+    nullif(c.public_notes, ''),
+    '正式字幕 00:05:47〜00:07:21：台湾の園地で「白金」とともに紹介され、一本のアビウに4〜5品種が接がれていました。'
+  ),
+  updated_at = now()
+from public.fruits f
+where c.fruit_id = f.id
+  and f.slug = 'abiu'
+  and (c.slug = 'Fuyumitsu' or c.name_ja like '%冬蜜%')
+  and coalesce(c.public_notes, '') not like '%00:05:47〜00:07:21%';
+
+commit;
+
+-- 実行後の確認用（15品種が表示されれば成功です）
+select
+  f.name_ja as fruit_name,
+  c.name_ja as cultivar_name,
+  c.slug,
+  c.is_public
+from public.cultivars c
+join public.fruits f on f.id = c.fruit_id
+where c.slug in (
+  'zhen-zhu-bai',
+  'sun-shan',
+  'mong-chen',
+  'qing-long-jin',
+  'pan-long',
+  'taitung-red',
+  'xiao-zi-mi',
+  'nangang-jiao',
+  'hei-bao',
+  'hei-jin-gang',
+  'hei-jin-huan',
+  'madou-no-2',
+  'bai-jin',
+  'zheng-tan-xiang-line',
+  'maha-chanok'
+)
+order by f.name_ja, c.name_ja;
