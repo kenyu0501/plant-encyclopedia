@@ -44,13 +44,13 @@ export const viewport: Viewport = {
   initialScale: 1
 };
 
+const adsenseClient = process.env.NEXT_PUBLIC_ADSENSE_CLIENT || "ca-pub-9550629898092318";
+
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="ja">
       <body>
-        {process.env.NEXT_PUBLIC_ADSENSE_CLIENT ? (
-          <Script async strategy="afterInteractive" src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${process.env.NEXT_PUBLIC_ADSENSE_CLIENT}`} crossOrigin="anonymous" />
-        ) : null}
+        <Script async strategy="beforeInteractive" src={`https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=${adsenseClient}`} crossOrigin="anonymous" />
         <PwaRegister />
         <PageViewTracker />
         <Suspense fallback={null}>

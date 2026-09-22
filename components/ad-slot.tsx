@@ -7,7 +7,7 @@ declare global {
 }
 
 export function AdSlot({ slot, format = "auto", className = "" }: { slot?: string; format?: "auto" | "fluid" | "rectangle"; className?: string }) {
-  const client = process.env.NEXT_PUBLIC_ADSENSE_CLIENT;
+  const client = process.env.NEXT_PUBLIC_ADSENSE_CLIENT || "ca-pub-9550629898092318";
   useEffect(() => {
     if (!client || !slot) return;
     try { (window.adsbygoogle = window.adsbygoogle || []).push({}); } catch { /* Ad blocker or duplicate initialization. */ }
