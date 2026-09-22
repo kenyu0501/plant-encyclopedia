@@ -11,6 +11,8 @@ import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
 import { getSiteUrl } from "@/lib/site-url";
 
+const adsenseClient = process.env.NEXT_PUBLIC_ADSENSE_CLIENT || "ca-pub-9550629898092318";
+
 export const metadata: Metadata = {
   metadataBase: new URL(getSiteUrl()),
   title: {
@@ -35,6 +37,9 @@ export const metadata: Metadata = {
     capable: true,
     title: "熱帯果樹図鑑",
     statusBarStyle: "default"
+  },
+  other: {
+    "google-adsense-account": adsenseClient
   }
 };
 
@@ -43,8 +48,6 @@ export const viewport: Viewport = {
   width: "device-width",
   initialScale: 1
 };
-
-const adsenseClient = process.env.NEXT_PUBLIC_ADSENSE_CLIENT || "ca-pub-9550629898092318";
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
