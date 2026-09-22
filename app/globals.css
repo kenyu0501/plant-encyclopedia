@@ -61,6 +61,22 @@ body {
   box-shadow: 0 20px 42px rgba(20, 47, 39, 0.12);
 }
 
+.form-control {
+  min-height: 3rem;
+  width: 100%;
+  border: 1px solid #cbdacc;
+  border-radius: 0.75rem;
+  background: #fff;
+  padding: 0.75rem;
+  color: #142f27;
+  outline: none;
+}
+
+.form-control:focus {
+  border-color: #386849;
+  box-shadow: 0 0 0 3px rgba(56, 104, 73, 0.12);
+}
+
 @media (prefers-reduced-motion: reduce) {
   html { scroll-behavior: auto; }
   .interactive-card { transition: none; }

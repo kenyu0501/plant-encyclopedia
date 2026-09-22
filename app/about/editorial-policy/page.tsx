@@ -1,0 +1,5 @@
+import type { Metadata } from "next";
+import { PageHeader } from "@/components/page-header";
+export const metadata: Metadata = { title: "編集方針" };
+export default function EditorialPolicyPage() { return <div className="space-y-6"><PageHeader title="編集方針" description="信頼できる熱帯果樹情報を届けるための方針です。" /><div className="editorial-card space-y-6 p-6 leading-8 text-leaf-900/78 sm:p-8"><Policy title="人の確認を経て公開します">自動収集や生成AIを調査・構成の補助に利用する場合がありますが、記事は出典、重要な数値、表現を編集者が確認し、掲載を承認してから公開します。</Policy><Policy title="一次資料と独自の価値を重視します">論文、公的機関、研究機関、生産現場などの一次資料を優先し、単なる翻訳や転載ではなく、沖縄や日本で熱帯果樹を育てる読者に役立つ背景と解説を加えます。</Policy><Policy title="訂正に誠実に対応します">誤りが判明した場合は速やかに修正します。栽培条件や品種特性には地域差・個体差があることを明示します。</Policy><Policy title="広告と編集を分離します">広告収益の有無によって記事の評価を変えません。広告は記事本文と区別できる形で表示します。</Policy></div></div>; }
+function Policy({ title, children }: { title: string; children: React.ReactNode }) { return <section><h2 className="display-serif text-xl font-bold text-leaf-900">{title}</h2><p className="mt-2">{children}</p></section>; }

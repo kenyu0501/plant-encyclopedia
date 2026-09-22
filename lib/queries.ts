@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase-server";
-import type { Cultivar, CultivarWithFruit, Fruit, FruitWithChildren, Photo, SiteSettings, Video } from "@/types/database";
+import type { Article, ArticleCategory, Cultivar, CultivarWithFruit, Fruit, FruitWithChildren, Photo, SiteSettings, Video } from "@/types/database";
 import { uniqueYoutubeLinks } from "@/lib/youtube";
 
 export type AdminCultivar = Cultivar & {
@@ -682,4 +682,56 @@ export async function getSiteSettings() {
     return defaultSiteSettings;
   }
   return (data as SiteSettings | null) ?? defaultSiteSettings;
+}
+
+export async function getPublishedArticles(options?: { category?: ArticleCategory; limit?: number }) {
+  const supabase = await createClient();
+  let query = supabase
+    .from("articles")
+    .select("*")
+    .eq("status", "published")
+    .order("published_at", { ascending: false, nullsFirst: false });
+  if (options?.category) query = query.eq("category", options.category);
+  if (options?.limit) query = query.limit(options.limit);
+  const { data, error } = await query;
+  if (error) {
+    if (error.code !== "42P01") console.error(error);
+    return [];
+  }
+  return data as Article[];
+}
+
+export async function getPublishedArticleBySlug(slug: string) {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("articles")
+    .select("*")
+    .eq("slug", slug)
+    .eq("status", "published")
+    .maybeSingle();
+  if (error) {
+    if (error.code !== "42P01") console.error(error);
+    return null;
+  }
+  return data as Article | null;
+}
+
+export async function getAdminArticles() {
+  const supabase = await createClient();
+  const { data, error } = await supabase.from("articles").select("*").order("updated_at", { ascending: false });
+  if (error) {
+    if (error.code !== "42P01") console.error(error);
+    return [];
+  }
+  return data as Article[];
+}
+
+export async function getAdminArticleById(id: string) {
+  const supabase = await createClient();
+  const { data, error } = await supabase.from("articles").select("*").eq("id", id).maybeSingle();
+  if (error) {
+    if (error.code !== "42P01") console.error(error);
+    return null;
+  }
+  return data as Article | null;
 }

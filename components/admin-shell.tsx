@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { ClipboardCheck, ImagePlus, Leaf, LogOut, PlaySquare, Settings, Sprout } from "lucide-react";
+import { ClipboardCheck, FileText, ImagePlus, Leaf, LogOut, PlaySquare, Settings, Sprout } from "lucide-react";
 import { createClient } from "@/lib/supabase-browser";
 
 export function AdminActions() {
@@ -16,7 +16,8 @@ export function AdminActions() {
   }
 
   return (
-    <div className="grid gap-3 sm:grid-cols-6">
+    <div className="grid gap-3 sm:grid-cols-4 lg:grid-cols-7">
+      <AdminLink href="/admin/articles" icon={<FileText size={18} />} label="記事管理" />
       <AdminLink href="/admin/fruits/new" icon={<Leaf size={18} />} label="果樹追加" />
       <AdminLink href="/admin/cultivars/new" icon={<Sprout size={18} />} label="品種追加" />
       <AdminLink href="/admin/photos" icon={<ImagePlus size={18} />} label="写真追加" />
@@ -26,7 +27,7 @@ export function AdminActions() {
       <button
         type="button"
         onClick={signOut}
-        className="inline-flex items-center justify-center gap-2 rounded-md border border-leaf-200 bg-white px-4 py-3 text-sm font-semibold text-leaf-800 sm:col-span-6"
+        className="inline-flex items-center justify-center gap-2 rounded-md border border-leaf-200 bg-white px-4 py-3 text-sm font-semibold text-leaf-800 sm:col-span-4 lg:col-span-7"
       >
         <LogOut size={18} />
         ログアウト

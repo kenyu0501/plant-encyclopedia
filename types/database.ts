@@ -138,6 +138,12 @@ export type Database = {
           }
         ];
       };
+      articles: {
+        Row: Article;
+        Insert: ArticleInsert;
+        Update: Partial<ArticleInsert>;
+        Relationships: [];
+      };
     };
     Views: Record<string, never>;
     Functions: {
@@ -159,6 +165,14 @@ export type Database = {
       withdraw_own_pending_photo_submission: {
         Args: { p_photo_id: string };
         Returns: boolean;
+      };
+      toggle_article_like: {
+        Args: { p_article_id: string; p_visitor_id: string };
+        Returns: { liked: boolean; likes: number }[];
+      };
+      subscribe_newsletter: {
+        Args: { p_email: string };
+        Returns: string;
       };
     };
     Enums: Record<string, never>;
@@ -388,4 +402,42 @@ export type CultivarWithFruit = Cultivar & {
 export type CultivarWithMedia = Cultivar & {
   photos?: Photo[];
   videos?: Video[];
+};
+
+export type ArticleCategory = "news" | "how-to" | "research" | "youtube" | "quiz";
+export type ArticleStatus = "draft" | "pending" | "published" | "rejected";
+
+export type Article = {
+  [key: string]: unknown;
+  id: string;
+  title: string;
+  slug: string;
+  category: ArticleCategory;
+  excerpt: string;
+  content: string;
+  hero_image_url: string | null;
+  source_name: string | null;
+  source_url: string | null;
+  source_published_at: string | null;
+  youtube_url: string | null;
+  author_name: string;
+  status: ArticleStatus;
+  is_featured: boolean;
+  like_count: number;
+  seo_title: string | null;
+  seo_description: string | null;
+  review_notes: string | null;
+  created_by: string | null;
+  approved_by: string | null;
+  approved_at: string | null;
+  published_at: string | null;
+  created_at: string;
+  updated_at: string;
+};
+
+export type ArticleInsert = Omit<Article, "id" | "like_count" | "created_at" | "updated_at"> & {
+  id?: string;
+  like_count?: number;
+  created_at?: string;
+  updated_at?: string;
 };
