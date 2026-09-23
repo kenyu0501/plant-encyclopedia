@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
-import { ExternalLink, ImagePlus, Pencil, PlayCircle } from "lucide-react";
+import { ExternalLink, ImagePlus, Newspaper, Pencil, PlayCircle } from "lucide-react";
 import { CommunityPhotoGallery, type CommunityPhotoItem } from "@/components/community-photo-gallery";
 import { CultivarList } from "@/components/cultivar-list";
 import { CultivarComparison } from "@/components/cultivar-comparison";
@@ -12,7 +12,7 @@ import { PageHeader } from "@/components/page-header";
 import { ShareButtons } from "@/components/share-buttons";
 import { getCurrentUser, isAdminUser } from "@/lib/auth";
 import { getPhotoUrl } from "@/lib/photo-url";
-import { getPublicFruitBySlug } from "@/lib/queries";
+import { getPublicFruitBySlug, getPublishedArticlesLinkingToPath } from "@/lib/queries";
 import { getAbsoluteUrl, getMetadataDescription } from "@/lib/site-url";
 
 export const dynamic = "force-dynamic";
@@ -60,6 +60,7 @@ export default async function FruitDetailPage({ params }: Props) {
 
   const user = await getCurrentUser();
   const isAdmin = await isAdminUser(user);
+  const relatedArticles = await getPublishedArticlesLinkingToPath(`/fruits/${fruit.slug}`);
   const officialPhotos = (fruit.photos ?? []).filter((photo) => photo.source_type !== "viewer");
   const mainPhoto = officialPhotos.find((photo) => photo.is_main) ?? officialPhotos[0];
   const shareTitle = `${fruit.name_ja}${fruit.name_en ? `（${fruit.name_en}）` : ""}｜けんゆーの熱帯果樹図鑑`;
@@ -134,6 +135,30 @@ export default async function FruitDetailPage({ params }: Props) {
       ) : null}
 
       <CommunityPhotoGallery items={communityPhotos} />
+
+      {relatedArticles.length > 0 ? (
+        <section className="space-y-3">
+          <div>
+            <p className="section-kicker">RELATED STORIES</p>
+            <h2 className="display-serif mt-2 text-2xl font-bold text-leaf-900">この果樹を紹介している記事</h2>
+          </div>
+          <div className="grid gap-3 sm:grid-cols-2">
+            {relatedArticles.map((article) => (
+              <Link
+                key={article.id}
+                href={`/articles/${article.slug}`}
+                className="interactive-card flex items-start gap-3 rounded-xl border border-leaf-100 bg-white p-4 shadow-soft"
+              >
+                <Newspaper className="mt-0.5 shrink-0 text-fruit-600" size={22} />
+                <span className="min-w-0">
+                  <span className="block font-bold leading-6 text-leaf-900">{article.title}</span>
+                  {article.excerpt ? <span className="mt-1 line-clamp-2 block text-xs leading-5 text-leaf-900/60">{article.excerpt}</span> : null}
+                </span>
+              </Link>
+            ))}
+          </div>
+        </section>
+      ) : null}
 
       <section className="editorial-card p-5 sm:p-7">
         <p className="section-kicker">FRUIT PROFILE</p>
