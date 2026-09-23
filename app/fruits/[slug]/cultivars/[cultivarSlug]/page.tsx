@@ -252,8 +252,11 @@ export default async function CultivarDetailPage({ params }: Props) {
           </InfoGroup>
 
           <InfoGroup title="栽培の見どころ">
+            {fruitSlug === "dragon-fruit" ? <Info label="品種系統・交配" value={cultivar.cultivar_lineage} /> : null}
             {isAvocado ? <Info label="耐寒温度目安" value={cultivar.cold_hardiness} /> : null}
             {showsFloweringType ? <Info label="開花型" value={cultivar.flowering_type} /> : null}
+            {fruitSlug === "dragon-fruit" ? <Info label="受粉適性" value={cultivar.pollination_compatibility} /> : null}
+            {fruitSlug === "dragon-fruit" ? <Info label="裂果傾向" value={cultivar.fruit_cracking_tendency} /> : null}
             {isBanana ? <Info label="背丈" value={cultivar.plant_height_type} /> : null}
             {isBanana ? <Info label="ゲノム構成" value={cultivar.genome_group} /> : null}
             {isBanana ? <Info label="収量" value={cultivar.yield_level} /> : null}

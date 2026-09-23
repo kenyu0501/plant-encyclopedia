@@ -229,6 +229,9 @@ export type Cultivar = {
   harvest_season: string | null;
   cold_hardiness: string | null;
   flowering_type: string | null;
+  cultivar_lineage: string | null;
+  pollination_compatibility: string | null;
+  fruit_cracking_tendency: string | null;
   plant_height_type: string | null;
   genome_group: string | null;
   yield_level: string | null;

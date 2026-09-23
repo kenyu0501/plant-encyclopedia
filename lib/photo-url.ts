@@ -14,7 +14,7 @@ export function getPhotoStoragePaths(photo: Photo) {
         photo.thumbnail_storage_path,
         photo.medium_storage_path,
         photo.original_storage_path
-      ].filter((path): path is string => Boolean(path))
+      ].filter((path): path is string => typeof path === "string" && !path.startsWith("static:"))
     )
   );
 }

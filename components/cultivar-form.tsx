@@ -30,6 +30,9 @@ type Field = keyof Pick<
   | "harvest_season"
   | "cold_hardiness"
   | "flowering_type"
+  | "cultivar_lineage"
+  | "pollination_compatibility"
+  | "fruit_cracking_tendency"
   | "plant_height_type"
   | "genome_group"
   | "yield_level"
@@ -60,6 +63,9 @@ const fields: { name: Field; label: string; textarea?: boolean; required?: boole
   { name: "harvest_season", label: "収穫期" },
   { name: "cold_hardiness", label: "耐寒温度目安" },
   { name: "flowering_type", label: "開花型" },
+  { name: "cultivar_lineage", label: "品種系統・交配" },
+  { name: "pollination_compatibility", label: "受粉適性" },
+  { name: "fruit_cracking_tendency", label: "裂果傾向" },
   { name: "plant_height_type", label: "背丈" },
   { name: "genome_group", label: "ゲノム構成" },
   { name: "yield_level", label: "収量" },
