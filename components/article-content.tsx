@@ -84,6 +84,18 @@ function parseQuizOptions(text: string): QuizOption[] {
 function renderParagraph(paragraph: string, key: number) {
   if (paragraph.startsWith("## ")) return <h2 key={key} className="display-serif pt-4 text-2xl font-bold leading-10 text-leaf-900"><InlineLinks text={paragraph.slice(3)} /></h2>;
   if (paragraph.startsWith("### ")) return <h3 key={key} className="text-lg font-bold leading-8 text-leaf-900"><InlineLinks text={paragraph.slice(4)} /></h3>;
+  const image = paragraph.match(/^!\[([^\]]+)\]\((https:\/\/[^)\s]+)\)$/);
+  if (image) {
+    return (
+      <figure key={key} className="overflow-hidden rounded-2xl border border-leaf-100 bg-white shadow-soft">
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={image[2]} alt={image[1]} loading="lazy" className="max-h-[42rem] w-full object-contain bg-leaf-50" />
+        <figcaption className="border-t border-leaf-100 px-4 py-3 text-sm leading-6 text-leaf-900/65 sm:px-5">
+          {image[1]}（けんゆーの熱帯果樹図鑑に登録された写真）
+        </figcaption>
+      </figure>
+    );
+  }
   return <p key={key} className="whitespace-pre-line"><InlineLinks text={paragraph} /></p>;
 }
 

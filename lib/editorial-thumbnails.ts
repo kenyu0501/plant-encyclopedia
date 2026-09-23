@@ -12,6 +12,7 @@ export const editorialThumbnailTargets = [
   { articleSlug: "tanzania-avocado-value-chain-2026", fruitSlug: "avocado", photoIndex: 0 },
   { articleSlug: "youtube-taiwan-21-cultivar-graft-orchard-part1-20260919", fruitSlug: "chempedak", photoIndex: 0 },
   { articleSlug: "youtube-taiwan-abiu-xin-huang-mi-tasting-20260906", fruitSlug: "abiu", photoIndex: 0 },
+  { articleSlug: "youtube-nettai-mysore-banana-tasting-20260916", fruitSlug: "banana", cultivarSlug: "banana-010", photoIndex: 0 },
   { articleSlug: "beginner-mango-quiz-10-questions-20260923", fruitSlug: "mango", photoIndex: 0 }
 ] as const;
 
@@ -29,14 +30,25 @@ export async function getEditorialSourcePhotoUrl(supabase: ServerSupabaseClient,
   const { data: fruit } = await supabase.from("fruits").select("id").eq("slug", target.fruitSlug).maybeSingle();
   if (!fruit) return null;
 
-  const { data: photos, error } = await supabase
+  let cultivarId: string | null = null;
+  if ("cultivarSlug" in target && target.cultivarSlug) {
+    const { data: cultivar } = await supabase
+      .from("cultivars")
+      .select("id")
+      .eq("fruit_id", fruit.id)
+      .eq("slug", target.cultivarSlug)
+      .maybeSingle();
+    cultivarId = cultivar?.id ?? null;
+  }
+
+  let query = supabase
     .from("photos")
     .select("image_url, medium_url, thumbnail_url")
-    .eq("fruit_id", fruit.id)
     .eq("approval_status", "approved")
     .order("is_main", { ascending: false })
-    .order("created_at", { ascending: true })
-    .range(target.photoIndex, target.photoIndex);
+    .order("created_at", { ascending: true });
+  query = cultivarId ? query.eq("cultivar_id", cultivarId) : query.eq("fruit_id", fruit.id);
+  const { data: photos, error } = await query.range(target.photoIndex, target.photoIndex);
 
   if (error) {
     console.error("Editorial thumbnail lookup failed", target.articleSlug, error);
