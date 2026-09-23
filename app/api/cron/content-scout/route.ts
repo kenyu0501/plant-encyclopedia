@@ -1,5 +1,6 @@
 import { createClient } from "@supabase/supabase-js";
 import { getAbsoluteUrl } from "@/lib/site-url";
+import { sendReviewEmail } from "@/lib/resend";
 
 type DraftCandidate = {
   title: string;
@@ -178,10 +179,11 @@ async function collectNews(): Promise<DraftCandidate[]> {
 }
 
 async function sendDigest(created: { id: string; title: string }[]) {
-  const apiKey = process.env.RESEND_API_KEY; const from = process.env.ARTICLE_REVIEW_FROM_EMAIL;
-  if (!apiKey || !from) return;
   const list = created.map((item) => `・${item.title}\n  ${getAbsoluteUrl(`/admin/articles/${item.id}`)}`).join("\n");
-  await fetch("https://api.resend.com/emails", { method: "POST", headers: { authorization: `Bearer ${apiKey}`, "content-type": "application/json" }, body: JSON.stringify({ from, to: ["kenyu.uehara@gmail.com"], subject: `【記事候補 ${created.length}件】掲載確認をお願いします`, text: `本日の記事候補を下書きに追加しました。\n\n${list}\n\n一次資料と内容を確認し、必要な独自解説を加えてから公開してください。` }) });
+  await sendReviewEmail({
+    subject: `【記事候補 ${created.length}件】掲載確認をお願いします`,
+    text: `本日の記事候補を下書きに追加しました。\n\n${list}\n\n一次資料と内容を確認し、必要な独自解説を加えてから公開してください。`
+  });
 }
 
 function textTag(xml: string, tag: string) { return xml.match(new RegExp(`<${tag}[^>]*>(?:<!\\[CDATA\\[)?([\\s\\S]*?)(?:\\]\\]>)?<\\/${tag}>`))?.[1]?.trim() ?? ""; }

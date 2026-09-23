@@ -1,5 +1,6 @@
 import { redirect } from "next/navigation";
 import { PageHeader } from "@/components/page-header";
+import { EmailTestButton } from "@/components/email-test-button";
 import { SiteSettingsForm } from "@/components/site-settings-form";
 import { requireAdmin } from "@/lib/auth";
 import { getSiteSettings } from "@/lib/queries";
@@ -15,6 +16,7 @@ export default async function SettingsPage() {
     <div className="space-y-5">
       <PageHeader title="トップページ設定" description="トップページ上部の小見出し・タイトル・説明文を編集します．" />
       <SiteSettingsForm settings={settings} />
+      <EmailTestButton />
     </div>
   );
 }
