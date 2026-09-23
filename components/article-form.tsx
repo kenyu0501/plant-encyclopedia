@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Save } from "lucide-react";
+import { Save, Trash2 } from "lucide-react";
 import { articleCategories, articleStatuses, createArticleSlug } from "@/lib/articles";
 import { createClient } from "@/lib/supabase-browser";
 import type { Article, ArticleCategory, ArticleStatus } from "@/types/database";
@@ -27,6 +27,7 @@ export function ArticleForm({ article }: { article?: Article | null }) {
   const [reviewNotes, setReviewNotes] = useState(article?.review_notes ?? "");
   const [message, setMessage] = useState("");
   const [loading, setLoading] = useState(false);
+  const [deleting, setDeleting] = useState(false);
 
   async function submit(event: React.FormEvent<HTMLFormElement>) {
     event.preventDefault();
@@ -62,6 +63,32 @@ export function ArticleForm({ article }: { article?: Article | null }) {
     router.refresh();
   }
 
+  async function deleteArticle() {
+    if (!article || article.status === "published") return;
+    const confirmed = window.confirm(`「${article.title}」を完全に削除します。\n\nこの操作は元に戻せません。削除してよろしいですか？`);
+    if (!confirmed) return;
+
+    setDeleting(true);
+    setMessage("");
+    const supabase = createClient();
+    const { data: { user } } = await supabase.auth.getUser();
+    if (!user) {
+      setMessage("管理者ログインが必要です。");
+      setDeleting(false);
+      return;
+    }
+
+    const { error } = await supabase.from("articles").delete().eq("id", article.id);
+    if (error) {
+      setMessage(`記事を削除できませんでした: ${error.message}`);
+      setDeleting(false);
+      return;
+    }
+
+    router.replace("/admin/articles");
+    router.refresh();
+  }
+
   return (
     <form onSubmit={submit} className="space-y-5">
       <section className="editorial-card space-y-4 p-5 sm:p-6">
@@ -91,6 +118,15 @@ export function ArticleForm({ article }: { article?: Article | null }) {
       </section>
       {message ? <p aria-live="polite" className="rounded-lg bg-leaf-50 p-4 text-sm font-semibold text-leaf-900">{message}</p> : null}
       <button type="submit" disabled={loading} className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-lg bg-leaf-900 px-5 font-bold text-white disabled:opacity-60"><Save size={18} />{loading ? "保存中" : "記事を保存"}</button>
+      {article && article.status !== "published" ? (
+        <section className="rounded-xl border border-red-200 bg-red-50/70 p-4">
+          <p className="text-sm font-bold text-red-900">この記事が不要な場合</p>
+          <p className="mt-1 text-xs leading-6 text-red-800/75">削除すると元に戻せません。修正する可能性がある記事は「差し戻し」のまま残してください。</p>
+          <button type="button" onClick={deleteArticle} disabled={deleting || loading} className="mt-3 inline-flex min-h-11 w-full items-center justify-center gap-2 rounded-lg border border-red-300 bg-white px-4 font-bold text-red-700 hover:bg-red-100 disabled:opacity-60">
+            <Trash2 size={18} />{deleting ? "削除中" : "記事を削除"}
+          </button>
+        </section>
+      ) : null}
     </form>
   );
 }
