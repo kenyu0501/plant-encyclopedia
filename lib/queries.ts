@@ -716,6 +716,22 @@ export async function getPublishedArticleBySlug(slug: string) {
   return data as Article | null;
 }
 
+export async function getPublishedArticlesLinkingToPath(path: string, limit = 6) {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("articles")
+    .select("*")
+    .eq("status", "published")
+    .ilike("content", `%${path}%`)
+    .order("published_at", { ascending: false, nullsFirst: false })
+    .limit(limit);
+  if (error) {
+    if (error.code !== "42P01") console.error(error);
+    return [];
+  }
+  return data as Article[];
+}
+
 export async function getAdminArticles() {
   const supabase = await createClient();
   const { data, error } = await supabase.from("articles").select("*").order("updated_at", { ascending: false });

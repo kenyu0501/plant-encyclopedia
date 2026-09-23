@@ -3,7 +3,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import type { ReactNode } from "react";
-import { Apple, BarChart3, Coffee, Dna, ExternalLink, Flower2, Globe2, ImagePlus, Leaf, Pencil, PlayCircle, Ruler, Scale, Sprout, Thermometer } from "lucide-react";
+import { Apple, BarChart3, Coffee, Dna, ExternalLink, Flower2, Globe2, ImagePlus, Leaf, Newspaper, Pencil, PlayCircle, Ruler, Scale, Sprout, Thermometer } from "lucide-react";
 import { CommunityPhotoGallery, type CommunityPhotoItem } from "@/components/community-photo-gallery";
 import { CultivarFavoriteButton } from "@/components/cultivar-favorite-button";
 import { PageHeader } from "@/components/page-header";
@@ -12,7 +12,7 @@ import { RecentCultivarTracker } from "@/components/recent-cultivar-tracker";
 import { ShareButtons } from "@/components/share-buttons";
 import { getCurrentUser, isAdminUser } from "@/lib/auth";
 import { getPhotoUrl } from "@/lib/photo-url";
-import { getPublicCultivarBySlugs } from "@/lib/queries";
+import { getPublicCultivarBySlugs, getPublishedArticlesLinkingToPath } from "@/lib/queries";
 import { getAbsoluteUrl, getMetadataDescription } from "@/lib/site-url";
 
 export const dynamic = "force-dynamic";
@@ -60,6 +60,8 @@ export default async function CultivarDetailPage({ params }: Props) {
 
   const user = await getCurrentUser();
   const isAdmin = await isAdminUser(user);
+  const cultivarPath = `/fruits/${cultivar.fruits.slug}/cultivars/${cultivar.slug}`;
+  const relatedArticles = await getPublishedArticlesLinkingToPath(cultivarPath);
   const officialPhotos = (cultivar.photos ?? []).filter((photo) => photo.source_type !== "viewer");
   const mainPhoto = officialPhotos.find((photo) => photo.is_main) ?? officialPhotos[0];
   const shareTitle = `${cultivar.name_ja}｜${cultivar.fruits.name_ja}の品種`;
@@ -192,6 +194,30 @@ export default async function CultivarDetailPage({ params }: Props) {
                 <span className="min-w-0 flex-1 font-semibold text-leaf-900">{video.title || video.youtube_url}</span>
                 <ExternalLink size={16} />
               </a>
+            ))}
+          </div>
+        </section>
+      ) : null}
+
+      {relatedArticles.length > 0 ? (
+        <section className="space-y-3">
+          <div>
+            <p className="section-kicker">RELATED STORIES</p>
+            <h2 className="display-serif mt-2 text-2xl font-bold text-leaf-900">この品種を紹介している記事</h2>
+          </div>
+          <div className="grid gap-3 sm:grid-cols-2">
+            {relatedArticles.map((article) => (
+              <Link
+                key={article.id}
+                href={`/articles/${article.slug}`}
+                className="interactive-card flex items-start gap-3 rounded-xl border border-leaf-100 bg-white p-4 shadow-soft"
+              >
+                <Newspaper className="mt-0.5 shrink-0 text-fruit-600" size={22} />
+                <span className="min-w-0">
+                  <span className="block font-bold leading-6 text-leaf-900">{article.title}</span>
+                  {article.excerpt ? <span className="mt-1 line-clamp-2 block text-xs leading-5 text-leaf-900/60">{article.excerpt}</span> : null}
+                </span>
+              </Link>
             ))}
           </div>
         </section>
