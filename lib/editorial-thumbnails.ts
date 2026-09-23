@@ -9,7 +9,9 @@ export const editorialThumbnailTargets = [
   { articleSlug: "guava-ascorbic-acid-melatonin-storage-2026", fruitSlug: "guava", photoIndex: 0 },
   { articleSlug: "nondestructive-durian-maturity-ai-sensor-2026", fruitSlug: "durian", photoIndex: 1 },
   { articleSlug: "papaya-sex-chromosome-cpyyl-2026", fruitSlug: "papaya", photoIndex: 0 },
-  { articleSlug: "tanzania-avocado-value-chain-2026", fruitSlug: "avocado", photoIndex: 0 }
+  { articleSlug: "tanzania-avocado-value-chain-2026", fruitSlug: "avocado", photoIndex: 0 },
+  { articleSlug: "youtube-taiwan-21-cultivar-graft-orchard-part1-20260919", fruitSlug: "chempedak", photoIndex: 0 },
+  { articleSlug: "youtube-taiwan-abiu-xin-huang-mi-tasting-20260906", fruitSlug: "abiu", photoIndex: 0 }
 ] as const;
 
 type ServerSupabaseClient = Awaited<ReturnType<typeof createClient>>;

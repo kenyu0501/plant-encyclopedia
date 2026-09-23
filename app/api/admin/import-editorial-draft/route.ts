@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/auth";
 import { getEditorialDraft202609 } from "@/lib/editorial-drafts-2026-09";
+import { getYoutubeEditorialDraft202609 } from "@/lib/youtube-editorial-drafts-2026-09";
 import { getEditorialThumbnailUrl } from "@/lib/editorial-thumbnails";
 import { sendReviewEmail } from "@/lib/resend";
 import { createClient } from "@/lib/supabase-server";
@@ -11,7 +12,7 @@ export async function POST(request: Request) {
   if (!isAdmin || !user) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
 
   const body = await request.json().catch(() => null) as { slug?: string } | null;
-  const draft = body?.slug ? getEditorialDraft202609(body.slug) : null;
+  const draft = body?.slug ? getEditorialDraft202609(body.slug) ?? getYoutubeEditorialDraft202609(body.slug) : null;
   if (!draft) return NextResponse.json({ error: "draft_not_found" }, { status: 404 });
 
   const supabase = await createClient();
@@ -27,7 +28,7 @@ export async function POST(request: Request) {
     source_name: draft.sourceName,
     source_url: draft.sourceUrl,
     source_published_at: draft.sourcePublishedAt,
-    youtube_url: null,
+    youtube_url: draft.youtubeUrl ?? null,
     author_name: "けんゆー",
     status: "draft",
     is_featured: false,

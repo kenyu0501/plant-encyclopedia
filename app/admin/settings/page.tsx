@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { PageHeader } from "@/components/page-header";
 import { EmailTestButton } from "@/components/email-test-button";
 import { EditorialDraftImporter } from "@/components/editorial-draft-importer";
+import { YoutubeEditorialDraftImporter } from "@/components/youtube-editorial-draft-importer";
 import { SiteSettingsForm } from "@/components/site-settings-form";
 import { requireAdmin } from "@/lib/auth";
 import { getSiteSettings } from "@/lib/queries";
@@ -19,6 +20,7 @@ export default async function SettingsPage() {
       <SiteSettingsForm settings={settings} />
       <EmailTestButton />
       <EditorialDraftImporter />
+      <YoutubeEditorialDraftImporter />
     </div>
   );
 }

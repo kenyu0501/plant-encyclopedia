@@ -12,6 +12,7 @@ export type EditorialDraft = {
   seoTitle: string;
   seoDescription: string;
   reviewNotes: string;
+  youtubeUrl?: string;
 };
 
 export const editorialDrafts202609: EditorialDraft[] = [

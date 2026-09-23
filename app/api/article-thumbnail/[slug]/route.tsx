@@ -1,5 +1,6 @@
 import { ImageResponse } from "next/og";
 import { getEditorialDraft202609 } from "@/lib/editorial-drafts-2026-09";
+import { getYoutubeEditorialDraft202609 } from "@/lib/youtube-editorial-drafts-2026-09";
 import { getEditorialSourcePhotoUrl } from "@/lib/editorial-thumbnails";
 import { createClient } from "@/lib/supabase-server";
 
@@ -9,13 +10,13 @@ type Props = { params: Promise<{ slug: string }> };
 
 export async function GET(_request: Request, { params }: Props) {
   const { slug } = await params;
-  const draft = getEditorialDraft202609(slug);
+  const draft = getEditorialDraft202609(slug) ?? getYoutubeEditorialDraft202609(slug);
   if (!draft) return new Response("Not found", { status: 404 });
 
   const supabase = await createClient();
   const photoUrl = await getEditorialSourcePhotoUrl(supabase, slug);
-  const category = draft.category === "news" ? "WORLD NEWS" : "NEW RESEARCH";
-  const categoryJa = draft.category === "news" ? "海外ニュース" : "新着論文";
+  const category = draft.category === "youtube" ? "VIDEO STORY" : draft.category === "news" ? "WORLD NEWS" : "NEW RESEARCH";
+  const categoryJa = draft.category === "youtube" ? "動画解説" : draft.category === "news" ? "海外ニュース" : "新着論文";
   const titleSize = draft.title.length > 38 ? 51 : draft.title.length > 29 ? 58 : 66;
 
   return new ImageResponse(
