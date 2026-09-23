@@ -15,8 +15,8 @@ export async function GET(_request: Request, { params }: Props) {
 
   const supabase = await createClient();
   const photoUrl = await getEditorialSourcePhotoUrl(supabase, slug);
-  const category = draft.category === "youtube" ? "VIDEO STORY" : draft.category === "news" ? "WORLD NEWS" : "NEW RESEARCH";
-  const categoryJa = draft.category === "youtube" ? "動画解説" : draft.category === "news" ? "海外ニュース" : "新着論文";
+  const category = draft.category === "youtube" ? "VIDEO STORY" : draft.category === "news" ? "WORLD NEWS" : draft.category === "quiz" ? "FRUIT QUIZ" : draft.category === "how-to" ? "HOW TO" : "NEW RESEARCH";
+  const categoryJa = draft.category === "youtube" ? "動画解説" : draft.category === "news" ? "海外ニュース" : draft.category === "quiz" ? "果樹クイズ" : draft.category === "how-to" ? "栽培解説" : "新着論文";
   const titleSize = draft.title.length > 38 ? 51 : draft.title.length > 29 ? 58 : 66;
 
   return new ImageResponse(
