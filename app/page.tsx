@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { ArrowRight, BookOpen, Newspaper } from "lucide-react";
+import { AnalyticsSummary } from "@/components/analytics-summary";
 import { ArticleCard } from "@/components/article-card";
 import { CreatorProfile } from "@/components/creator-profile";
 import { HomeSearch } from "@/components/home-search";
@@ -8,15 +9,16 @@ import { PendingSubmissionsNotice } from "@/components/pending-submissions-notic
 import { RecentlyViewedCultivars } from "@/components/recently-viewed-cultivars";
 import { RecentlyUpdatedCultivars } from "@/components/recently-updated-cultivars";
 import { getCurrentUser, isAdminUser } from "@/lib/auth";
-import { getPendingViewerPhotoCount, getPublicSearchEntries, getPublishedArticles, getRecentlyUpdatedCultivars } from "@/lib/queries";
+import { getPendingViewerPhotoCount, getPublicSearchEntries, getPublishedArticles, getRecentlyUpdatedCultivars, getSiteAnalytics } from "@/lib/queries";
 
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
-  const [searchEntries, articles, recentlyUpdatedCultivars, user] = await Promise.all([
+  const [searchEntries, articles, recentlyUpdatedCultivars, analytics, user] = await Promise.all([
     getPublicSearchEntries(),
     getPublishedArticles({ limit: 7 }),
     getRecentlyUpdatedCultivars(),
+    getSiteAnalytics(),
     getCurrentUser()
   ]);
   const isAdmin = await isAdminUser(user);
@@ -52,6 +54,8 @@ export default async function HomePage() {
       <section className="editorial-card p-5 sm:p-7">
         <div className="grid gap-5 sm:grid-cols-[0.8fr_1.2fr] sm:items-center"><div><p className="section-kicker">FRUIT ENCYCLOPEDIA</p><h2 className="display-serif mt-2 text-2xl font-bold text-leaf-900">品種図鑑から探す</h2><p className="mt-2 text-sm leading-7 text-leaf-900/60">果樹名・品種名・特徴から検索できます。</p></div><div className="rounded-xl border border-leaf-100 bg-leaf-50/50 p-2"><HomeSearch entries={searchEntries} /></div></div>
       </section>
+
+      <AnalyticsSummary analytics={analytics} />
 
       <NewsletterSignup />
 

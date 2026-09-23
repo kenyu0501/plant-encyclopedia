@@ -46,6 +46,7 @@ export type AnalyticsCultivarItem = {
 };
 
 export type SiteAnalytics = {
+  todayViews: number;
   totalViews: number;
   periods: Record<
     AnalyticsPeriodKey,
@@ -284,12 +285,14 @@ export async function getPublicFruitOptions() {
 
 export async function getSiteAnalytics(): Promise<SiteAnalytics | null> {
   const supabase = await createClient();
+  const tokyoToday = getTokyoDateKey();
   const currentHour = new Date();
   currentHour.setMinutes(0, 0, 0);
   const oldestIncludedHour = new Date(currentHour.getTime() - (30 * 24 * 2 - 1) * 60 * 60 * 1000).toISOString();
   const hourlyAnalyticsSelect =
     "id, views, view_hour, cultivar_id, cultivars(name_ja, slug, is_public, fruits(name_ja, slug, is_public))";
   const recentData: unknown[] = [];
+  let todayViews = 0;
   let totalViews = 0;
   let totalError: { message?: string } | null = null;
   let recentError: { message?: string } | null = null;
@@ -300,7 +303,7 @@ export async function getSiteAnalytics(): Promise<SiteAnalytics | null> {
   for (let from = 0; ; from += pageSize) {
     const totalResult = await supabase
       .from("page_views")
-      .select("id, views")
+      .select("id, views, view_date")
       .order("id", { ascending: true })
       .range(from, from + pageSize - 1);
 
@@ -311,6 +314,7 @@ export async function getSiteAnalytics(): Promise<SiteAnalytics | null> {
 
     const page = totalResult.data ?? [];
     totalViews += page.reduce((sum, row) => sum + (row.views ?? 0), 0);
+    todayViews += page.reduce((sum, row) => sum + (row.view_date === tokyoToday ? (row.views ?? 0) : 0), 0);
     if (page.length < pageSize) break;
   }
 
@@ -341,6 +345,7 @@ export async function getSiteAnalytics(): Promise<SiteAnalytics | null> {
   const recentRows = recentData as AnalyticsRow[];
 
   return {
+    todayViews,
     totalViews,
     periods: {
       "24h": buildAnalyticsPeriod(recentRows, currentHour.getTime(), 24),
@@ -348,6 +353,17 @@ export async function getSiteAnalytics(): Promise<SiteAnalytics | null> {
       "30d": buildAnalyticsPeriod(recentRows, currentHour.getTime(), 30 * 24)
     }
   };
+}
+
+function getTokyoDateKey() {
+  const parts = new Intl.DateTimeFormat("en-US", {
+    timeZone: "Asia/Tokyo",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit"
+  }).formatToParts(new Date());
+  const values = Object.fromEntries(parts.map((part) => [part.type, part.value]));
+  return `${values.year}-${values.month}-${values.day}`;
 }
 
 export async function getRecentlyUpdatedCultivars(limit = 6): Promise<RecentlyUpdatedCultivar[]> {

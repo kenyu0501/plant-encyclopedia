@@ -42,7 +42,12 @@ export function AnalyticsSummary({ analytics }: { analytics: SiteAnalytics | nul
         </div>
       </div>
 
-      <div className="grid gap-3 sm:grid-cols-2">
+      <div className="grid gap-3 sm:grid-cols-3">
+        <StatCard
+          label="今日のPV"
+          value={analytics.todayViews.toLocaleString()}
+          comparison="日本時間の0時から"
+        />
         <StatCard
           label={period.statLabel}
           value={activeAnalytics.views.toLocaleString()}
