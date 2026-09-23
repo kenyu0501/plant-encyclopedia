@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server";
 import { requireAdmin } from "@/lib/auth";
 import { getEditorialDraft202609 } from "@/lib/editorial-drafts-2026-09";
+import { getEditorialThumbnailUrl } from "@/lib/editorial-thumbnails";
 import { sendReviewEmail } from "@/lib/resend";
 import { createClient } from "@/lib/supabase-server";
 import { getAbsoluteUrl } from "@/lib/site-url";
@@ -15,13 +16,14 @@ export async function POST(request: Request) {
 
   const supabase = await createClient();
   const now = new Date().toISOString();
+  const heroImageUrl = getEditorialThumbnailUrl(draft.slug);
   const { data, error } = await supabase.from("articles").upsert({
     title: draft.title,
     slug: draft.slug,
     category: draft.category,
     excerpt: draft.excerpt,
     content: draft.content,
-    hero_image_url: null,
+    hero_image_url: heroImageUrl,
     source_name: draft.sourceName,
     source_url: draft.sourceUrl,
     source_published_at: draft.sourcePublishedAt,

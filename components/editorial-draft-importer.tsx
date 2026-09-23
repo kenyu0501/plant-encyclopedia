@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { FilePlus2 } from "lucide-react";
+import { EditorialThumbnailButton } from "@/components/editorial-thumbnail-button";
 
 const drafts = [
   { slug: "wild-banana-fusarium-resistant-hybrids-2026", title: "耐病性バナナの育種研究" },
@@ -69,6 +70,7 @@ export function EditorialDraftImporter() {
       <button type="button" onClick={importDrafts} disabled={loading} className="inline-flex min-h-12 w-full items-center justify-center gap-2 rounded-lg bg-leaf-900 px-4 font-bold text-white disabled:opacity-60">
         <FilePlus2 size={18} />{loading ? `登録中（${progress}/${drafts.length}）` : progress === drafts.length ? "8本を再登録する" : "8本を下書きとして登録"}
       </button>
+      <EditorialThumbnailButton />
     </section>
   );
 }
