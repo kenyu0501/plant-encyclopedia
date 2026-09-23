@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { PageHeader } from "@/components/page-header";
 import { EmailTestButton } from "@/components/email-test-button";
+import { EditorialDraftImporter } from "@/components/editorial-draft-importer";
 import { SiteSettingsForm } from "@/components/site-settings-form";
 import { requireAdmin } from "@/lib/auth";
 import { getSiteSettings } from "@/lib/queries";
@@ -17,6 +18,7 @@ export default async function SettingsPage() {
       <PageHeader title="トップページ設定" description="トップページ上部の小見出し・タイトル・説明文を編集します．" />
       <SiteSettingsForm settings={settings} />
       <EmailTestButton />
+      <EditorialDraftImporter />
     </div>
   );
 }
