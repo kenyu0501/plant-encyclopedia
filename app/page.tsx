@@ -9,16 +9,17 @@ import { PendingSubmissionsNotice } from "@/components/pending-submissions-notic
 import { RecentlyViewedCultivars } from "@/components/recently-viewed-cultivars";
 import { RecentlyUpdatedCultivars } from "@/components/recently-updated-cultivars";
 import { getCurrentUser, isAdminUser } from "@/lib/auth";
-import { getPendingViewerPhotoCount, getPublicSearchEntries, getPublishedArticles, getRecentlyUpdatedCultivars, getSiteAnalytics } from "@/lib/queries";
+import { getPendingViewerPhotoCount, getPublicSearchEntries, getPublishedArticles, getRecentlyUpdatedCultivars, getSiteAnalytics, getSiteSettings } from "@/lib/queries";
 
 export const dynamic = "force-dynamic";
 
 export default async function HomePage() {
-  const [searchEntries, articles, recentlyUpdatedCultivars, analytics, user] = await Promise.all([
+  const [searchEntries, articles, recentlyUpdatedCultivars, analytics, settings, user] = await Promise.all([
     getPublicSearchEntries(),
     getPublishedArticles({ limit: 7 }),
     getRecentlyUpdatedCultivars(),
     getSiteAnalytics(),
+    getSiteSettings(),
     getCurrentUser()
   ]);
   const isAdmin = await isAdminUser(user);
@@ -28,10 +29,10 @@ export default async function HomePage() {
     <div className="space-y-10 sm:space-y-12">
       <section className="relative rounded-[2rem] bg-[radial-gradient(circle_at_95%_0%,#2a6547_0%,#142f27_58%)] px-6 py-9 text-white shadow-lift sm:px-10 sm:py-12">
         <div className="max-w-3xl">
-          <p className="text-[11px] font-bold tracking-[0.22em] text-fruit-200">TROPICAL FRUIT JOURNAL &amp; FIELD GUIDE</p>
-          <h1 className="display-serif mt-5 text-[2.25rem] font-bold leading-[1.3] text-white sm:text-5xl">熱帯果樹を、もっと深く。<br />育てる人の専門メディア。</h1>
+          <p className="text-[11px] font-bold tracking-[0.22em] text-fruit-200">{settings.home_eyebrow}</p>
+          <h1 className="display-serif mt-5 whitespace-pre-line text-[2.25rem] font-bold leading-[1.3] text-white sm:text-5xl">{settings.home_title}</h1>
           <div className="mt-5 h-px w-14 bg-fruit-300" />
-          <p className="mt-5 max-w-2xl text-sm leading-8 text-white/78 sm:text-base">国内外のニュース、研究、栽培のコツを分かりやすく解説。蓄積してきた品種図鑑とともに、毎日の発見を届けます。</p>
+          <p className="mt-5 max-w-2xl whitespace-pre-line text-sm leading-8 text-white/78 sm:text-base">{settings.home_description}</p>
         </div>
         <div className="mt-7 flex flex-wrap items-center gap-x-6 gap-y-3">
           <Link href="/articles" className="inline-flex items-center gap-2 rounded-full bg-fruit-300 px-5 py-3 text-sm font-bold text-leaf-950 transition-colors hover:bg-fruit-200">

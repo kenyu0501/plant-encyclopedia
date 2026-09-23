@@ -106,11 +106,20 @@ export type RecentlyUpdatedCultivar = {
 
 export const defaultSiteSettings: SiteSettings = {
   id: "home",
+  home_eyebrow: "TROPICAL FRUIT JOURNAL & FIELD GUIDE",
+  home_title: "熱帯果樹を、もっと深く。\n育てる人の専門メディア。",
+  home_description:
+    "国内外のニュース、研究、栽培のコツを分かりやすく解説。蓄積してきた品種図鑑とともに、毎日の発見を届けます。",
+  updated_at: new Date(0).toISOString()
+};
+
+const legacyDefaultSiteSettings = {
   home_eyebrow: "スマホでひらく栽培メモ",
   home_title: "けんゆーの熱帯果樹図鑑",
-  home_description:
+  home_descriptions: [
     "果樹ページを親にして，品種・写真・YouTubeを整理する熱帯果樹PWAです． マンゴー，アボカド，バナナなどを現場で見返しやすい形にまとめます．",
-  updated_at: new Date(0).toISOString()
+    "果樹ページを親にして、品種・写真・YouTubeを整理する熱帯果樹PWAです。 マンゴー、アボカド、バナナなどを現場で見返しやすい形にまとめます。"
+  ]
 };
 
 export async function getPublicFruits(limit?: number) {
@@ -697,7 +706,13 @@ export async function getSiteSettings() {
     console.error(error);
     return defaultSiteSettings;
   }
-  return (data as SiteSettings | null) ?? defaultSiteSettings;
+  const settings = data as SiteSettings | null;
+  if (!settings) return defaultSiteSettings;
+
+  const isLegacyDefault = settings.home_eyebrow === legacyDefaultSiteSettings.home_eyebrow
+    && settings.home_title === legacyDefaultSiteSettings.home_title
+    && legacyDefaultSiteSettings.home_descriptions.includes(settings.home_description);
+  return isLegacyDefault ? { ...defaultSiteSettings, updated_at: settings.updated_at } : settings;
 }
 
 export async function getPublishedArticles(options?: { category?: ArticleCategory; limit?: number }) {
