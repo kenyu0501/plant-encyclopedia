@@ -5,12 +5,16 @@ update public.articles
 set
   content = replace(
     replace(
-      content,
-      '正式字幕で確認できる名称は『新黄蜜（シン・ホァンミー）』。',
-      '正式字幕で確認できる名称は[『新黄蜜（シン・ホァンミー）』](/fruits/abiu/cultivars/Shinkoumitsu)。'
+      replace(
+        content,
+        '正式字幕で確認できる名称は『新黄蜜（シン・ホァンミー）』。',
+        '正式字幕で確認できる名称は[『新黄蜜（シン・ホァンミー）』](/fruits/abiu/cultivars/Shinkoumitsu)。'
+      ),
+      '名称は『新黄蜜（シン・ホァンミー）』。',
+      '名称は[『新黄蜜（シン・ホァンミー）』](/fruits/abiu/cultivars/Shinkoumitsu)。'
     ),
-    '・[アビウ](/fruits/abiu)\n・[白金](/fruits/abiu/cultivars/bai-jin)',
-    '・[アビウ](/fruits/abiu)\n・[新黄蜜](/fruits/abiu/cultivars/Shinkoumitsu)\n・[白金](/fruits/abiu/cultivars/bai-jin)'
+    E'・[アビウ](/fruits/abiu)\n・[白金](/fruits/abiu/cultivars/bai-jin)',
+    E'・[アビウ](/fruits/abiu)\n・[新黄蜜](/fruits/abiu/cultivars/Shinkoumitsu)\n・[白金](/fruits/abiu/cultivars/bai-jin)'
   ),
   updated_at = now()
 where slug = 'youtube-taiwan-abiu-xin-huang-mi-tasting-20260906'
