@@ -1,13 +1,38 @@
 "use client";
 
 import Link from "next/link";
-import { useMemo, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import { Leaf, Search, Sprout, X } from "lucide-react";
 import type { PublicSearchEntry } from "@/lib/queries";
 
-export function HomeSearch({ entries }: { entries: PublicSearchEntry[] }) {
+export function HomeSearch() {
   const [query, setQuery] = useState("");
+  const [entries, setEntries] = useState<PublicSearchEntry[]>([]);
+  const [isLoading, setIsLoading] = useState(false);
+  const [hasLoaded, setHasLoaded] = useState(false);
+  const [loadError, setLoadError] = useState(false);
+  const loadingRef = useRef(false);
   const normalizedQuery = normalize(query);
+
+  const loadEntries = useCallback(async () => {
+    if (hasLoaded || loadingRef.current) return;
+    loadingRef.current = true;
+    setIsLoading(true);
+    setLoadError(false);
+    try {
+      const response = await fetch("/api/public-search");
+      if (!response.ok) throw new Error("Search data could not be loaded");
+      const data = (await response.json()) as { entries?: PublicSearchEntry[] };
+      setEntries(data.entries ?? []);
+      setHasLoaded(true);
+    } catch (error) {
+      setLoadError(true);
+      console.error(error);
+    } finally {
+      loadingRef.current = false;
+      setIsLoading(false);
+    }
+  }, [hasLoaded]);
 
   const results = useMemo(() => {
     if (!normalizedQuery) return [];
@@ -26,7 +51,11 @@ export function HomeSearch({ entries }: { entries: PublicSearchEntry[] }) {
         <Search size={19} className="shrink-0 text-leaf-700" />
         <input
           value={query}
-          onChange={(event) => setQuery(event.target.value)}
+          onFocus={() => void loadEntries()}
+          onChange={(event) => {
+            setQuery(event.target.value);
+            void loadEntries();
+          }}
           placeholder="果樹や品種の名前で探す"
           className="min-w-0 flex-1 bg-transparent py-3 text-base text-leaf-900 outline-none placeholder:text-leaf-900/40"
         />
@@ -44,7 +73,9 @@ export function HomeSearch({ entries }: { entries: PublicSearchEntry[] }) {
 
       {normalizedQuery ? (
         <div className="absolute inset-x-0 top-full z-30 mt-4 max-h-[62vh] overflow-y-auto rounded-xl bg-white p-2 shadow-lift ring-1 ring-leaf-100">
-          {results.length > 0 ? (
+          {isLoading ? (
+            <p className="p-4 text-sm font-semibold text-leaf-900/56">検索データを読み込んでいます…</p>
+          ) : results.length > 0 ? (
             <div className="grid gap-1">
               {results.map((entry) => (
                 <Link
@@ -67,9 +98,11 @@ export function HomeSearch({ entries }: { entries: PublicSearchEntry[] }) {
                 </Link>
               ))}
             </div>
-          ) : (
+          ) : loadError ? (
+            <p className="p-4 text-sm font-semibold text-rose-700">検索データを読み込めませんでした。入力し直して再試行してください。</p>
+          ) : hasLoaded ? (
             <p className="p-4 text-sm font-semibold text-leaf-900/56">一致する果樹・品種がありません．</p>
-          )}
+          ) : null}
         </div>
       ) : null}
     </div>

@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase-server";
+import { createPublicClient } from "@/lib/supabase-public";
 import type { Article, ArticleCategory, Cultivar, CultivarWithFruit, Fruit, FruitWithChildren, Photo, SiteSettings, Video } from "@/types/database";
 import { uniqueYoutubeLinks } from "@/lib/youtube";
 
@@ -240,7 +241,7 @@ export async function getPublicCultivarBySlugs(fruitSlug: string, cultivarSlug: 
 }
 
 export async function getPublicSearchEntries() {
-  const supabase = await createClient();
+  const supabase = createPublicClient();
   const [fruitsResult, cultivarsResult] = await Promise.all([
     supabase
       .from("fruits")
@@ -331,7 +332,7 @@ export async function getPublicFruitOptions() {
 }
 
 export async function getSiteAnalytics(): Promise<SiteAnalytics | null> {
-  const supabase = await createClient();
+  const supabase = createPublicClient();
   const tokyoToday = getTokyoDateKey();
   const currentHour = new Date();
   currentHour.setMinutes(0, 0, 0);
@@ -414,7 +415,7 @@ function getTokyoDateKey() {
 }
 
 export async function getRecentlyUpdatedCultivars(limit = 6): Promise<RecentlyUpdatedCultivar[]> {
-  const supabase = await createClient();
+  const supabase = createPublicClient();
   const { data, error } = await supabase
     .from("cultivars")
     .select("id, name_ja, name_en, slug, updated_at, fruits!inner(name_ja, slug, is_public)")
@@ -738,7 +739,7 @@ export async function getAdminVideos() {
 }
 
 export async function getSiteSettings() {
-  const supabase = await createClient();
+  const supabase = createPublicClient();
   const { data, error } = await supabase.from("site_settings").select("*").eq("id", "home").maybeSingle();
   if (error) {
     console.error(error);
@@ -754,7 +755,7 @@ export async function getSiteSettings() {
 }
 
 export async function getPublishedArticles(options?: { category?: ArticleCategory; limit?: number }) {
-  const supabase = await createClient();
+  const supabase = createPublicClient();
   let query = supabase
     .from("articles")
     .select("*")

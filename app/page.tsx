@@ -1,29 +1,23 @@
 import Link from "next/link";
 import { ArrowRight, BookOpen, Newspaper } from "lucide-react";
-import { AnalyticsSummary } from "@/components/analytics-summary";
 import { ArticleCard } from "@/components/article-card";
 import { CreatorProfile } from "@/components/creator-profile";
+import { HomeAdminNotice } from "@/components/home-admin-notice";
+import { HomeAnalytics } from "@/components/home-analytics";
 import { HomeSearch } from "@/components/home-search";
 import { NewsletterSignup } from "@/components/newsletter-signup";
-import { PendingSubmissionsNotice } from "@/components/pending-submissions-notice";
 import { RecentlyViewedCultivars } from "@/components/recently-viewed-cultivars";
 import { RecentlyUpdatedCultivars } from "@/components/recently-updated-cultivars";
-import { getCurrentUser, isAdminUser } from "@/lib/auth";
-import { getPendingViewerPhotoCount, getPublicSearchEntries, getPublishedArticles, getRecentlyUpdatedCultivars, getSiteAnalytics, getSiteSettings } from "@/lib/queries";
+import { getPublishedArticles, getRecentlyUpdatedCultivars, getSiteSettings } from "@/lib/queries";
 
-export const dynamic = "force-dynamic";
+export const revalidate = 300;
 
 export default async function HomePage() {
-  const [searchEntries, articles, recentlyUpdatedCultivars, analytics, settings, user] = await Promise.all([
-    getPublicSearchEntries(),
+  const [articles, recentlyUpdatedCultivars, settings] = await Promise.all([
     getPublishedArticles({ limit: 7 }),
     getRecentlyUpdatedCultivars(),
-    getSiteAnalytics(),
-    getSiteSettings(),
-    getCurrentUser()
+    getSiteSettings()
   ]);
-  const isAdmin = await isAdminUser(user);
-  const pendingViewerPhotoCount = isAdmin ? await getPendingViewerPhotoCount() : 0;
 
   return (
     <div className="space-y-10 sm:space-y-12">
@@ -53,10 +47,10 @@ export default async function HomePage() {
       )}
 
       <section className="editorial-card p-5 sm:p-7">
-        <div className="grid gap-5 sm:grid-cols-[0.8fr_1.2fr] sm:items-center"><div><p className="section-kicker">FRUIT ENCYCLOPEDIA</p><h2 className="display-serif mt-2 text-2xl font-bold text-leaf-900">品種図鑑から探す</h2><p className="mt-2 text-sm leading-7 text-leaf-900/60">果樹名・品種名・特徴から検索できます。</p></div><div className="rounded-xl border border-leaf-100 bg-leaf-50/50 p-2"><HomeSearch entries={searchEntries} /></div></div>
+        <div className="grid gap-5 sm:grid-cols-[0.8fr_1.2fr] sm:items-center"><div><p className="section-kicker">FRUIT ENCYCLOPEDIA</p><h2 className="display-serif mt-2 text-2xl font-bold text-leaf-900">品種図鑑から探す</h2><p className="mt-2 text-sm leading-7 text-leaf-900/60">果樹名・品種名・特徴から検索できます。</p></div><div className="rounded-xl border border-leaf-100 bg-leaf-50/50 p-2"><HomeSearch /></div></div>
       </section>
 
-      <AnalyticsSummary analytics={analytics} />
+      <HomeAnalytics />
 
       <NewsletterSignup />
 
@@ -68,7 +62,7 @@ export default async function HomePage() {
 
       <div className="text-center"><Link href="/admin/login" prefetch={false} className="text-[11px] font-semibold text-leaf-900/35 hover:text-leaf-700">管理者ログイン</Link></div>
 
-      <PendingSubmissionsNotice count={pendingViewerPhotoCount} />
+      <HomeAdminNotice />
     </div>
   );
 }
