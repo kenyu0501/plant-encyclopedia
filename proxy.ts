@@ -3,7 +3,8 @@ import { updateSession } from "@/lib/supabase-middleware";
 
 export async function proxy(request: NextRequest) {
   const publicCachedPaths = new Set(["/", "/api/home-analytics", "/api/public-search"]);
-  if (publicCachedPaths.has(request.nextUrl.pathname)) {
+  const pathname = request.nextUrl.pathname;
+  if (publicCachedPaths.has(pathname) || pathname.startsWith("/api/newsletter/") || pathname.startsWith("/newsletter/")) {
     return NextResponse.next();
   }
   return updateSession(request);

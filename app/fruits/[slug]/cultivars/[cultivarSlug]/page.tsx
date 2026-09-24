@@ -6,6 +6,7 @@ import type { ReactNode } from "react";
 import { Apple, BarChart3, Coffee, Dna, ExternalLink, Flower2, Globe2, ImagePlus, Leaf, Newspaper, Pencil, PlayCircle, Ruler, Scale, Sprout, Thermometer } from "lucide-react";
 import { CommunityPhotoGallery, type CommunityPhotoItem } from "@/components/community-photo-gallery";
 import { CultivarFavoriteButton } from "@/components/cultivar-favorite-button";
+import { JsonLd } from "@/components/json-ld";
 import { PageHeader } from "@/components/page-header";
 import { PhotoLightboxGallery } from "@/components/photo-lightbox-gallery";
 import { RecentCultivarTracker } from "@/components/recent-cultivar-tracker";
@@ -14,6 +15,7 @@ import { getCurrentUser, isAdminUser } from "@/lib/auth";
 import { getPhotoUrl } from "@/lib/photo-url";
 import { getPublicCultivarBySlugs, getPublishedArticlesLinkingToPath } from "@/lib/queries";
 import { getAbsoluteUrl, getMetadataDescription } from "@/lib/site-url";
+import { buildBreadcrumbList, buildImageObjects } from "@/lib/structured-data";
 
 export const dynamic = "force-dynamic";
 
@@ -100,9 +102,59 @@ export default async function CultivarDetailPage({ params }: Props) {
     difficulty: cultivar.difficulty,
     treeVigor: cultivar.tree_vigor
   });
+  const cultivarTermId = `${shareUrl}#cultivar`;
+  const breadcrumbId = `${shareUrl}#breadcrumb`;
+  const structuredImages = buildImageObjects({
+    photos,
+    pageUrl: shareUrl,
+    subjectId: cultivarTermId,
+    subjectName: cultivar.name_ja
+  });
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@graph": [
+      buildBreadcrumbList(breadcrumbId, [
+        { name: "ホーム", url: getAbsoluteUrl("/") },
+        { name: "果樹図鑑", url: getAbsoluteUrl("/fruits") },
+        { name: cultivar.fruits.name_ja, url: getAbsoluteUrl(`/fruits/${fruitSlug}`) },
+        { name: cultivar.name_ja, url: shareUrl }
+      ]),
+      {
+        "@type": "WebPage",
+        "@id": `${shareUrl}#webpage`,
+        url: shareUrl,
+        name: shareTitle,
+        description: shareText,
+        dateModified: cultivar.updated_at,
+        breadcrumb: { "@id": breadcrumbId },
+        mainEntity: { "@id": cultivarTermId },
+        ...(structuredImages[0] ? { primaryImageOfPage: { "@id": structuredImages[0]["@id"] } } : {})
+      },
+      {
+        "@type": "DefinedTerm",
+        "@id": cultivarTermId,
+        name: cultivar.name_ja,
+        ...(cultivar.name_en ? { alternateName: cultivar.name_en } : {}),
+        termCode: cultivar.slug,
+        description: shareText,
+        url: shareUrl,
+        inDefinedTermSet: {
+          "@type": "DefinedTermSet",
+          "@id": `${getAbsoluteUrl(`/fruits/${fruitSlug}`)}#cultivars`,
+          name: `${cultivar.fruits.name_ja}の品種`,
+          url: getAbsoluteUrl(`/fruits/${fruitSlug}#cultivars`)
+        },
+        ...(structuredImages.length > 0
+          ? { image: structuredImages.map((image) => ({ "@id": image["@id"] })) }
+          : {})
+      },
+      ...structuredImages
+    ]
+  };
 
   return (
     <div className="space-y-7">
+      <JsonLd data={structuredData} />
       <RecentCultivarTracker
         id={cultivar.id}
         fruitName={cultivar.fruits.name_ja}

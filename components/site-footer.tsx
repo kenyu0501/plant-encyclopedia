@@ -8,6 +8,7 @@ export function SiteFooter() {
         <nav className="flex flex-wrap gap-x-4 gap-y-2" aria-label="サイト情報">
           <Link href="/about/editorial-policy" className="hover:text-leaf-800">編集方針</Link>
           <Link href="/privacy" className="hover:text-leaf-800">プライバシー</Link>
+          <Link href="/newsletter/unsubscribe" className="hover:text-leaf-800">メール配信解除</Link>
           <Link href="/fruits" className="hover:text-leaf-800">品種図鑑</Link>
         </nav>
       </div>

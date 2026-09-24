@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Mail } from "lucide-react";
-import { createClient } from "@/lib/supabase-browser";
+import Link from "next/link";
 
 export function NewsletterSignup() {
   const [email, setEmail] = useState("");
@@ -13,15 +13,19 @@ export function NewsletterSignup() {
     event.preventDefault();
     setLoading(true);
     setMessage("");
-    const supabase = createClient();
-    const { error } = await supabase.rpc("subscribe_newsletter", { p_email: email });
+    const response = await fetch("/api/newsletter/subscribe", {
+      method: "POST",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ email })
+    });
+    const result = await response.json().catch(() => null) as { message?: string; error?: string } | null;
     setLoading(false);
-    if (error) {
-      setMessage(error.message.includes("invalid email") ? "メールアドレスをご確認ください。" : "現在登録できません。少し時間をおいてお試しください。");
+    if (!response.ok) {
+      setMessage(result?.error ?? "現在登録できません。少し時間をおいてお試しください。");
       return;
     }
     setEmail("");
-    setMessage("仮登録を受け付けました。配信開始時に確認メールをお送りします。");
+    setMessage(result?.message ?? "確認メールを送信しました。メール内のリンクから本登録を完了してください。");
   }
 
   return (
@@ -41,7 +45,11 @@ export function NewsletterSignup() {
             </label>
             <button disabled={loading} className="min-h-12 rounded-lg bg-fruit-300 px-5 text-sm font-bold text-leaf-950 disabled:opacity-60">{loading ? "登録中" : "無料登録"}</button>
           </div>
-          <p className="text-[10px] leading-5 text-white/55">登録によりメール配信に同意したものとします。いつでも解除できます。</p>
+          <p className="text-[10px] leading-5 text-white/55">
+            確認メール内のリンクで本登録となります。いつでも
+            <Link href="/newsletter/unsubscribe" className="underline underline-offset-2 hover:text-white">配信を解除</Link>
+            できます。
+          </p>
           {message ? <p aria-live="polite" className="text-xs font-semibold text-fruit-100">{message}</p> : null}
         </form>
       </div>

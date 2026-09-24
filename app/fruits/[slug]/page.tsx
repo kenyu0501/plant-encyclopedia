@@ -6,6 +6,7 @@ import { ExternalLink, ImagePlus, Newspaper, Pencil, PlayCircle } from "lucide-r
 import { CommunityPhotoGallery, type CommunityPhotoItem } from "@/components/community-photo-gallery";
 import { CultivarList } from "@/components/cultivar-list";
 import { CultivarComparison } from "@/components/cultivar-comparison";
+import { JsonLd } from "@/components/json-ld";
 import { MangoPedigree } from "@/components/mango-pedigree";
 import { PhotoLightboxGallery } from "@/components/photo-lightbox-gallery";
 import { PageHeader } from "@/components/page-header";
@@ -14,6 +15,7 @@ import { getCurrentUser, isAdminUser } from "@/lib/auth";
 import { getPhotoUrl } from "@/lib/photo-url";
 import { getPublicFruitBySlug, getPublishedArticlesLinkingToPath } from "@/lib/queries";
 import { getAbsoluteUrl, getMetadataDescription } from "@/lib/site-url";
+import { buildBreadcrumbList, buildImageObjects } from "@/lib/structured-data";
 
 export const dynamic = "force-dynamic";
 
@@ -85,9 +87,58 @@ export default async function FruitDetailPage({ params }: Props) {
         }))
     )
   ];
+  const fruitTermId = `${shareUrl}#fruit`;
+  const breadcrumbId = `${shareUrl}#breadcrumb`;
+  const structuredImages = buildImageObjects({
+    photos,
+    pageUrl: shareUrl,
+    subjectId: fruitTermId,
+    subjectName: fruit.name_ja
+  });
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@graph": [
+      buildBreadcrumbList(breadcrumbId, [
+        { name: "ホーム", url: getAbsoluteUrl("/") },
+        { name: "果樹図鑑", url: getAbsoluteUrl("/fruits") },
+        { name: fruit.name_ja, url: shareUrl }
+      ]),
+      {
+        "@type": "WebPage",
+        "@id": `${shareUrl}#webpage`,
+        url: shareUrl,
+        name: shareTitle,
+        description: shareText,
+        dateModified: fruit.updated_at,
+        breadcrumb: { "@id": breadcrumbId },
+        mainEntity: { "@id": fruitTermId },
+        ...(structuredImages[0] ? { primaryImageOfPage: { "@id": structuredImages[0]["@id"] } } : {})
+      },
+      {
+        "@type": "DefinedTerm",
+        "@id": fruitTermId,
+        name: fruit.name_ja,
+        ...(fruit.name_en ? { alternateName: fruit.name_en } : {}),
+        termCode: fruit.slug,
+        description: shareText,
+        url: shareUrl,
+        inDefinedTermSet: {
+          "@type": "DefinedTermSet",
+          "@id": `${getAbsoluteUrl("/fruits")}#term-set`,
+          name: "けんゆーの熱帯果樹図鑑",
+          url: getAbsoluteUrl("/fruits")
+        },
+        ...(structuredImages.length > 0
+          ? { image: structuredImages.map((image) => ({ "@id": image["@id"] })) }
+          : {})
+      },
+      ...structuredImages
+    ]
+  };
 
   return (
     <div className="space-y-7">
+      <JsonLd data={structuredData} />
       <PageHeader
         title={fruit.name_ja}
         description={fruit.name_en ?? undefined}
