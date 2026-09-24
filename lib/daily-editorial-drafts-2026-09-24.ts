@@ -68,7 +68,7 @@ export const dailyEditorialDrafts20260924: EditorialDraft[] = [
     category: "research",
     excerpt: "多胚性マンゴー『Olour』の半きょうだい28系統を比較し、樹高、節間、樹皮・木部比などから矮性台木候補7系統を選んだ研究を解説します。",
     content: [
-      "[マンゴー](/fruits/mango)は樹が大きくなりやすく、剪定、収穫、台風対策に労力がかかります。BMC Plant Biologyに2026年9月22日掲載された研究は、多胚性品種『[Olour（オロール）](/fruits/mango/cultivars/olour)』の半きょうだい後代28系統を調べ、高密植栽培に使える矮性台木候補を探しました。",
+      "[マンゴー](/fruits/mango)は樹が大きくなりやすく、剪定、収穫、台風対策に労力がかかります。BMC Plant Biologyに2026年9月22日掲載された研究は、多胚性品種『Olour（オロール）』の半きょうだい後代28系統を調べ、高密植栽培に使える矮性台木候補を探しました。",
       "## 『半きょうだい』を比較する意味",
       "半きょうだいは、片方の親を共有し、もう片方が異なる後代です。同じOlourを母系に持っていても遺伝的な違いが生まれるため、その中から生育の小さい個体を選べます。研究チームは樹高や幹周、節間長だけでなく、光合成、蒸散、気孔密度、クロロフィル、樹皮と木部の重量比、フェノール類、抗酸化能まで統合して評価しました。",
       "## 有望とされた7系統",
@@ -83,7 +83,7 @@ export const dailyEditorialDrafts20260924: EditorialDraft[] = [
       "## 出典",
       "・[BMC Plant Biology: Dissecting dwarfness in half-sib progenies of Olour mango through morpho-physiological and biochemical characterization](https://link.springer.com/article/10.1186/s12870-026-09801-2)（2026年9月22日公開）",
       "## 関連する図鑑ページ",
-      "・[マンゴー](/fruits/mango)\n・[Olour（オロール）](/fruits/mango/cultivars/olour)"
+      "・[マンゴー](/fruits/mango)"
     ].join("\n\n"),
     sourceName: "BMC Plant Biology",
     sourceUrl: "https://link.springer.com/article/10.1186/s12870-026-09801-2",

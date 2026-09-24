@@ -16,7 +16,7 @@ export const editorialThumbnailTargets = [
   { articleSlug: "beginner-mango-quiz-10-questions-20260923", fruitSlug: "mango", photoIndex: 0 },
   { articleSlug: "youtube-mango-iris-tasting-20260918", fruitSlug: "mango", photoIndex: 0 },
   { articleSlug: "youtube-mango-mallika-tasting-20260910", fruitSlug: "mango", cultivarSlug: "mallika", photoIndex: 0 },
-  { articleSlug: "mango-olour-dwarf-rootstock-progenies-20260922", fruitSlug: "mango", cultivarSlug: "olour", photoIndex: 0 },
+  { articleSlug: "mango-olour-dwarf-rootstock-progenies-20260922", fruitSlug: "mango", photoIndex: 0 },
   { articleSlug: "dragon-fruit-integrated-nutrient-management-20260922", fruitSlug: "dragon-fruit", photoIndex: 0 }
 ] as const;
 
