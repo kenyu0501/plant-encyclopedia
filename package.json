@@ -7,7 +7,6 @@
   },
   "scripts": {
     "dev": "next dev",
-    "prebuild": "node scripts/apply-youtube-catalog-enrichment.mjs",
     "build": "next build",
     "start": "next start",
     "lint": "next lint"
