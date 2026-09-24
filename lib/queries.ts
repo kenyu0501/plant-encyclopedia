@@ -15,6 +15,12 @@ export type PublicFruitOption = Pick<Fruit, "id" | "name_ja" | "slug"> & {
   cultivars: Pick<Cultivar, "id" | "fruit_id" | "name_ja" | "slug">[];
 };
 
+export type PublicCultivarSitemapEntry = {
+  cultivarSlug: string;
+  fruitSlug: string;
+  updatedAt: string;
+};
+
 export type ViewerPhotoSubmission = Photo & {
   fruits: Pick<Fruit, "name_ja" | "slug"> | null;
   cultivars: Pick<Cultivar, "name_ja" | "slug"> | null;
@@ -144,6 +150,38 @@ export async function getPublicFruits(limit?: number) {
     videos: uniqueYoutubeLinks((fruit.videos ?? []).filter((video) => video.is_public && !video.cultivar_id)),
     cultivars: (fruit.cultivars ?? []).filter((cultivar) => cultivar.is_public)
   }));
+}
+
+export async function getPublicCultivarSitemapEntries(): Promise<PublicCultivarSitemapEntry[]> {
+  const supabase = await createClient();
+  const { data, error } = await supabase
+    .from("cultivars")
+    .select("slug, updated_at, fruits!inner(slug, is_public)")
+    .eq("is_public", true)
+    .eq("fruits.is_public", true)
+    .order("slug", { ascending: true })
+    .limit(1000);
+
+  if (error) {
+    console.error(error);
+    return [];
+  }
+
+  type SitemapCultivarRow = Pick<Cultivar, "slug" | "updated_at"> & {
+    fruits: Pick<Fruit, "slug"> | Pick<Fruit, "slug">[] | null;
+  };
+
+  return ((data ?? []) as SitemapCultivarRow[])
+    .map((cultivar) => ({
+      cultivar,
+      fruit: Array.isArray(cultivar.fruits) ? cultivar.fruits[0] : cultivar.fruits
+    }))
+    .filter((item): item is { cultivar: SitemapCultivarRow; fruit: Pick<Fruit, "slug"> } => Boolean(item.fruit))
+    .map(({ cultivar, fruit }) => ({
+      cultivarSlug: cultivar.slug,
+      fruitSlug: fruit.slug,
+      updatedAt: cultivar.updated_at
+    }));
 }
 
 export async function getPublicFruitBySlug(slug: string) {
