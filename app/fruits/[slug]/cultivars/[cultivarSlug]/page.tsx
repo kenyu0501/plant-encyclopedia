@@ -5,6 +5,7 @@ import { notFound } from "next/navigation";
 import type { ReactNode } from "react";
 import { Apple, BarChart3, Coffee, Dna, ExternalLink, Flower2, Globe2, ImagePlus, Leaf, Newspaper, Pencil, PlayCircle, Ruler, Scale, Sprout, Thermometer } from "lucide-react";
 import { CommunityPhotoGallery, type CommunityPhotoItem } from "@/components/community-photo-gallery";
+import { ContextNavigation } from "@/components/context-navigation";
 import { CultivarFavoriteButton } from "@/components/cultivar-favorite-button";
 import { JsonLd } from "@/components/json-ld";
 import { PageHeader } from "@/components/page-header";
@@ -155,6 +156,14 @@ export default async function CultivarDetailPage({ params }: Props) {
   return (
     <div className="space-y-7">
       <JsonLd data={structuredData} />
+      <ContextNavigation
+        fallbackHref={`/fruits/${fruitSlug}#cultivars`}
+        trail={[
+          { label: "図鑑", href: "/fruits" },
+          { label: cultivar.fruits.name_ja, href: `/fruits/${fruitSlug}#cultivars` },
+          { label: cultivar.name_ja }
+        ]}
+      />
       <RecentCultivarTracker
         id={cultivar.id}
         fruitName={cultivar.fruits.name_ja}
@@ -336,6 +345,16 @@ export default async function CultivarDetailPage({ params }: Props) {
           </div>
         ) : null}
       </section>
+
+      <ContextNavigation
+        variant="footer"
+        fallbackHref={`/fruits/${fruitSlug}#cultivars`}
+        trail={[]}
+        destinations={[
+          { label: `${cultivar.fruits.name_ja}の品種一覧へ`, href: `/fruits/${fruitSlug}#cultivars` },
+          { label: "果樹図鑑へ", href: "/fruits" }
+        ]}
+      />
     </div>
   );
 }

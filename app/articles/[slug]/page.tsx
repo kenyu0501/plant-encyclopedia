@@ -5,6 +5,7 @@ import { ExternalLink } from "lucide-react";
 import { ArticleLikeButton } from "@/components/article-like-button";
 import { ArticleContent } from "@/components/article-content";
 import { AdSlot } from "@/components/ad-slot";
+import { ContextNavigation } from "@/components/context-navigation";
 import { NewsletterSignup } from "@/components/newsletter-signup";
 import { ShareButtons } from "@/components/share-buttons";
 import { formatArticleDate, getArticleCategory } from "@/lib/articles";
@@ -37,6 +38,14 @@ export default async function ArticlePage({ params }: Props) {
   return (
     <article className="space-y-7">
       <script type="application/ld+json" dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd).replace(/</g, "\\u003c") }} />
+      <ContextNavigation
+        fallbackHref="/articles"
+        trail={[
+          { label: "記事", href: "/articles" },
+          { label: category.label, href: `/articles?category=${article.category}` },
+          { label: article.title }
+        ]}
+      />
       <header className="border-b border-leaf-200 pb-7">
         <Link href={`/articles?category=${article.category}`} className="text-[11px] font-black tracking-[0.2em] text-leaf-700">{category.shortLabel} · {category.label}</Link>
         <h1 className="display-serif mt-4 text-3xl font-bold leading-[1.4] text-leaf-900 sm:text-5xl">{article.title}</h1>
@@ -52,6 +61,15 @@ export default async function ArticlePage({ params }: Props) {
       {article.source_url ? <aside className="mx-auto max-w-3xl rounded-xl border border-leaf-100 bg-leaf-50/70 p-5"><p className="text-xs font-black tracking-widest text-leaf-700">SOURCE</p><a href={article.source_url} target="_blank" rel="noopener noreferrer" className="mt-2 inline-flex items-center gap-2 font-bold text-leaf-900 underline decoration-leaf-300 underline-offset-4">{article.source_name || "出典を確認"}<ExternalLink size={15} /></a><p className="mt-2 text-xs leading-5 text-leaf-900/55">一次資料をご確認ください。記事は出典をもとに独自に解説しています。</p></aside> : null}
       <div className="flex flex-wrap items-center gap-3 border-y border-leaf-200 py-5"><ArticleLikeButton articleId={article.id} initialCount={article.like_count} /><ShareButtons title={article.title} text={article.excerpt} url={url} /></div>
       <NewsletterSignup />
+      <ContextNavigation
+        variant="footer"
+        fallbackHref="/articles"
+        trail={[]}
+        destinations={[
+          { label: `${category.label}の記事一覧へ`, href: `/articles?category=${article.category}` },
+          { label: "すべての記事へ", href: "/articles" }
+        ]}
+      />
     </article>
   );
 }

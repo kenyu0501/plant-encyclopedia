@@ -4,6 +4,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { ExternalLink, ImagePlus, Newspaper, Pencil, PlayCircle } from "lucide-react";
 import { CommunityPhotoGallery, type CommunityPhotoItem } from "@/components/community-photo-gallery";
+import { ContextNavigation } from "@/components/context-navigation";
 import { CultivarList } from "@/components/cultivar-list";
 import { CultivarComparison } from "@/components/cultivar-comparison";
 import { JsonLd } from "@/components/json-ld";
@@ -139,6 +140,13 @@ export default async function FruitDetailPage({ params }: Props) {
   return (
     <div className="space-y-7">
       <JsonLd data={structuredData} />
+      <ContextNavigation
+        fallbackHref="/fruits"
+        trail={[
+          { label: "図鑑", href: "/fruits" },
+          { label: fruit.name_ja }
+        ]}
+      />
       <PageHeader
         title={fruit.name_ja}
         description={fruit.name_en ?? undefined}
@@ -281,6 +289,16 @@ export default async function FruitDetailPage({ params }: Props) {
           </Link>
         </section>
       ) : null}
+
+      <ContextNavigation
+        variant="footer"
+        fallbackHref="/fruits"
+        trail={[]}
+        destinations={[
+          { label: "果樹図鑑の一覧へ", href: "/fruits" },
+          { label: "記事を読む", href: "/articles" }
+        ]}
+      />
     </div>
   );
 }
