@@ -17,7 +17,9 @@ export const editorialThumbnailTargets = [
   { articleSlug: "youtube-mango-iris-tasting-20260918", fruitSlug: "mango", photoIndex: 0 },
   { articleSlug: "youtube-mango-mallika-tasting-20260910", fruitSlug: "mango", cultivarSlug: "mallika", photoIndex: 0 },
   { articleSlug: "mango-olour-dwarf-rootstock-progenies-20260922", fruitSlug: "mango", photoIndex: 0 },
-  { articleSlug: "dragon-fruit-integrated-nutrient-management-20260922", fruitSlug: "dragon-fruit", photoIndex: 0 }
+  { articleSlug: "dragon-fruit-integrated-nutrient-management-20260922", fruitSlug: "dragon-fruit", photoIndex: 0 },
+  { articleSlug: "youtube-soil-microbiome-fruit-growing-20260916", fruitSlug: "banana", photoIndex: 0, youtubeId: "8t25V4bYFx4" },
+  { articleSlug: "youtube-taiwan-high-graft-japanese-pear-20260912", fruitSlug: "japanese-pear", photoIndex: 0, youtubeId: "av_BIyG4Sy8" }
 ] as const;
 
 type ServerSupabaseClient = Awaited<ReturnType<typeof createClient>>;
@@ -30,6 +32,10 @@ export function getEditorialThumbnailUrl(articleSlug: string) {
 export async function getEditorialSourcePhotoUrl(supabase: ServerSupabaseClient, articleSlug: string) {
   const target = editorialThumbnailTargets.find((item) => item.articleSlug === articleSlug);
   if (!target) return null;
+
+  if ("youtubeId" in target && target.youtubeId) {
+    return `https://img.youtube.com/vi/${target.youtubeId}/maxresdefault.jpg`;
+  }
 
   const { data: fruit } = await supabase.from("fruits").select("id").eq("slug", target.fruitSlug).maybeSingle();
   if (!fruit) return null;
