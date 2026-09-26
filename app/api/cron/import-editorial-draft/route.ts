@@ -197,15 +197,42 @@ async function ensureDailyCatalog(supabase: ServiceClient) {
     is_for_sale: false
   });
 
+  const miXue = await ensureCultivar(supabase, pear.id, "mi-xue-pear", {
+    name_ja: "蜜雪梨",
+    name_en: "Mi Xue pear / Tainung Seedling No. 2",
+    origin: "台湾",
+    description: "台湾の種苗改良繁殖場が新世紀梨と横山梨の交配から育成した低温要求量の少ないニホンナシ。選抜時の系統番号は種苗4029、正式品種名は台農種苗二号、商品名は蜜雪梨です。",
+    fruit_size: "平均約450g（台湾種苗改良繁殖場資料）",
+    sugar_content: "11〜13°Brix。動画の試食果は11.2〜11.3°Brix。",
+    taste: "脆く多汁で、酸味とリンゴを思わせる独特の香り。動画では新世紀梨を思わせる風味と評価。",
+    texture: "白く褐変しにくい果肉で、硬めのしゃきしゃきした食感",
+    harvest_season: "台湾では5〜7月、正期果は開花約120日後の7月",
+    cultivar_lineage: "新世紀梨（種子親）×横山梨（花粉親）。1976年交配、系統番号『種苗4029』を経て1995年命名。",
+    okinawa_suitability: "日本梨より低温要求量が少ない可能性がありますが、沖縄での開花安定性、台風耐性、授粉条件、果実品質は未確認です。小規模試験と植物防疫・正規入手経路の確認が必要です。",
+    public_notes: `公的出典: 台湾種苗改良繁殖場「台農種苗二号『蜜雪梨』の選育」https://www.tss.gov.tw/redirect_files.php?file_name=syOAWGEqualWGEqualqret657KQC5TzCtJSM&link=m33qelmWGSlashPYnBpUPZOgJa1AyaWGPlusSDtCbsHSSRb3WFKThRFdfgGKndGM7PUXDZf1BnK\nYouTube現地観察: ${pearUrl}。字幕で4029＝蜜雪梨と確認。試食果は糖度11.2〜11.3°Brix、果汁が多く硬めで、酸味と新世紀梨を思わせる香りがあった。公的資料では長期貯蔵に不向きで、7〜10℃で約2週間、5℃以下では低温障害が生じやすい。`,
+    is_public: true,
+    is_for_sale: false
+  });
+
+  await appendPublicNote(
+    supabase,
+    "fruits",
+    pear,
+    "字幕再確認（2026-09-26）: 4029＝蜜雪梨",
+    `【字幕再確認（2026-09-26）: 4029＝蜜雪梨】\n提供字幕と台湾種苗改良繁殖場資料を照合し、動画の系統番号4029は、正式品種名「台農種苗二号」、商品名「蜜雪梨」であることを確認。新世紀梨×横山梨の交配で、低温要求量が比較的少ない。旧メモの「名称未確定」は本追記により訂正。動画: ${pearUrl}`
+  );
+
   const pearDescription = "台湾の低標高地で、低温を受けた花芽付き穂木を毎年高接ぎする梨栽培を取材。豊水と寶島甘露を実食。";
   await ensureVideo(supabase, pear.id, null, pearUrl, "台湾で日本の高級梨を作る高接ぎ技術", pearDescription);
   await ensureVideo(supabase, pear.id, hosui.id, pearUrl, "台湾の高接ぎ梨『豊水』", pearDescription);
   await ensureVideo(supabase, pear.id, ganlu.id, pearUrl, "台湾育成梨『寶島甘露』を実食", pearDescription);
+  await ensureVideo(supabase, pear.id, miXue.id, pearUrl, "台湾育成梨『蜜雪梨（4029）』を実食", "台湾育成の蜜雪梨（台農種苗二号・系統4029）を実食。糖度11.2〜11.3°Brixで、果汁、硬めの食感、酸味とリンゴ様の香りを記録。");
 
   return [
     { name: "ニホンナシ", url: getAbsoluteUrl("/fruits/japanese-pear") },
     { name: "豊水", url: getAbsoluteUrl("/fruits/japanese-pear/cultivars/hosui") },
     { name: "寶島甘露", url: getAbsoluteUrl("/fruits/japanese-pear/cultivars/baodao-ganlu") },
+    { name: "蜜雪梨（台農種苗二号・4029）", url: getAbsoluteUrl("/fruits/japanese-pear/cultivars/mi-xue-pear") },
     { name: "バナナ（栽培メモ追記）", url: getAbsoluteUrl("/fruits/banana") },
     { name: "マンゴー（栽培メモ追記）", url: getAbsoluteUrl("/fruits/mango") }
   ];
