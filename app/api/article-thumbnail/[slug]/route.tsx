@@ -3,6 +3,7 @@ import { getEditorialDraft202609 } from "@/lib/editorial-drafts-2026-09";
 import { getYoutubeEditorialDraft202609 } from "@/lib/youtube-editorial-drafts-2026-09";
 import { getDailyEditorialDraft20260924 } from "@/lib/daily-editorial-drafts-2026-09-24";
 import { getDailyEditorialDraft20260925 } from "@/lib/daily-editorial-drafts-2026-09-25";
+import { getDailyEditorialDraft20260926 } from "@/lib/daily-editorial-drafts-2026-09-26";
 import { getEditorialSourcePhotoUrl } from "@/lib/editorial-thumbnails";
 import { createClient } from "@/lib/supabase-server";
 
@@ -12,7 +13,7 @@ type Props = { params: Promise<{ slug: string }> };
 
 export async function GET(_request: Request, { params }: Props) {
   const { slug } = await params;
-  const draft = getEditorialDraft202609(slug) ?? getYoutubeEditorialDraft202609(slug) ?? getDailyEditorialDraft20260924(slug) ?? getDailyEditorialDraft20260925(slug);
+  const draft = getEditorialDraft202609(slug) ?? getYoutubeEditorialDraft202609(slug) ?? getDailyEditorialDraft20260924(slug) ?? getDailyEditorialDraft20260925(slug) ?? getDailyEditorialDraft20260926(slug);
   if (!draft) return new Response("Not found", { status: 404 });
 
   const supabase = await createClient();

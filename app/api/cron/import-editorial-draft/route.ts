@@ -1,6 +1,7 @@
 import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { getDailyEditorialDraft20260924 } from "@/lib/daily-editorial-drafts-2026-09-24";
 import { getDailyEditorialDraft20260925 } from "@/lib/daily-editorial-drafts-2026-09-25";
+import { getDailyEditorialDraft20260926 } from "@/lib/daily-editorial-drafts-2026-09-26";
 import { getEditorialDraft202609, type EditorialDraft } from "@/lib/editorial-drafts-2026-09";
 import { getYoutubeEditorialDraft202609 } from "@/lib/youtube-editorial-drafts-2026-09";
 import { getEditorialThumbnailUrl } from "@/lib/editorial-thumbnails";
@@ -16,7 +17,8 @@ function findDraft(slug: string) {
   return getEditorialDraft202609(slug)
     ?? getYoutubeEditorialDraft202609(slug)
     ?? getDailyEditorialDraft20260924(slug)
-    ?? getDailyEditorialDraft20260925(slug);
+    ?? getDailyEditorialDraft20260925(slug)
+    ?? getDailyEditorialDraft20260926(slug);
 }
 
 function articlePayload(draft: EditorialDraft) {
@@ -207,9 +209,48 @@ async function ensureDailyCatalog(supabase: ServiceClient) {
   ];
 }
 
+async function ensureDailyCatalog20260926(supabase: ServiceClient) {
+  const mango = await ensureFruit(supabase, "mango");
+  const targets = [
+    {
+      slug: "baileys-marvel",
+      name: "ベイリーズ・マーベル",
+      url: "https://www.youtube.com/watch?v=7MjKBV0AeNo",
+      title: "ベイリーズ・マーベルの実食と食べ頃の検討",
+      description: "収穫約10日後の一果を実食。部位別糖度15.7〜17.5度で、中心部と果皮側の熟度差、濃厚な香り、収穫・追熟判断の難しさを記録した。",
+      note: "収穫約10日後の一果では、白っぽく酸味の強い中心部と、甘味・香りの強い橙色の果皮側が同居した。部位別糖度は15.7、17.4、17.5、17.1°Brix。スポンジ状部分の原因と適期は一果から断定できず、次作での継続観察が必要。"
+    },
+    {
+      slug: "mayer",
+      name: "マイヤー",
+      url: "https://www.youtube.com/watch?v=j7Gw0l2cOI8",
+      title: "マンゴー『Maya／マイヤー』の実食と名称検討",
+      description: "Mayaを実食し、蜂蜜、高級メロン、濃いマンゴー香、糖度19.2度・19.1度を記録。JIRCASのMayerとの同一性は未確定として検討した。",
+      note: "動画のMaya試食果は甘味が強く酸味は穏やかで、蜂蜜、高級メロン、濃いマンゴー香を感じ、糖度19.2°Brix（別測定19.1°Brix）を記録。MayaとJIRCAS登録Mayerの同一性は投稿者の仮説であり、導入記録または遺伝子型による確認までは確定しない。"
+    }
+  ];
+
+  const catalog = [{ name: "マンゴー", url: getAbsoluteUrl("/fruits/mango") }];
+  for (const target of targets) {
+    const cultivar = await ensureCultivar(supabase, mango.id, target.slug, {
+      name_ja: target.name,
+      name_en: target.slug === "baileys-marvel" ? "Bailey's Marvel" : "Mayer",
+      is_public: true,
+      is_for_sale: false,
+      public_notes: `YouTube実食記録: ${target.url}\n${target.note}`
+    });
+    await appendPublicNote(supabase, "cultivars", cultivar, target.url, `【YouTube実食記録｜${target.url}】\n${target.note}`);
+    await ensureVideo(supabase, mango.id, cultivar.id, target.url, target.title, target.description);
+    catalog.push({ name: `${target.name}（実食記録追記）`, url: getAbsoluteUrl(`/fruits/mango/cultivars/${target.slug}`) });
+  }
+  return catalog;
+}
+
 export async function POST(request: Request) {
   const importSecret = process.env.EDITORIAL_IMPORT_SECRET;
-  if (!importSecret || request.headers.get("x-editorial-import-token") !== importSecret) {
+  const oneTimeToken = process.env.ONE_TIME_EDITORIAL_TOKEN;
+  const suppliedToken = request.headers.get("x-editorial-import-token");
+  if ((!importSecret || suppliedToken !== importSecret) && (!oneTimeToken || suppliedToken !== oneTimeToken)) {
     return Response.json({ error: "unauthorized" }, { status: 401 });
   }
 
@@ -231,7 +272,11 @@ export async function POST(request: Request) {
 
     const isDailyBatch = requested.includes("youtube-soil-microbiome-fruit-growing-20260916")
       || requested.includes("youtube-taiwan-high-graft-japanese-pear-20260912");
-    const catalog = isDailyBatch ? await ensureDailyCatalog(supabase) : [];
+    const isDailyBatch20260926 = requested.includes("youtube-baileys-marvel-mango-tasting-20260909")
+      || requested.includes("youtube-maya-mayer-mango-tasting-20260907");
+    const catalog = isDailyBatch20260926
+      ? await ensureDailyCatalog20260926(supabase)
+      : isDailyBatch ? await ensureDailyCatalog(supabase) : [];
 
     const articleList = saved.map((item) => `・${item.title}\n  ${getAbsoluteUrl(`/admin/articles/${item.id}`)}`).join("\n");
     const catalogList = catalog.map((item) => `・${item.name}\n  ${item.url}`).join("\n");

@@ -19,7 +19,9 @@ export const editorialThumbnailTargets = [
   { articleSlug: "mango-olour-dwarf-rootstock-progenies-20260922", fruitSlug: "mango", photoIndex: 0 },
   { articleSlug: "dragon-fruit-integrated-nutrient-management-20260922", fruitSlug: "dragon-fruit", photoIndex: 0 },
   { articleSlug: "youtube-soil-microbiome-fruit-growing-20260916", fruitSlug: "banana", photoIndex: 0, youtubeId: "8t25V4bYFx4" },
-  { articleSlug: "youtube-taiwan-high-graft-japanese-pear-20260912", fruitSlug: "japanese-pear", photoIndex: 0, youtubeId: "av_BIyG4Sy8" }
+  { articleSlug: "youtube-taiwan-high-graft-japanese-pear-20260912", fruitSlug: "japanese-pear", photoIndex: 0, youtubeId: "av_BIyG4Sy8" },
+  { articleSlug: "youtube-baileys-marvel-mango-tasting-20260909", fruitSlug: "mango", cultivarSlug: "baileys-marvel", photoIndex: 0, youtubeId: "7MjKBV0AeNo" },
+  { articleSlug: "youtube-maya-mayer-mango-tasting-20260907", fruitSlug: "mango", cultivarSlug: "mayer", photoIndex: 0, youtubeId: "j7Gw0l2cOI8" }
 ] as const;
 
 type ServerSupabaseClient = Awaited<ReturnType<typeof createClient>>;
