@@ -22,6 +22,17 @@ export const editorialThumbnailTargets = [
   { articleSlug: "youtube-taiwan-high-graft-japanese-pear-20260912", fruitSlug: "japanese-pear", photoIndex: 0, youtubeId: "av_BIyG4Sy8" },
   { articleSlug: "youtube-baileys-marvel-mango-tasting-20260909", fruitSlug: "mango", cultivarSlug: "baileys-marvel", photoIndex: 0, youtubeId: "7MjKBV0AeNo" },
   { articleSlug: "youtube-maya-mayer-mango-tasting-20260907", fruitSlug: "mango", cultivarSlug: "mayer", photoIndex: 0, youtubeId: "j7Gw0l2cOI8" }
+  ,{ articleSlug: "mango-hot-water-microrna-heat-response-20260217", fruitSlug: "mango", photoIndex: 0 }
+  ,{ articleSlug: "mango-nirs-acidity-vitamin-c-machine-learning-20260613", fruitSlug: "mango", photoIndex: 1 }
+  ,{ articleSlug: "hass-avocado-altitude-soil-fruit-quality-20260416", fruitSlug: "avocado", cultivarSlug: "hass", photoIndex: 0 }
+  ,{ articleSlug: "avocado-uav-canopy-nitrogen-yield-quality-20260801", fruitSlug: "avocado", photoIndex: 0 }
+  ,{ articleSlug: "banana-ratoon-corm-microbiome-fusarium-20260203", fruitSlug: "banana", photoIndex: 0 }
+  ,{ articleSlug: "rubber-banana-intercrop-organic-nitrogen-20260731", fruitSlug: "banana", photoIndex: 1 }
+  ,{ articleSlug: "papaya-banana-anthracnose-essential-oil-nanoemulsion-20260903", fruitSlug: "papaya", photoIndex: 0 }
+  ,{ articleSlug: "passion-fruit-spent-mushroom-substrate-yield-20260907", fruitSlug: "passion-fruit", photoIndex: 0 }
+  ,{ articleSlug: "passion-fruit-thrips-climate-ipm-20260227", fruitSlug: "passion-fruit", photoIndex: 1 }
+  ,{ articleSlug: "banana-nine-ripening-stages-biochemical-profile-20260518", fruitSlug: "banana", photoIndex: 2 }
+  ,{ articleSlug: "pineapple-unemat-rubi-spineless-fusariosis-resistant-20250513", fruitSlug: "pineapple", photoIndex: 0 }
 ] as const;
 
 type ServerSupabaseClient = Awaited<ReturnType<typeof createClient>>;

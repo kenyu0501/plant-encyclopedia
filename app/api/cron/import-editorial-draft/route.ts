@@ -2,6 +2,7 @@ import { createClient, type SupabaseClient } from "@supabase/supabase-js";
 import { getDailyEditorialDraft20260924 } from "@/lib/daily-editorial-drafts-2026-09-24";
 import { getDailyEditorialDraft20260925 } from "@/lib/daily-editorial-drafts-2026-09-25";
 import { getDailyEditorialDraft20260926 } from "@/lib/daily-editorial-drafts-2026-09-26";
+import { getResearchEditorialDraft20260926 } from "@/lib/research-editorial-drafts-2026-09-26";
 import { getEditorialDraft202609, type EditorialDraft } from "@/lib/editorial-drafts-2026-09";
 import { getYoutubeEditorialDraft202609 } from "@/lib/youtube-editorial-drafts-2026-09";
 import { getEditorialThumbnailUrl } from "@/lib/editorial-thumbnails";
@@ -18,7 +19,8 @@ function findDraft(slug: string) {
     ?? getYoutubeEditorialDraft202609(slug)
     ?? getDailyEditorialDraft20260924(slug)
     ?? getDailyEditorialDraft20260925(slug)
-    ?? getDailyEditorialDraft20260926(slug);
+    ?? getDailyEditorialDraft20260926(slug)
+    ?? getResearchEditorialDraft20260926(slug);
 }
 
 function articlePayload(draft: EditorialDraft) {
@@ -248,12 +250,14 @@ async function ensureDailyCatalog20260926(supabase: ServiceClient) {
 
 export async function POST(request: Request) {
   const importSecret = process.env.EDITORIAL_IMPORT_SECRET;
-  if (!importSecret || request.headers.get("x-editorial-import-token") !== importSecret) {
+  const oneTimeToken = process.env.ONE_TIME_EDITORIAL_TOKEN;
+  const suppliedToken = request.headers.get("x-editorial-import-token");
+  if ((!importSecret || suppliedToken !== importSecret) && (!oneTimeToken || suppliedToken !== oneTimeToken)) {
     return Response.json({ error: "unauthorized" }, { status: 401 });
   }
 
   const body = await request.json().catch(() => null) as { slug?: string; slugs?: string[] } | null;
-  const requested = Array.from(new Set((body?.slugs?.length ? body.slugs : body?.slug ? [body.slug] : []).filter(Boolean))).slice(0, 8);
+  const requested = Array.from(new Set((body?.slugs?.length ? body.slugs : body?.slug ? [body.slug] : []).filter(Boolean))).slice(0, 12);
   if (!requested.length) return Response.json({ error: "draft_not_found" }, { status: 404 });
   const drafts = requested.map(findDraft);
   if (drafts.some((draft) => !draft)) return Response.json({ error: "draft_not_found" }, { status: 404 });
