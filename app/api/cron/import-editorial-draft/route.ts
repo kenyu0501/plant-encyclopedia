@@ -248,9 +248,7 @@ async function ensureDailyCatalog20260926(supabase: ServiceClient) {
 
 export async function POST(request: Request) {
   const importSecret = process.env.EDITORIAL_IMPORT_SECRET;
-  const oneTimeToken = process.env.ONE_TIME_EDITORIAL_TOKEN;
-  const suppliedToken = request.headers.get("x-editorial-import-token");
-  if ((!importSecret || suppliedToken !== importSecret) && (!oneTimeToken || suppliedToken !== oneTimeToken)) {
+  if (!importSecret || request.headers.get("x-editorial-import-token") !== importSecret) {
     return Response.json({ error: "unauthorized" }, { status: 401 });
   }
 
